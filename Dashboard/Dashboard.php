@@ -31,10 +31,6 @@
             Like
         </a>
         <a href="#" class="menu-item">
-            <i>👑</i>
-            Premium
-        </a>
-        <a href="#" class="menu-item">
             <i>👤</i>
             Profile
         </a>
