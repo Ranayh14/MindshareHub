@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindshareHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
         body {
@@ -36,7 +37,8 @@
 
     <!-- Features Section -->
     <section class="space-y-20 px-10 mt-10">
-        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10">
+        <!-- Forum Anonym -->
+        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 reveal">
             <div class="flex-1 text-left">
                 <h2 class="text-2xl font-semibold mb-4 text-white">Forum Anonym</h2>
                 <p class="text-gray-300 leading-relaxed text-sm">
@@ -51,8 +53,8 @@
             </div>
         </div>
 
-        <!-- Feature 2 -->
-        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10">
+        <!-- Chat Anonym -->
+        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 reveal">
             <div class="flex-1 text-left">
                 <h2 class="text-2xl font-semibold mb-4 text-white">Chat Anonym</h2>
                 <p class="text-gray-300 leading-relaxed text-sm">
@@ -66,8 +68,8 @@
             </div>
         </div>
 
-        <!-- Feature 3 -->
-        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10">
+        <!-- Diary -->
+        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 reveal">
             <div class="flex-1 text-left">
                 <h2 class="text-2xl font-semibold mb-4 text-white">Diary</h2>
                 <p class="text-gray-300 leading-relaxed text-sm">
@@ -94,9 +96,19 @@
     </section>
 
     <!-- Footer -->
-    <footer class="text-center py-6  mt-10">
+    <footer class="text-center py-6 mt-10">
         <p class="text-xs text-gray-300">© 2024 MindshareHub. Hak cipta dilindungi.</p>
     </footer>
 
+    <script>
+        // ScrollReveal animation
+        ScrollReveal().reveal('.reveal', {
+            origin: 'bottom',
+            distance: '50px',
+            duration: 800,
+            easing: 'ease-in-out',
+            interval: 200,
+        });
+    </script>
 </body>
 </html>
