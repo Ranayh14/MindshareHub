@@ -3,10 +3,9 @@
     --primary-color: #2B1B54;
     --text-color: #ffffff;
     --text-secondary: #B4B4B4;
-    --white-color: #ffffff;
+    --white-color: #ffffff; /* Menambahkan variable untuk warna putih */
 }
 
-/* Reset styles */
 * {
     margin: 0;
     padding: 0;
@@ -15,72 +14,106 @@
 
 /* Body styling */
 body {
-    background-color: var(--primary-color);
-    background-image: url('Login - visible (1).png');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
+    background-color: var(--primary-color); /* Warna latar belakang default */
+    background-image: url('Login - visible (1).png'); /* Ganti dengan path gambar Anda */
+    background-size: cover; /* Gambar menutupi seluruh elemen */
+    background-position: center center; /* Gambar ditempatkan di tengah */
+    background-repeat: no-repeat; /* Menghindari pengulangan gambar */
     color: var(--text-color);
     font-family: 'Poppins', sans-serif;
-    min-height: 100vh;
+    min-height: 100vh; /* Pastikan body memiliki tinggi minimal */
     position: relative;
-    padding-bottom: 60px;
+    padding-bottom: 60px; /* Memberikan ruang untuk footer jika konten sedikit */
 }
 
 /* Sticky Header */
 .header {
-    display: flex; /* Use flexbox to align items */
-    justify-content: space-between; /* Space out the items */
-    align-items: center; /* Vertically center the items */
-    position: sticky;
-    top: 0;
+    position: sticky;  /* Menjadikan header sticky */
+    top: 0;  /* Tetap di atas layar */
     padding: 20px 40px;
-    background-color: var(--primary-color);
-    z-index: 1000;
+    text-align: right;
+    background-color: var(--primary-color); /* Memberikan latar belakang agar header tetap terlihat */
+    z-index: 1000;  /* Agar header tetap berada di atas elemen lainnya */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.header .logo-container {
-    display: flex;
-    align-items: center;
-}
-
-.logo-container img {
-    width: 80px;
-    height: auto;
-}
-
-/* Buttons: Login and Register */
-.header .login-register-btns {
-    display: flex; /* Align buttons in a row */
-    justify-content: flex-start; /* Align to the left */
-    gap: 20px; /* Add space between buttons */
-}
-
+/* Tombol Login dan Register */
 .login-btn, .register-btn {
     color: var(--text-color);
     text-decoration: none;
     font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 20px;
+    margin-left: 20px; /* Memberikan jarak antara tombol Login dan Register */
+    padding: 10px 20px; /* Memberikan ruang di sekitar teks */
+    border-radius: 20px; /* Membuat sudut melengkung pada tombol */
     display: inline-block;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Efek transisi */
 }
 
+/* Efek Hover untuk tombol Login */
 .login-btn:hover {
-    background-color: var(--white-color);
-    color: var(--primary-color);
-    transform: scale(1.05);
+    background-color: var(--white-color); /* Mengubah warna latar belakang saat hover */
+    color: var(--primary-color); /* Mengubah warna teks saat hover */
+    transform: scale(1.05); /* Efek memperbesar sedikit tombol */
 }
 
+/* Register Button */
 .register-btn {
-    background-color: var(--white-color);
-    color: var(--primary-color);
-    font-weight: 600;
+    background-color: var(--white-color); /* Memberikan latar belakang putih */
+    color: var(--primary-color); /* Memberikan warna teks sesuai dengan warna utama */
+    font-weight: 600; /* Membuat teks lebih tebal */
 }
 
 .register-btn:hover {
-    background-color: #f4f4f4;
+    background-color: #f4f4f4; /* Warna latar belakang saat hover */
+}
+
+/* Container utama */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    min-height: 100vh; /* Pastikan konten cukup panjang untuk di-scroll */
+}
+
+/* Top Decorations */
+.top-decorations {
+    position: absolute;
+    width: 100%;
+    height: 100px;
+    top: 0;
+}
+
+.star-white {
+    position: absolute;
+    left: 50px;
+    top: 20px;
+    color: white;
+    font-size: 24px;
+}
+
+.star-small {
+    position: absolute;
+    left: 50px;
+    top: 60px;
+    color: white;
+    font-size: 12px;
+}
+
+.moon {
+    position: absolute;
+    right: 50px;
+    top: 20px;
+    color: #6B4E9F;
+    font-size: 24px;
+}
+
+.dot-white {
+    position: absolute;
+    right: 30px;
+    top: 50px;
+    color: white;
+    font-size: 12px;
 }
 
 /* Welcome Section */
@@ -96,9 +129,17 @@ body {
     margin-bottom: 20px;
 }
 
-/* Brand Name Styling */
-.brand-name-container {
-    margin-top: 20px;
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo-container img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
 }
 
 .brand-name {
@@ -106,12 +147,11 @@ body {
     color: var(--primary-color);
     padding: 8px 24px;
     border-radius: 20px;
-    font-weight: 600;
-    font-size: 36px;
-    display: inline-block;
+    font-weight: 500;
+    font-size: 16px;
 }
 
-/* Features Section */
+/* Features */
 .features {
     display: flex;
     flex-direction: column;
@@ -122,32 +162,32 @@ body {
 
 .feature-section {
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Mengubah menjadi center untuk keseimbangan */
     align-items: center;
     gap: 40px;
-    max-width: 1000px;
+    max-width: 1000px; /* Membatasi lebar untuk memastikan keselarasan */
     margin: 0 auto;
 }
 
 .feature-text {
     flex: 1;
     text-align: left;
-    margin: 0 auto;
-    max-width: 800px;
+    margin: 0 auto;  /* Agar berada di tengah dengan jarak yang cukup */
+    max-width: 800px; /* Membatasi lebar teks */
 }
 
 .feature-text h2 {
     font-size: 24px;
     font-weight: 500;
     margin-bottom: 16px;
-    text-align: left;
+    text-align: left; /* Mengatur judul tetap rata kiri */
 }
 
 .feature-text p {
     color: var(--text-secondary);
     line-height: 1.6;
     font-size: 15px;
-    text-align: left;
+    text-align: left; /* Mengatur teks tetap rata kiri */
 }
 
 .feature-icon {
@@ -169,7 +209,7 @@ footer {
     text-align: center;
     position: relative;
     width: 100%;
-    margin-top: 50px;
+    margin-top: 50px; /* Memberi ruang antara konten dan footer */
     bottom: 0;
 }
 
@@ -178,6 +218,39 @@ footer {
     margin: 0 auto;
     font-size: 14px;
     color: #fff;
+}
+
+/* Cookie Consent Banner */
+.cookie-consent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8); /* Latar belakang semi-transparan */
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    z-index: 9999;
+    display: none; /* Tersembunyi secara default */
+}
+
+.cookie-message {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.accept-cookies {
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.accept-cookies:hover {
+    background-color: #3a1d60;
 }
 
 /* Responsive Design */
@@ -197,6 +270,10 @@ footer {
     .feature-icon {
         margin-bottom: 20px;
     }
+
+    .top-decorations {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
@@ -205,7 +282,7 @@ footer {
     }
 
     .brand-name {
-        font-size: 28px; 
+        font-size: 14px;
     }
 
     .feature-text h2 {
