@@ -105,7 +105,7 @@ body {
 /* Right Sidebar */
 .right-sidebar {
     padding: 20px;
-    background-color: #1a1a1a;
+    background-color: #13141f;
     color: white;
 }
 
@@ -195,4 +195,37 @@ body {
 
 .user-name {
     font-size: 14px;
+}
+
+/* Atur gambar agar selalu di tengah */
+.carousel-item img {
+    object-fit: cover; /* Mengatur gambar agar proporsional */
+    height: 100%;
+    width: auto;
+    margin: auto;
+}
+
+/* Tombol navigasi carousel */
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.carousel-button:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.carousel-button-prev {
+    left: 1rem;
+}
+
+.carousel-button-next {
+    right: 1rem;
 }
