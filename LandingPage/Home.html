@@ -5,11 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindshareHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/scrollreveal"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
         body {
             font-family: 'Poppins', sans-serif;
+        }
+
+        /* Animasi fade-in */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
         }
     </style>
 </head>
@@ -22,8 +31,8 @@
         </div>
         <!-- Login & Register Buttons -->
         <div class="flex gap-4">
-            <a href="login.html" class="py-2 px-4 text-white border border-white rounded-full hover:bg-white hover:text-[#2B1B54] transition">Login</a>
-            <a href="register.html" class="py-2 px-4 bg-white text-[#2B1B54] font-semibold rounded-full hover:bg-gray-200 transition">Register</a>
+            <a href="/login/login.html" class="py-2 px-4 text-white border border-white rounded-full hover:bg-white hover:text-[#2B1B54] transition">Login</a>
+            <a href="/register/register.html" class="py-2 px-4 bg-white text-[#2B1B54] font-semibold rounded-full hover:bg-gray-200 transition">Register</a>
         </div>
     </header>
 
@@ -38,7 +47,7 @@
     <!-- Features Section -->
     <section class="space-y-20 px-10 mt-10">
         <!-- Forum Anonym -->
-        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 reveal">
+        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 fade-in">
             <div class="flex-1 text-left">
                 <h2 class="text-2xl font-semibold mb-4 text-white">Forum Anonym</h2>
                 <p class="text-gray-300 leading-relaxed text-sm">
@@ -54,7 +63,7 @@
         </div>
 
         <!-- Chat Anonym -->
-        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 reveal">
+        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 fade-in">
             <div class="flex-1 text-left">
                 <h2 class="text-2xl font-semibold mb-4 text-white">Chat Anonym</h2>
                 <p class="text-gray-300 leading-relaxed text-sm">
@@ -69,7 +78,7 @@
         </div>
 
         <!-- Diary -->
-        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 reveal">
+        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 fade-in">
             <div class="flex-1 text-left">
                 <h2 class="text-2xl font-semibold mb-4 text-white">Diary</h2>
                 <p class="text-gray-300 leading-relaxed text-sm">
@@ -85,6 +94,18 @@
         </div>
     </section>
 
+    <!-- Cookie Consent Section (Modern Design) -->
+    <div id="cookieConsent" class="fixed bottom-0 left-0 right-0 bg-white text-[#2B1B54] py-4 px-8 flex items-center justify-between shadow-lg z-50 rounded-t-lg">
+        <div class="flex items-center gap-4">
+            <span class="text-sm">
+                We use cookies to ensure you get the best experience on our website.
+            </span>
+        </div>
+        <button id="acceptCookies" class="py-2 px-6 bg-[#2B1B54] text-white font-semibold rounded-full hover:bg-[#4C3A75] transition">
+            Got it!
+        </button>
+    </div>
+
     <!-- Terms and Conditions Card -->
     <section class="mt-16 bg-[#2B1B54] text-white py-8 px-10 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105 max-w-4xl mx-auto">
         <h2 class="text-xl font-semibold mb-4">Terms and Conditions</h2>
@@ -96,19 +117,26 @@
     </section>
 
     <!-- Footer -->
-    <footer class="text-center py-6 mt-10">
+    <footer class="text-center py-6  mt-10">
         <p class="text-xs text-gray-300">© 2024 MindshareHub. Hak cipta dilindungi.</p>
     </footer>
 
     <script>
-        // ScrollReveal animation
-        ScrollReveal().reveal('.reveal', {
-            origin: 'bottom',
-            distance: '50px',
-            duration: 800,
-            easing: 'ease-in-out',
-            interval: 200,
+        // Cookie consent functionality
+        const cookieConsent = document.getElementById('cookieConsent');
+        const acceptCookies = document.getElementById('acceptCookies');
+
+        // Check if the user has already accepted cookies
+        if (!localStorage.getItem('cookieAccepted')) {
+            cookieConsent.classList.remove('hidden');
+        }
+
+        // Hide cookie consent when accepted
+        acceptCookies.addEventListener('click', () => {
+            localStorage.setItem('cookieAccepted', 'true');
+            cookieConsent.classList.add('hidden');
         });
     </script>
+
 </body>
 </html>
