@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     // Simpan data pengguna ke dalam session
                     $_SESSION['username'] = $user['username'];
                     $_SESSION['roles'] = $user['roles'];
+                    $_SESSION['user_id'] = $user['id'];
 
                     // Redirect berdasarkan role
                     if ($user['roles'] === 'admin') {
