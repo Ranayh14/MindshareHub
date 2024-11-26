@@ -50,11 +50,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Hash password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
+        // Tentukan role berdasarkan email
+        $role = (strpos($email, '@admin.mindsharehub.ac.id') !== false) ? 'admin' : 'user';
+
         // Generate username
-        $username = generateUsername($conn);
+        if ($role === 'user') {
+            // Untuk user biasa, generate username otomatis
+            $username = generateUsername($conn);
+        } else {
+            // Untuk admin, ambil bagian sebelum "@"
+            $username = substr($email, 0, strpos($email, '@'));
+        }
 
         // Simpan data ke database
-        $query = "INSERT INTO users (username, email, pass) VALUES ('$username', '$email', '$hashed_password')";
+        $query = "INSERT INTO users (username, email, pass, roles) VALUES ('$username', '$email', '$hashed_password', '$role')";
         if ($conn->query($query) === TRUE) {
             echo "<script>alert('Registrasi berhasil! Username Anda: $username'); window.location.href='/login/login.html';</script>";
         } else {
