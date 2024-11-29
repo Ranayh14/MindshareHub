@@ -22,10 +22,13 @@ if (!isset($_SESSION['user_id'])) {
 <body>
 
     <!-- Sidebar -->
-    <?php include('sidebar.html');   ?>
+    <div class="fixed top-0 left-0 h-screen w-64 z-50">
+        <?php include('../slicing/sidebar.html'); ?>
+    </div>
+    
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content ml-64 mr-4">
         <div id="default-carousel" class="relative w-full" data-carousel="slide">
             <!-- Carousel wrapper -->
             <div class="relative flex items-center justify-center h-40 overflow-hidden rounded-lg md:h-71">
@@ -43,7 +46,7 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
             </div>
             <!-- Slider indicators -->
-            <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
+            <div class="absolute z-30 flex-translate-x-1/2 bottom-5 left-1/2 space-x-3">
                 <button type="button" class="w-3 h-3 rounded-full" aria-current="true" aria-label="Slide 1" data-carousel-slide-to="0"></button>
                 <button type="button" class="w-3 h-3 rounded-full" aria-label="Slide 2" data-carousel-slide-to="1"></button>
                 <button type="button" class="w-3 h-3 rounded-full" aria-label="Slide 3" data-carousel-slide-to="2"></button>
@@ -113,7 +116,9 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 
     <!-- Right Sidebar -->
-    <?php include('rightSidebar.html'); ?>
+     <div class="sticky top-0 right-0 h-screen w-64 bg-white z-50">
+        <?php include('../slicing/rightSidebar.html'); ?>
+     </div>
 </body>
 </html>
 
