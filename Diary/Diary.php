@@ -7,44 +7,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#1a1b26] text-white flex">
-    <div class="sidebar w-60 bg-[#13141f] h-screen p-5 flex flex-col justify-between">
-        <div>
-            <div class="logo text-xl font-bold mb-8">MindshareHub</div>
-            <nav class="menu space-y-2">
-                <a href="#" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">🏠</span> Home
-                </a>
-                <a href="#" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">🔔</span> Notifications
-                </a>
-                <a href="#" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">💭</span> Chat anonym
-                </a>
-                <a href="#" class="menu-item flex items-center p-3 bg-[#2d2d3d] text-white rounded transition">
-                    <span class="mr-2">📔</span> Diary
-                </a>
-                <a href="#" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">❤️</span> Like
-                </a>
-                <a href="#" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">👑</span> Premium
-                </a>
-                <a href="#" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">👤</span> Profile
-                </a>
-            </nav>
-        </div>
-        <div class="user-profile flex items-center justify-between">
-            <div class="user-avatar w-10 h-10 bg-[#2d2d3d] rounded-full mr-3"></div>
-            <span>User1234</span>
-            <button class="more-options text-[#8e8ea0] text-xl">•••</button>
-        </div>
+    <!-- sidebar -->
+    <div>
+        <?php include('../slicing/sidebar.html'); ?>
     </div>
 
     <div class="main-content flex-1 p-5">
         <div class="header flex items-center justify-between mb-5">
             <div class="title-container flex-grow mr-2">
-                <input type="text" class="title-input w-full p-3 bg-[#2d2d3d] text-white text-lg rounded outline-none" placeholder="Rasa Lelah" value="">
+                <input type="text" class="title-input w-full p-3 bg-[#2d2d3d] text-white text-lg rounded outline-none" placeholder="Judul" value="">
             </div>
             <div class="actions flex space-x-2">
                 <button class="new-note-btn px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
