@@ -3,34 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>sidebar</title>
+    <title>Sidebar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
 </head>
 <body>
     <div class="sidebar w-60 bg-[#13141f] h-screen p-5 flex flex-col justify-between">
         <div>
-            <div class="logo text-xl font-bold mb-8">MindshareHub</div>
+            <div class="logo text-xl font-bold mb-8 text-white">MindshareHub</div>
             <nav class="menu space-y-2">
                 <a href="/Dashboard/Dashboard.php" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">🏠</span> Home
+                    <span class="icon w-6 h-6 flex items-center justify-center mr-3">
+                        <i class="fi fi-rr-home"></i>
+                    </span>
+                    Home
                 </a>
                 <a href="#" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">🔔</span> Notifications
+                    <span class="icon w-6 h-6 flex items-center justify-center mr-3">
+                        <i class="fi fi-rr-bell"></i>
+                    </span>
+                    Notifications
                 </a>
                 <a href="#" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">💭</span> Chat anonym
+                    <span class="icon w-6 h-6 flex items-center justify-center mr-3">
+                        <i class="fi fi-rr-comment-alt-middle"></i>
+                    </span>
+                    Chat Anonym
                 </a>
-                <a href="/Diary/Diary.php" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] rounded transition">
-                    <span class="mr-2">📔</span> Diary
+
+                <a href="/Diary/Diary.php" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
+                    <span class="icon w-6 h-6 flex items-center justify-center mr-3">
+                        <i class="fi fi-rr-book"></i>
+                    </span>
+                    Diary
                 </a>
                 <a href="#" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
-                    <span class="mr-2">👤</span> Profile
+                    <span class="icon w-6 h-6 flex items-center justify-center mr-3">
+                        <i class="fi fi-rr-user"></i>
+                    </span>
+                    Profile
                 </a>
             </nav>
         </div>
-        <div class="user-profile flex items-center justify-between">
+        <div class="user-profile flex items-center justify-between text-[#8e8ea0]">
             <div class="user-avatar w-10 h-10 bg-[#2d2d3d] rounded-full mr-3"></div>
             <span>User1234</span>
-            <button class="more-options text-[#8e8ea0] text-xl">•••</button>
+            <button class="more-options">•••</button>
         </div>
     </div>
 </body>
