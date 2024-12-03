@@ -2,10 +2,51 @@
 session_start();
 include('../conn.php');
 
-// Redirect jika belum login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
+// Pastikan user sudah login
+if (!isset($_SESSION['user_id'], $_GET['id'])) {
+    die("Error: Akses ditolak.");
+}
+
+$post_id = $_GET['id'];
+$user_id = $_SESSION['user_id'];
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $content = $_POST['postContent'];
+    if (empty($content)) {
+        die("Error: Konten tidak boleh kosong.");
+    }
+
+    $stmt = $conn->prepare("UPDATE posts SET content = ? WHERE id = ? AND user_id = ?");
+    $stmt->bind_param("sii", $content, $post_id, $user_id);
+
+    if ($stmt->execute()) {
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+    $stmt->close();
+} else {
+    // Ambil postingan yang sedang diedit
+    $stmt = $conn->prepare("SELECT content FROM posts WHERE id = ? AND user_id = ?");
+    $stmt->bind_param("ii", $post_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $post = $result->fetch_assoc();
+    } else {
+        die("Error: Postingan tidak ditemukan atau bukan milik Anda.");
+    }
+    $stmt->close();
+
+    // Ambil postingan lain
+    $stmt = $conn->prepare("SELECT id, content, created_at, (SELECT username FROM users WHERE users.id = posts.user_id) AS username FROM posts WHERE id != ? ORDER BY created_at DESC");
+    $stmt->bind_param("i", $post_id);
+    $stmt->execute();
+    $other_posts = $stmt->get_result();
+    $stmt->close();
 }
 ?>
 
@@ -14,13 +55,11 @@ if (!isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindshareHub</title>
+    <title>Edit Post</title>
     <link rel="stylesheet" href="Dashboard.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 </head>
 <body>
-
     <!-- Sidebar -->
     <div class="fixed top-0 left-0 h-screen w-64 z-50">
         <?php include('../slicing/sidebar.html'); ?>
@@ -62,64 +101,46 @@ if (!isset($_SESSION['user_id'])) {
                 </svg>
             </button>
         </div>
-
+        <!-- Form Edit Post -->
         <div class="content">
-            <div class="new-post-form p-4 rounded-lg mb-6 mt-6 post">
-                <div class="justify-center">
-                    <div class="avatar"></div>
-                    <h2 class="text-lg font-semibold mb-3 opacity-90">Buat Postingan Baru</h2>
-                </div>
-                <form action="post.php" method="POST">
+            <div class="edit-post-form border p-4 rounded-lg mb-6 mt-6 post">
+                <h2 class="text-lg font-semibold mb-3">Edit Postingan</h2>
+                <form action="" method="POST">
                     <textarea 
                         name="postContent" 
                         rows="4" 
-                        class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 opacity-40 text-black"
-                        placeholder="Tulis sesuatu..."
-                        required></textarea>
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-black"
+                        placeholder="Edit konten postingan..."
+                        required><?php echo htmlspecialchars($post['content']); ?></textarea>
                     <button 
                         type="submit" 
-                        class="mt-3 bg-white text-purple-600 px-4 py-2 rounded hover:bg-purple-600 hover:text-white opacity-90">
-                        Kirim
+                        class="mt-3 bg-white text-purple-600 px-4 py-2 rounded hover:bg-purple-600 hover:text-white">
+                        Update
                     </button>
                 </form>
             </div>
+        </div>
 
-            <!-- Posts -->
-            <div>
-                <?php
-                    $sql = "SELECT posts.id, posts.content, posts.created_at, users.username 
-                            FROM posts 
-                            JOIN users ON posts.user_id = users.id 
-                            ORDER BY posts.created_at DESC";
-                    $result = $conn->query($sql);
-
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            echo '<div class="post relative">';
-                            echo '    <div class="post-header flex justify-between items-center">';
-                            echo '        <div class="flex items-center">';
-                            echo '            <div class="avatar"></div>';
-                            echo '            <div class="post-author text-lg ml-2">' . htmlspecialchars($row['username']) . '</div>';
-                            echo '            <div class="post-time pl-4 text-sm">' . time_ago($row['created_at']) . '</div>'; 
-                            echo '        </div>';
-                            echo '        <div class="post-options absolute top-0 right-0 mt-2 mr-6">';
-                            echo '            <div class="relative">';
-                            echo '                <button onclick="toggleOptions(' . htmlspecialchars($row['id']) . ')" class="options-button text-xl text-bold">⋮</button>';
-                            echo '                <div id="options-' . htmlspecialchars($row['id']) . '" class="options-menu hidden bg-white border border-gray-300 rounded-md shadow-lg absolute top-0 right-0">';
-                            echo '                    <a href="edit_post.php?id=' . htmlspecialchars($row['id']) . '" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>';
-                            echo '                    <a href="delete_post.php?id=' . htmlspecialchars($row['id']) . '" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</a>';
-                            echo '                </div>';
-                            echo '            </div>';
-                            echo '        </div>';
-                            echo '    </div>';
-                            echo '    <div class="post-content mt-2">' . htmlspecialchars($row['content']) . '</div>';
-                            echo '</div>';
-                        }
-                    } else {
-                        echo '<div class="post">Belum ada postingan.</div>';
-                    }
-                ?>    
-            </div>
+        <!-- Other Posts -->
+        <div class="other-posts">
+            <?php
+            if ($other_posts->num_rows > 0) {
+                while ($row = $other_posts->fetch_assoc()) {
+                    echo '<div class="post p-4 rounded-lg mb-4">';
+                    echo '    <div class="post-header flex justify-between items-center">';
+                    echo '        <div class="flex items-center">';
+                    echo '            <div class="avatar"></div>';
+                    echo '            <div class="post-author text-lg ml-2">' . htmlspecialchars($row['username']) . '</div>';
+                    echo '            <div class="post-time pl-4 text-sm">' . time_ago($row['created_at']) . '</div>';
+                    echo '        </div>';
+                    echo '    </div>';
+                    echo '    <div class="post-content mt-2">' . htmlspecialchars($row['content']) . '</div>';
+                    echo '</div>';
+                }
+            } else {
+                echo '<div class="post">Tidak ada postingan lain.</div>';
+            }
+            ?>
         </div>
     </div>
 
@@ -127,21 +148,11 @@ if (!isset($_SESSION['user_id'])) {
     <div class="sticky top-0 right-0 h-screen w-64 bg-white z-50">
         <?php include('../slicing/rightSidebar.html'); ?>
     </div>
-
-    <script>
-    function toggleOptions(postId) {
-        var optionsMenu = document.getElementById('options-' + postId);
-        if (optionsMenu.classList.contains('hidden')) {
-            optionsMenu.classList.remove('hidden');
-        } else {
-            optionsMenu.classList.add('hidden');
-        }
-    }
-    </script>
 </body>
 </html>
 
 <?php
+// Fungsi untuk menghitung waktu relatif
 function time_ago($datetime, $full = false) {
     $now = new DateTime;
     $ago = new DateTime($datetime);

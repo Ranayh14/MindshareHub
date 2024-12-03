@@ -56,6 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 // Tampilkan pesan error jika ada
 if (isset($error)) {
-    echo "<script>alert('$error'); window.history.back();</script>";
+    header("Location: /login/login.html?error=" . urlencode($error));
+    exit();
 }
 ?>
