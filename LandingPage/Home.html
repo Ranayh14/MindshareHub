@@ -1,142 +1,153 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindshareHub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
 
-        /* Animasi fade-in */
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
+<meta charset="UTF-8">
 
-        .fade-in {
-            animation: fadeIn 1s ease-out forwards;
-        }
-    </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MindshareHub</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+body {
+
+font-family: 'Poppins', sans-serif;
+
+}
+
+    /* Animasi fade-in */
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 1s ease-out forwards;
+    }
+</style>
 </head>
+
 <body class="bg-cover bg-center bg-no-repeat" style="background-image: url('Login - visible (1).png');">
+<header class="flex justify-between items-center sticky top-0 py-1 px-10 bg-[#2B1B54] shadow-lg z-50">
+    <!-- Logo -->
+    <div>
+        <img src="Logo MindsahreHub-08 1.png" alt="MindshareHub Logo" class="w-20 py-1">
+    </div>
+    <!-- Login & Register Buttons -->
+    <div class="flex gap-4">
+        <a href="/login/login.html" class="py-2 px-4 text-white border border-white rounded-full hover:bg-white hover:text-[#2B1B54] transition">Login</a>
+        <a href="/register/register.html" class="py-2 px-4 bg-white text-[#2B1B54] font-semibold rounded-full hover:bg-gray-200 transition">Register</a>
+    </div>
+</header>
 
-    <header class="flex justify-between items-center sticky top-0 py-1 px-10 bg-[#2B1B54] shadow-lg z-50">
-        <!-- Logo -->
-        <div>
-            <img src="Logo MindsahreHub-08 1.png" alt="MindshareHub Logo" class="w-20 py-1">
-        </div>
-        <!-- Login & Register Buttons -->
-        <div class="flex gap-4">
-            <a href="/login/login.html" class="py-2 px-4 text-white border border-white rounded-full hover:bg-white hover:text-[#2B1B54] transition">Login</a>
-            <a href="/register/register.html" class="py-2 px-4 bg-white text-[#2B1B54] font-semibold rounded-full hover:bg-gray-200 transition">Register</a>
-        </div>
-    </header>
+<!-- Welcome Section -->
+<section class="text-center py-10">
+    <h1 class="text-2xl font-medium mb-6 text-white">Welcome To</h1>
+    <div class="inline-block bg-white text-[#2B1B54] py-3 px-6 rounded-full font-semibold text-3xl">
+        MindshareHub
+    </div>
+</section>
 
-    <!-- Welcome Section -->
-    <section class="text-center py-10">
-        <h1 class="text-2xl font-medium mb-6 text-white">Welcome To</h1>
-        <div class="inline-block bg-white text-[#2B1B54] py-3 px-6 rounded-full font-semibold text-3xl">
-            MindshareHub
+<!-- Features Section -->
+<section class="space-y-20 px-10 mt-10">
+    <!-- Forum Anonym -->
+    <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 fade-in">
+        <div class="flex-1 text-left">
+            <h2 class="text-2xl font-semibold mb-4 text-white">Forum Anonym</h2>
+            <p class="text-gray-300 leading-relaxed text-sm">
+                Forum anonim adalah platform online di mana pengguna dapat berpartisipasi dalam diskusi, bertukar
+                informasi, dan berbagi konten tanpa harus mengungkapkan identitas mereka. Ini memungkinkan individu
+                untuk berbicara secara bebas tanpa takut terhadap konsekuensi pribadi atau sosial yang mungkin
+                timbul dari pengungkapan identitas mereka.
+            </p>
         </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="space-y-20 px-10 mt-10">
-        <!-- Forum Anonym -->
-        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 fade-in">
-            <div class="flex-1 text-left">
-                <h2 class="text-2xl font-semibold mb-4 text-white">Forum Anonym</h2>
-                <p class="text-gray-300 leading-relaxed text-sm">
-                    Forum anonim adalah platform online di mana pengguna dapat berpartisipasi dalam diskusi, bertukar
-                    informasi, dan berbagi konten tanpa harus mengungkapkan identitas mereka. Ini memungkinkan individu
-                    untuk berbicara secara bebas tanpa takut terhadap konsekuensi pribadi atau sosial yang mungkin
-                    timbul dari pengungkapan identitas mereka.
-                </p>
-            </div>
-            <div class="w-24 h-24">
-                <img src="People Working Together.png" alt="Forum Icon" class="w-full h-full object-contain">
-            </div>
+        <div class="w-24 h-24">
+            <img src="People Working Together.png" alt="Forum Icon" class="w-full h-full object-contain">
         </div>
-
-        <!-- Chat Anonym -->
-        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 fade-in">
-            <div class="flex-1 text-left">
-                <h2 class="text-2xl font-semibold mb-4 text-white">Chat Anonym</h2>
-                <p class="text-gray-300 leading-relaxed text-sm">
-                    Chat anonim adalah platform komunikasi di mana pengguna dapat berbicara dengan orang lain tanpa
-                    harus memberikan identitas mereka. Ini memungkinkan diskusi terbuka tanpa ketakutan akan konsekuensi
-                    sosial, tetapi tetap mematuhi aturan dan kebijakan untuk mencegah penyalahgunaan.
-                </p>
-            </div>
-            <div class="w-24 h-24">
-                <img src="Chat.png" alt="Chat Icon" class="w-full h-full object-contain">
-            </div>
-        </div>
-
-        <!-- Diary -->
-        <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 fade-in">
-            <div class="flex-1 text-left">
-                <h2 class="text-2xl font-semibold mb-4 text-white">Diary</h2>
-                <p class="text-gray-300 leading-relaxed text-sm">
-                    Fitur diary di anonim forum adalah layanan yang memungkinkan pengguna untuk membuat catatan pribadi
-                    atau entri harian tanpa harus mengungkapkan identitas mereka kepada publik. Ini berarti pengguna
-                    dapat menyimpan catatan pribadi mereka, mencurahkan pikiran, atau berbagi pengalaman tanpa takut
-                    identitas mereka terungkap.
-                </p>
-            </div>
-            <div class="w-24 h-24">
-                <img src="Journal.png" alt="Diary Icon" class="w-full h-full object-contain">
-            </div>
-        </div>
-    </section>
-
-    <!-- Cookie Consent Section (Modern Design) -->
-    <div id="cookieConsent" class="fixed bottom-0 left-0 right-0 bg-white text-[#2B1B54] py-4 px-8 flex items-center justify-between shadow-lg z-50 rounded-t-lg">
-        <div class="flex items-center gap-4">
-            <span class="text-sm">
-                We use cookies to ensure you get the best experience on our website.
-            </span>
-        </div>
-        <button id="acceptCookies" class="py-2 px-6 bg-[#2B1B54] text-white font-semibold rounded-full hover:bg-[#4C3A75] transition">
-            Got it!
-        </button>
     </div>
 
-    <!-- Terms and Conditions Card -->
-    <section class="mt-16 bg-[#2B1B54] text-white py-8 px-10 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105 max-w-4xl mx-auto">
-        <h2 class="text-xl font-semibold mb-4">Terms and Conditions</h2>
-        <p class="text-xs leading-relaxed">
-            Dengan menggunakan layanan kami, Anda menyetujui syarat dan ketentuan yang berlaku. Untuk informasi lebih
-            lanjut, silakan baca
-            <a href="terms.html" class="text-purple-300 underline hover:text-purple-500">Terms and Conditions</a> .
-        </p>
-    </section>
+    <!-- Chat Anonym -->
+    <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 fade-in">
+        <div class="flex-1 text-left">
+            <h2 class="text-2xl font-semibold mb-4 text-white">Chat Anonym</h2>
+            <p class="text-gray-300 leading-relaxed text-sm">
+                Chat anonim adalah platform komunikasi di mana pengguna dapat berbicara dengan orang lain tanpa
+                harus memberikan identitas mereka. Ini memungkinkan diskusi terbuka tanpa ketakutan akan konsekuensi
+                sosial, tetapi tetap mematuhi aturan dan kebijakan untuk mencegah penyalahgunaan.
+            </p>
+        </div>
+        <div class="w-24 h-24">
+            <img src="Chat.png" alt="Chat Icon" class="w-full h-full object-contain">
+        </div>
+    </div>
 
-    <!-- Footer -->
-    <footer class="text-center py-6  mt-10">
-        <p class="text-xs text-gray-300">© 2024 MindshareHub. Hak cipta dilindungi.</p>
-    </footer>
+    <!-- Diary -->
+    <div class="flex flex-col lg:flex-row items-center max-w-5xl mx-auto gap-10 fade-in">
+        <div class="flex-1 text-left">
+            <h2 class="text-2xl font-semibold mb-4 text-white">Diary</h2>
+            <p class="text-gray-300 leading-relaxed text-sm">
+                Fitur diary di anonim forum adalah layanan yang memungkinkan pengguna untuk membuat catatan pribadi
+                atau entri harian tanpa harus mengungkapkan identitas mereka kepada publik. Ini berarti pengguna
+                dapat menyimpan catatan pribadi mereka, mencurahkan pikiran, atau berbagi pengalaman tanpa takut
+                identitas mereka terungkap.
+            </p>
+        </div>
+        <div class="w-24 h-24">
+            <img src="Journal.png" alt="Diary Icon" class="w-full h-full object-contain">
+        </div>
+    </div>
+</section>
 
-    <script>
-        // Cookie consent functionality
-        const cookieConsent = document.getElementById('cookieConsent');
-        const acceptCookies = document.getElementById('acceptCookies');
+<!-- Cookie Consent Section (Modern Design) -->
+<div id="cookieConsent" class="fixed bottom-0 left-0 right-0 bg-white text-[#2B1B54] py-4 px-8 flex items-center justify-between shadow-lg z-50 rounded-t-lg">
+    <div class="flex items-center gap-4">
+        <span class="text-sm">
+            We use cookies to ensure you get the best experience on our website.
+        </span>
+    </div>
+    <button id="acceptCookies" class="py-2 px-6 bg-[#2B1B54] text-white font-semibold rounded-full hover:bg-[#4C3A75] transition">
+        Got it!
+    </button>
+</div>
 
-        // Check if the user has already accepted cookies
-        if (!localStorage.getItem('cookieAccepted')) {
-            cookieConsent.classList.remove('hidden');
-        }
+<!-- Terms and Conditions Card -->
+<section class="mt-16 bg-[#2B1B54] text-white py-8 px-10 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105 max-w-4xl mx-auto">
+    <h2 class="text-xl font-semibold mb-4">Terms and Conditions</h2>
+    <p class="text-xs leading-relaxed">
+        Dengan menggunakan layanan kami, Anda menyetujui syarat dan ketentuan yang berlaku. Untuk informasi lebih
+        lanjut, silakan baca
+        <a href="terms.html" class="text-purple-300 underline hover:text-purple-500">Terms and Conditions</a> .
+    </p>
+</section>
 
-        // Hide cookie consent when accepted
-        acceptCookies.addEventListener('click', () => {
-            localStorage.setItem('cookieAccepted', 'true');
-            cookieConsent.classList.add('hidden');
-        });
-    </script>
+<!-- Footer -->
+<footer class="text-center py-6  mt-10">
+    <p class="text-xs text-gray-300">© 2024 MindshareHub. Hak cipta dilindungi.</p>
+</footer>
 
+<script>
+    // Cookie consent functionality
+    const cookieConsent = document.getElementById('cookieConsent');
+    const acceptCookies = document.getElementById('acceptCookies');
+
+    // Check if the user has already accepted cookies
+    if (!localStorage.getItem('cookieAccepted')) {
+        cookieConsent.classList.remove('hidden');
+    }
+
+    // Hide cookie consent when accepted
+    acceptCookies.addEventListener('click', () => {
+        localStorage.setItem('cookieAccepted', 'true');
+        cookieConsent.classList.add('hidden');
+    });
+</script>
 </body>
+
 </html>

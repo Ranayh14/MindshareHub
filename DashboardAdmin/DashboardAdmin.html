@@ -6,102 +6,138 @@
     <title>Dashboard Admin - Forum Anonim</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Menyediakan ikon dari Font Awesome */
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
     </style>
 </head>
 <body class="bg-[#2f3136] text-gray-100">
     <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <aside class="w-64 bg-[#18191A] p-4">
-            <div class="mb-8">
-                <h1 class="text-xl font-bold text-white">PusatAdmin</h1>
+        <aside class="w-64 bg-[#202225] p-6">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-white">PusatAdmin</h1>
             </div>
-            
-            <nav class="space-y-2">
-                <a href="#" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-[#5E5ED6] text-white transition duration-200">
+            <nav class="space-y-4">
+                <a href="#" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-home w-5 h-5"></i>
                     <span>Beranda</span>
                 </a>
-                
-                <a href="KelolaPengguna.html" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-[#5E5ED6] text-gray-300 transition duration-200">
+                <a href="KelolaPengguna.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-user-friends w-5 h-5"></i>
                     <span>Kelola Pengguna</span>
                 </a>
-                
-                <a href="KelolaKonten.html" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-[#5E5ED6] text-gray-300 transition duration-200">
+                <a href="KelolaKonten.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-file-alt w-5 h-5"></i>
                     <span>Kelola Konten</span>
                 </a>
-                
-                <a href="LaporanMasuk.html" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-[#5E5ED6] text-gray-300 transition duration-200">
+                <a href="LaporanMasuk.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
                 </a>
-
-                <a href="ViewReport.html" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-[#5E5ED6] text-gray-300 transition duration-200">
+                <a href="ViewReport.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-eye w-5 h-5"></i>
                     <span>Lihat Laporan</span>
                 </a>
-                
-                <a href="#" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-[#5E5ED6] text-gray-300 transition duration-200">
+                <a href="#" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-5 h-5"></i>
                     <span>Keluar</span>
                 </a>
-                
             </nav>
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 p-8">
             <div class="mb-8">
-                <h2 class="text-2xl font-bold">Ringkasan Dashboard</h2>
+                <h2 class="text-2xl font-bold">Hallo! Raditya</h2>
             </div>
 
             <!-- Stats Cards -->
             <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-[#2f3136] p-6 rounded-lg">
+                <div class="transform transition-transform duration-200 hover:scale-105 bg-gradient-to-r from-[#5865F2] to-[#3b4c8f] p-6 rounded-lg shadow-lg">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-gray-400">Total Pengguna</h3>
-                        <span class="text-[#43b581]">
+                        <h3 class="text-gray-200">Total Pengguna</h3>
+                        <span class="text-white">
                             <i class="fas fa-users w-6 h-6"></i>
                         </span>
                     </div>
-                    <p class="text-2xl font-bold mt-2">1.234</p>
+                    <p class="text-3xl font-bold mt-2 text-white">150</p> <!-- Angka contoh -->
+                    
                 </div>
 
-                <div class="bg-[#2f3136] p-6 rounded-lg">
+                <div class="transform transition-transform duration-200 hover:scale-105 bg-gradient-to-r from-[#f04747] to-[#d32f2f] p-6 rounded-lg shadow-lg">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-gray-400">Laporan Aktif</h3>
-                        <span class="text-red-500">
+                        <h3 class="text-gray-200">Laporan Aktif</h3>
+                        <span class="text-white">
                             <i class="fas fa-exclamation-circle w-6 h-6"></i>
                         </span>
                     </div>
-                    <p class="text-2xl font-bold mt-2">42</p>
+                    <p class="text-3xl font-bold mt-2 text-white">12</p> <!-- Angka contoh -->
                 </div>
 
-                <div class="bg-[#2f3136] p-6 rounded-lg">
+                <div class="transform transition-transform duration-200 hover:scale-105 bg-gradient-to-r from-[#43b581] to-[#388e3c] p-6 rounded-lg shadow-lg">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-gray-400">Postingan Hari Ini</h3>
-                        <span class="text-green-500">
+                        <h3 class="text-gray-200">Postingan Hari Ini</h3>
+                        <span class="text-white">
                             <i class="fas fa-pencil-alt w-6 h-6"></i>
                         </span>
                     </div>
-                    <p class="text-2xl font-bold mt-2">253</p>
+                    <p class="text-3xl font-bold mt-2 text-white">8</p> <!-- Angka contoh -->
                 </div>
 
-                <div class="bg-[#2f3136] p-6 rounded-lg">
+                <div class="transform transition-transform duration-200 hover:scale-105 bg-gradient-to-r from-[#3b82f6] to-[#1e40af] p-6 rounded-lg shadow-lg">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-gray-400">Masalah Terselesaikan</h3>
-                        <span class="text-blue-500">
+                        <h3 class="text-gray-200">Masalah Terselesaikan</h3>
+                        <span class="text-white">
                             <i class="fas fa-check-circle w-6 h-6"></i>
                         </span>
                     </div>
-                    <p class="text-2xl font-bold mt-2">123</p>
+                    <p class="text-3xl font-bold mt-2 text-white">5</p> <!-- Angka contoh -->
                 </div>
+            </div>
+
+            <!-- Container for Chart -->
+            <div class="bg-gray-800 p-4 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-bold text-gray-200 mb-4">Grafik Aktivitas</h3>
+                <canvas id="activityChart" width="30" height="5"></canvas> <!-- Ukuran grafik -->
             </div>
         </main>
     </div>
+
+    <script>
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const activityChart = new Chart(ctx, {
+            type: 'line', // Tipe grafik: garis
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul'], // Label untuk sumbu X
+                datasets: [
+                    {
+                        label: 'Postingan Bulanan',
+                        data: [12, 19, 3, 5, 2, 3, 7], // Data untuk sumbu Y
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                    },
+                    {
+                        label: 'Total Pengguna',
+                        data: [100, 120, 130, 140, 150, 150, 150], // Data pengguna dari bulan ke bulan
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
