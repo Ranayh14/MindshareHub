@@ -1,3 +1,20 @@
+<?php
+declare(strict_types=1);
+require '../vendor/autoload.php';
+$secret = 'XVQ2UIGO75XRUKJO';
+$link = \Sonata\GoogleAuthenticator\GoogleQrUrl::generate('MindshareHub', $secret, 'MindshareHub');
+$g = new \Sonata\GoogleAuthenticator\GoogleAuthenticator();
+
+if (isset($_POST['submit'])) {
+    $code = $_POST['pass-code'];
+    if ($g->checkCode($secret, $code)) {
+        header("Location: resetPassword.php");
+    } else {
+        echo "<script>alert('Pin Salah'); window.history.back();</script>";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,17 +73,21 @@
           <div class="w-32 h-32 mx-auto mb-3 flex items-center justify-center">
             <img src="/Asset/Logo MindsahreHub-07.png" alt="Logo" class="w-32 h-32">
           </div>
-          <h2 class="text-4xl font-bold">Masukkan Kode OTP</h2>
+          
+          <h2 class="text-4xl font-bold">Scan QR Code dengan aplikasi Authenticator</h2>
+          <div class="flex justify-center justify-items-center mt-6">
+            <img src="<?=$link;?>" alt="bar code">
+          </div>
         </div>
     
         <div class="flex justify-center items-center">
-          <form action="send_otp.php" method="POST" class="space-y-6 p-5 max-w-md w-full rounded-lg shadow-md bg-customPurple opacity-90">
+          <form action="resetPassword.html" method="POST" class="space-y-6 p-5 max-w-md w-full rounded-lg shadow-md bg-customPurple opacity-90">
             <div>
-              <label for="otp" class="block text-lg font-medium mb-1">Email</label>
-              <input type="text" id="otp" name="otp" placeholder="Masukkan Kode OTP" required
+              <label for="pass-code" class="block text-lg font-medium mb-1">Kode OTP</label>
+              <input type="text" id="pass-code" name="pass-code" placeholder="Masukkan Kode OTP" maxlength="6" required
                 class="w-full px-3 py-1.5 rounded-lg bg-gray-50 text-black border border-purple-600 focus:ring focus:ring-purple-400 outline-none text-sm">
             </div>
-            <button type="submit"
+            <button type="submit" name="submit"
               class="w-full py-1.5 bg-white hover:bg-purple-900 hover:text-white text-purple-900 text-lg font-semibold rounded-lg shadow-lg">
               Konfimasi OTP
             </button>
