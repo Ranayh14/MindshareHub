@@ -21,15 +21,11 @@
                 <button class="new-note-btn px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
                     <span class="mr-2">+</span> New notes
                 </button>
-                <button class="save-btn px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">Save</button>
+                <button class="save-btn px-4 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition">Save</button>
             </div>
         </div>
 
-        <textarea class="note-input w-full h-48 p-5 bg-[#2d2d3d] text-white text-base rounded outline-none resize-none mb-5" placeholder="Write your thoughts...">Hari ini benar-benar melelahkan. Sejak pagi, kuliah, diskusi, dan praktikum tidak ada hentinya. Badan terasa berat saat pulang, tapi tugas masih menumpuk. Aku rindu masa sekolah yang lebih ringan dibanding kuliah ini.
-
-Aku berharap bisa lebih pandai mengatur waktu dan menemukan cara mengurangi kelelahan. Mungkin tidur lebih awal bisa membantu. Semoga besok aku bangun dengan semangat baru.
-
-Salam lelah,</textarea>
+        <textarea class="note-input w-full h-48 p-5 bg-[#2d2d3d] text-white text-base rounded outline-none resize-none mb-5" placeholder="Tulis disini..."></textarea>
     </div>
 
     <div class="notes-sidebar w-72 bg-[#13141f] h-screen p-5 flex flex-col">

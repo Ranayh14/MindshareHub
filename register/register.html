@@ -14,22 +14,39 @@
 
     @layer utilities {
       .bg-customPurple {
+        --tw-bg-opacity: 1;
         background-color: rgba(43, 27, 84, 1);
       }
     }
+
+    /* Animasi untuk fade-in */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
   </style>
 </head>
-<body class="bg-customPurple h-screen flex items-center justify-center m-0">
+<body class="bg-customPurple h-screen flex items-center justify-center m-0 relative">
+
   <!-- Kontainer Utama -->
-  <div class="flex flex-col md:flex-row bg-customPurple shadow-lg overflow-hidden w-full h-screen">
-    <!-- Bagian Kiri: Ilustrasi (hanya tampil di desktop) -->
-    <div class="relative flex-grow bg-cover bg-center h-full hidden md:block" style="background-image: url('poster1.png');">
+  <div id="registerForm" class="flex flex-col md:flex-row bg-customPurple shadow-lg overflow-hidden w-full h-screen relative z-10">
+    <!-- Bagian Kiri: Ilustrasi -->
+    <div class="relative flex-grow bg-cover bg-center h-full z-100 hidden md:block" style="background-image: url('poster1.png');">
+      <div class="absolute inset-0 bg-customPurple"></div>
       <img src="poster1.png" alt="Illustration" class="absolute inset-0 object-cover w-full h-full opacity-55" />
     </div>
 
-    <!-- Bagian Kanan: Form Pendaftaran -->
+    <!-- Bagian Kanan: Form Register -->
     <div class="w-full md:w-8/12 p-8 bg-customPurple text-white flex flex-col justify-center h-full relative overflow-hidden">
-      <!-- Animasi Kanan Atas -->
       <dotlottie-player src="https://lottie.host/2c9557a7-b65b-4d41-8e57-d6e566c92891/0uJzquhaU2.lottie" 
         background="transparent" 
         speed="1" 
@@ -38,7 +55,6 @@
         class="absolute top-[-500px] right-[-500px] z-0 opacity-70">
       </dotlottie-player>
     
-      <!-- Animasi Kiri Bawah -->
       <dotlottie-player src="https://lottie.host/2c9557a7-b65b-4d41-8e57-d6e566c92891/0uJzquhaU2.lottie" 
         background="transparent" 
         speed="1" 
@@ -47,7 +63,7 @@
         class="absolute bottom-[-500px] left-[-500px] z-0 opacity-70">
       </dotlottie-player>
     
-      <!-- Konten Form Pendaftaran -->
+      <!-- Konten Form Register -->
       <div class="relative z-10">
         <div class="text-center mb-6">
           <div class="w-32 h-32 mx-auto mb-3 flex items-center justify-center">
@@ -55,9 +71,57 @@
           </div>
           <h2 class="text-4xl font-bold">Yuk, bikin akunmu!</h2>
         </div>
-    
+
+        <!-- Alert Modal -->
+        <div id="alert-border-2" class="hidden max-w-md mx-auto flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800 rounded-lg fade-in" role="alert">
+          <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+          </svg>
+          <div class="ms-3 text-sm font-medium">
+            Anda harus menyetujui syarat dan ketentuan sebelum mendaftar.
+          </div>
+          <button type="button" aria-label="Close" onclick="closeAlert()" style="background: none; border: none; cursor: pointer; padding: 0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+              <line x1="6" y1="18" x2="18" y2="6"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Alert Modal untuk Password -->
+        <div id="alert-password" class="hidden max-w-md mx-auto flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800 rounded-lg fade-in" role="alert">
+          <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+          </svg>
+          <div class="ms-3 text-sm font-medium">
+            Password harus memiliki panjang minimal 8 karakter.
+          </div>
+          <button type="button" aria-label="Close" onclick="closePasswordAlert()" style="background: none; border: none; cursor: pointer; padding: 0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+              <line x1="6" y1="18" x2="18" y2="6"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Alert Modal untuk Konfirmasi Password -->
+        <div id="alert-conpassword" class="hidden max-w-md mx-auto flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800 rounded-lg fade-in" role="alert">
+          <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+          </svg>
+          <div class="ms-3 text-sm font-medium">
+            Konfirmasi kata sandi tidak cocok.
+          </div>
+          <button type="button" aria-label="Close" onclick="closeConPasswordAlert()" style="background: none; border: none; cursor: pointer; padding: 0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+              <line x1="6" y1="18" x2="18" y2="6"></line>
+            </svg>
+          </button>
+        </div>
+
         <div class="flex justify-center items-center">
-          <form action="/register/register.php" method="POST" class="space-y-6 p-5 max-w-md w-full rounded-lg shadow-md bg-white bg-opacity-20 backdrop-blur-lg">
+          <form id="register-form" action="/register/register.php" method="POST" class="space-y-6 p-5 max-w-md w-full rounded-lg shadow-md bg-white bg-opacity-20 backdrop-blur-lg">
             <div>
               <label for="email" class="block text-lg font-medium mb-1">Email</label>
               <input type="email" id="email" name="email" placeholder="contoh@gmail.com" required
@@ -65,13 +129,8 @@
             </div>
             <div>
               <label for="password" class="block text-lg font-medium mb-1">Kata Sandi</label>
-              <div class="relative">
-                <input type="password" id="password" name="password" placeholder="Kata Sandi" required
-                  class="w-full px-4 py-3 rounded-lg bg-gray-100 text-gray-800 border border-purple-600 focus:ring focus:ring-purple-400 outline-none text-sm transition duration-200 ease-in-out shadow-sm hover:shadow-lg">
-                <span class="absolute inset-y-0 right-3 flex items-center text-gray-400 cursor-pointer" onclick="togglePassword()">
-                  <i class="fi fi-rr-eye"></i>
-                </span>
-              </div>
+              <input type="password" id="password" name="password" placeholder="Kata Sandi" required
+                class="w-full px-4 py-3 rounded-lg bg-gray-100 text-gray-800 border border-purple-600 focus:ring focus:ring-purple-400 outline-none text-sm transition duration-200 ease-in-out shadow-sm hover:shadow-lg">
             </div>
             <div>
               <label for="conpassword" class="block text-lg font-medium mb-1">Konfirmasi Kata Sandi</label>
@@ -84,8 +143,11 @@
               </div>
             </div>
             <div class="flex items-center">
-              <input type="checkbox" name="terms" id="terms" class="mr-2" value="accepted"> 
-              <p class="text-sm text-white"> Saya menyetujui <a href="#" class="text-sm text-white font-semibold hover:underline"> Syarat dan Ketentuan </a></p>
+              <input type="checkbox" name="terms" id="terms" class="mr-2" value="accepted">
+              
+              <p class="text-sm text-white">Saya menyetujui 
+                <a href="#" class="text-sm text-white font-semibold hover:underline">Syarat dan Ketentuan</a>
+              </p>
             </div>
             <button type="submit"
               class="w-full py-2 bg-purple-600 hover:bg-purple-900 text-white text-lg font-semibold rounded-lg shadow-lg transition duration-200 ease-in-out transform hover:scale-105">
@@ -98,20 +160,45 @@
         </div>
       </div>
     </div>
-    
   </div>
-  
+
   <script>
-    function togglePassword() {
-      const passwordInput = document.getElementById('password');
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
+    function closeAlert() {
+      document.getElementById('alert-border-2').classList.add('hidden');
     }
-    function toggleConPassword() {
-      const passwordInput = document.getElementById('conpassword');
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
+
+    function closePasswordAlert() {
+      document.getElementById('alert-password').classList.add('hidden');
     }
+
+    function closeConPasswordAlert() {
+      document.getElementById('alert-conpassword').classList.add('hidden');
+    }
+
+    document.getElementById('register-form').addEventListener('submit', function(event) {
+      const termsCheckbox = document.getElementById('terms');
+      const password = document.getElementById('password').value;
+      const conPassword = document.getElementById('conpassword').value;
+      
+      // Validasi Syarat dan Ketentuan
+      if (!termsCheckbox.checked) {
+        event.preventDefault();  // Mencegah submit
+        document.getElementById('alert-border-2').classList.remove('hidden');
+      }
+
+      // Validasi Password
+      if (password.length < 8) {
+        event.preventDefault();  // Mencegah submit
+        document.getElementById('alert-password').classList.remove('hidden');
+      }
+
+      // Validasi Konfirmasi Password
+      if (password !== conPassword) {
+        event.preventDefault();  // Mencegah submit
+        document.getElementById('alert-conpassword').classList.remove('hidden');
+      }
+    });
   </script>
+
 </body>
 </html>
