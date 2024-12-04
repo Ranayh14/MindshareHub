@@ -73,7 +73,7 @@ if (!isset($_SESSION['user_id'])) {
                     <textarea 
                         name="postContent" 
                         rows="4" 
-                        class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 opacity-40 text-black"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-black"
                         placeholder="Tulis sesuatu..."
                         required></textarea>
                     <button 
@@ -112,7 +112,7 @@ if (!isset($_SESSION['user_id'])) {
                             echo '            </div>';
                             echo '        </div>';
                             echo '    </div>';
-                            echo '    <div class="post-content mt-2">' . htmlspecialchars($row['content']) . '</div>';
+                            echo '    <div class="post-content mt-2 text-white">' . htmlspecialchars($row['content']) . '</div>';
                             echo '</div>';
                         }
                     } else {
