@@ -105,9 +105,19 @@
 
   <script>
     function togglePassword() {
-      const passwordInput = document.getElementById('password');
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
+      var passwordField = document.getElementById("password");
+      var icon = document.querySelector(".fi-rr-eye");
+  
+      // Toggle password visibility
+      if (passwordField.type === "password") {
+        passwordField.type = "text";  // Show password
+        icon.classList.remove("fi-rr-eye");
+        icon.classList.add("fi-rr-eye-crossed");  // Change icon to 'eye-crossed'
+      } else {
+        passwordField.type = "password";  // Hide password
+        icon.classList.remove("fi-rr-eye-crossed");
+        icon.classList.add("fi-rr-eye");  // Revert icon to 'eye'
+      }
     }
 
     // Fungsi untuk menampilkan alert error
