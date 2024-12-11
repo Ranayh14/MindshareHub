@@ -58,7 +58,7 @@ $query = "SELECT id, content,
 
             if (title && content) {
                 // Kirim data ke PHP menggunakan fetch
-                fetch('save_diary.php', {
+                fetch('saveDiary.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
