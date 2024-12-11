@@ -1,6 +1,5 @@
 <?php
 include("../conn.php");
-<<<<<<< Updated upstream
 session_start();
 
 // Ambil data catatan dari database
@@ -9,7 +8,6 @@ $query = "SELECT id, content,
         LEFT(content, 50) AS snippet FROM posts WHERE user_id =
         $user_id ORDER BY created_at DESC";
         $result = $conn->query($query);
-=======
 
 
 $userId = 1;
@@ -40,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
     }
 }
->>>>>>> Stashed changes
 ?>
 
 <!DOCTYPE html>
@@ -58,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div class="main-content flex-1 p-5">
-<<<<<<< Updated upstream
         <div class="header flex items-center justify-between mb-5">
             <div class="title-container flex-grow mr-2">
                 <input id="title" type="text" class="title-input w-full p-3 bg-[#2d2d3d] text-white text-lg rounded outline-none" placeholder="Judul" value="">
@@ -72,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <textarea id="content" class="note-input w-full h-48 p-5 bg-[#2d2d3d] text-white text-base rounded outline-none resize-none mb-5" placeholder="Tulis disini..."></textarea>
-=======
         <form method="POST" action="">
             <div class="header flex items-center justify-between mb-5">
                 <div class="title-container flex-grow mr-2">
@@ -90,19 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <textarea name="content" class="note-input w-full h-48 p-5 bg-[#2d2d3d] text-white text-base rounded outline-none resize-none mb-5" placeholder="Tulis disini..."></textarea>
             <input type="hidden" name="edit_id" value="">
         </form>
->>>>>>> Stashed changes
     </div>
 
     <div class="notes-sidebar w-72 bg-[#13141f] h-screen p-5 flex flex-col">
         <div class="notes-list flex-grow overflow-y-auto space-y-3">
-<<<<<<< Updated upstream
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="note-item p-4 bg-[#1e1f2e] rounded transition cursor-pointer hover:bg-[#2d2d3d]">
                     <h3 class="note-title text-base font-bold mb-1"><?php echo htmlspecialchars($row['snippet']); ?>...</h3>
                     <p class="note-snippet text-sm text-[#8e8ea0]"><?php echo htmlspecialchars($row['content']); ?></p>
                 </div>
             <?php endwhile; ?>
-=======
             <?php
             // Menampilkan catatan
             $sql = "SELECT * FROM posts WHERE user_id = ?";
@@ -121,7 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo '</div>';
             }
             ?>
->>>>>>> Stashed changes
         </div>
     </div>
 
