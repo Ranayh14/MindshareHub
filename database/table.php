@@ -19,6 +19,13 @@ $sql_post = "CREATE TABLE IF NOT EXISTS posts (
     FOREIGN KEY (user_id) REFERENCES users(id)
 )";
 
+$sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+
 try {   
     if(mysqli_query($conn, $sql_user)) {
         echo "tabel users berhasil dibuat <br>";
@@ -35,5 +42,14 @@ try {
 }
 catch (mysqli_sql_exception) {
     echo "Tabel post gagal dibuat";
+}
+
+try {   
+    if(mysqli_query($conn, $sql_diarys)) {
+        echo "tabel Diary berhasil dibuat <br>";
+    }
+}
+catch (mysqli_sql_exception) {
+    echo "Tabel Diary gagal dibuat";
 }
 ?>

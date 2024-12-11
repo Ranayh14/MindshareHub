@@ -138,6 +138,76 @@ if (!isset($_SESSION['user_id'])) {
         }
     }
     </script>
+
+    <!-- Modal Konfirmasi -->
+<div id="modalConfirmation" tabindex="-1" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-1/3">
+        <h2 id="modalTitle" class="text-xl font-semibold mb-4"></h2>
+        <p id="modalBody" class="mb-6"></p>
+        <div class="flex justify-end gap-3">
+            <button id="cancelButton" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Batal</button>
+            <button id="confirmButton" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800">Ya, Lanjutkan</button>
+        </div>
+    </div>
+</div>
+
+ <!-- Modal Konfirmasi -->
+ <div id="modalConfirmation" tabindex="-1" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-1/3">
+            <h2 id="modalTitle" class="text-xl font-semibold mb-4"></h2>
+            <p id="modalBody" class="mb-6"></p>
+            <div class="flex justify-end gap-3">
+                <button id="cancelButton" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Batal</button>
+                <button id="confirmButton" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script JS -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('modalConfirmation');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const confirmButton = document.getElementById('confirmButton');
+        const cancelButton = document.getElementById('cancelButton');
+
+        function showModal(action, callback) {
+            modal.classList.remove('hidden');
+            modalTitle.innerText = `Konfirmasi ${action}`;
+            modalBody.innerText = `Apakah Anda yakin ingin ${action.toLowerCase()} konten ini?`;
+
+            confirmButton.onclick = function () {
+                callback();
+                modal.classList.add('hidden');
+            };
+
+            cancelButton.onclick = function () {
+                modal.classList.add('hidden');
+            };
+        }
+
+        document.querySelectorAll('.post form button').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                showModal('Posting', function () {
+                    event.target.closest('form').submit();
+                });
+            });
+        });
+
+        document.querySelectorAll('.post-options a').forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const actionType = link.innerText.trim().toLowerCase();
+                showModal(actionType, function () {
+                    window.location.href = link.href;
+                });
+            });
+        });
+    });
+    </script>
+
 </body>
 </html>
 
