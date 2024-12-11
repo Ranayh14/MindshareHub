@@ -1,156 +1,60 @@
-// Previous JavaScript code remains, adding new functionality
+let notes = [];
+let editIndex = -1;
 
-// DOM Elements
-const notesSidebar = document.querySelector('.notes-sidebar');
-const notesList = document.querySelector('.notes-list');
-let currentNoteId = null;
+document.getElementById('new-note-btn').addEventListener('click', () => {
+    document.getElementById('title').value = '';
+    document.getElementById('note-input').value = '';
+    editIndex = -1; // Reset edit index for new note
+});
 
-// Show/Hide Notes Sidebar
-function toggleNotesSidebar() {
-    notesSidebar.classList.toggle('active');
-}
+document.getElementById('save-btn').addEventListener('click', () => {
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('note-input').value;
 
-// Load Notes List
-async function loadNotesList() {
-    try {
-        const response = await fetch('api/get_notes.php');
-        const notes = await response.json();
-        
-        notesList.innerHTML = '';
-        notes.forEach(note => {
-            const noteCard = createNoteCard(note);
-            notesList.appendChild(noteCard);
-        });
-    } catch (error) {
-        console.error('Error loading notes:', error);
+    if (editIndex === -1) {
+        // Add new note
+        notes.push({ title, content });
+    } else {
+        // Edit existing note (only once)
+        notes[editIndex].title = title;
+        notes[editIndex].content = content;
+        editIndex = -1; // Reset after editing
     }
+
+    renderNotes();
+    clearInputs();
+});
+
+function clearInputs() {
+    document.getElementById('title').value = '';
+    document.getElementById('note-input').value = '';
 }
 
-// Create Note Card Element
-function createNoteCard(note) {
-    const card = document.createElement('div');
-    card.className = 'note-card';
-    card.innerHTML = `
-        <h3>${note.title || 'Untitled'}</h3>
-        <p>${note.content.substring(0, 50)}${note.content.length > 50 ? '...' : ''}</p>
-        <div class="timestamp">${formatDate(note.created_at)}</div>
-    `;
-    
-    card.addEventListener('click', () => loadNote(note.id));
-    return card;
-}
+function renderNotes() {
+    const notesList = document.getElementById('notes-list');
+    notesList.innerHTML = '';
 
-// Format Date
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
+    notes.forEach((note, index) => {
+        const noteItem = document.createElement('div');
+        noteItem.className = 'note-item p-4 bg-[#1e1f2e] rounded transition cursor-pointer hover:bg-[#2d2d3d]';
+        noteItem.innerHTML = `
+            <h3 class="note-title text-base font-bold mb-1">${note.title}</h3>
+            <p class="note-snippet text-sm text-[#8e8ea0]">${note.content}</p>
+            <button onclick="editNote(${index})" class="edit-btn text-blue-400">Edit</button>
+            <button onclick="deleteNote(${index})" class="delete-btn text-red-400">Delete</button>
+        `;
+        notesList.appendChild(noteItem);
     });
 }
 
-// Load Note Content
-async function loadNote(noteId) {
-    try {
-        const response = await fetch(`api/get_note.php?id=${noteId}`);
-        const note = await response.json();
-        
-        currentNoteId = note.id;
-        titleInput.value = note.title;
-        noteInput.value = note.content;
-        
-        if (note.audio_url) {
-            audioUrl = note.audio_url;
-            createAudioElement();
-        }
-    } catch (error) {
-        console.error('Error loading note:', error);
-    }
+function editNote(index) {
+    const note = notes[index];
+    document.getElementById('title').value = note.title;
+    document.getElementById('note-input').value = note.content;
+    editIndex = index; // Set index to edit
 }
 
-// Save Note Function (Updated)
-async function saveNote() {
-    const noteData = {
-        id: currentNoteId,
-        title: titleInput.value,
-        content: noteInput.value,
-        audio_url: audioUrl
-    };
-    
-    try {
-        const formData = new FormData();
-        Object.keys(noteData).forEach(key => {
-            if (noteData[key]) formData.append(key, noteData[key]);
-        });
-        
-        if (audioBlob) {
-            formData.append('audio_file', audioBlob, 'recording.wav');
-        }
-        
-        const response = await fetch('api/save_note.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showSaveSuccess();
-            currentNoteId = result.note_id;
-            loadNotesList();
-            toggleNotesSidebar();
-        } else {
-            throw new Error(result.message);
-        }
-    } catch (error) {
-        console.error('Error saving note:', error);
-        showSaveError();
-    }
+function deleteNote(index) {
+    notes.splice(index, 1);
+    renderNotes();
 }
-
-// New Note Function
-function createNewNote() {
-    currentNoteId = null;
-    titleInput.value = '';
-    noteInput.value = '';
-    audioUrl = null;
-    audioElement = null;
-    audioBlob = null;
-    audioChunks = [];
-    timeDisplay.textContent = '0:00';
-    progressBar.style.width = '0%';
-}
-
-// Save Feedback
-function showSaveSuccess() {
-    const originalText = saveBtn.textContent;
-    saveBtn.textContent = 'Saved!';
-    saveBtn.style.backgroundColor = '#4CAF50';
-    
-    setTimeout(() => {
-        saveBtn.textContent = originalText;
-        saveBtn.style.backgroundColor = '';
-    }, 2000);
-}
-
-function showSaveError() {
-    const originalText = saveBtn.textContent;
-    saveBtn.textContent = 'Error!';
-    saveBtn.style.backgroundColor = '#f44336';
-    
-    setTimeout(() => {
-        saveBtn.textContent = originalText;
-        saveBtn.style.backgroundColor = '';
-    }, 2000);
-}
-
-// Event Listeners
-document.querySelector('.new-note-btn').addEventListener('click', createNewNote);
-saveBtn.addEventListener('click', () => {
-    saveNote();
-    toggleNotesSidebar();
-});
-
-// Initialize
-loadNotesList();
