@@ -174,8 +174,8 @@ if (!isset($_SESSION['user_id'])) {
 
         function showModal(action, callback) {
             modal.classList.remove('hidden');
-            modalTitle.innerText = `Konfirmasi ${action}`;
-            modalBody.innerText = `Apakah Anda yakin ingin ${action.toLowerCase()} konten ini?`;
+            modalTitle.innerText = Konfirmasi ${action};
+            modalBody.innerText = Apakah Anda yakin ingin ${action.toLowerCase()} konten ini?;
 
             confirmButton.onclick = function () {
                 callback();

@@ -38,6 +38,14 @@ $query = "SELECT id, content,
         </div>
 
         <textarea id="content" class="note-input w-full h-48 p-5 bg-[#2d2d3d] text-white text-base rounded outline-none resize-none mb-5" placeholder="Tulis disini..."></textarea>
+
+        <div class="voice-note mt-5">
+            <button id="record-btn" class="px-4 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                <span id="record-btn-text"> Start Recording</span>
+            </button>
+            <p id="record-status" class="text-sm text-[#8e8ea0] mt-2 hidden">Recording...</p>
+            <div id="recordings-container" class="space-y-4 mt-4"></div>
+        </div>
     </div>
 
     <div class="notes-sidebar w-72 bg-[#13141f] h-screen p-5 flex flex-col">
@@ -45,37 +53,72 @@ $query = "SELECT id, content,
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="note-item p-4 bg-[#1e1f2e] rounded transition cursor-pointer hover:bg-[#2d2d3d]">
                     <h3 class="note-title text-base font-bold mb-1"><?php echo htmlspecialchars($row['snippet']); ?>...</h3>
-                    <p class="note-snippet text-sm text-[#8e8ea0]"><?php echo htmlspecialchars($row['content']); ?></p>
+                    <p class="note-snippet text-sm text-[#8e8ea0]"> <?php echo htmlspecialchars($row['content']); ?></p>
                 </div>
             <?php endwhile; ?>
         </div>
     </div>
 
     <script>
-        document.getElementById('save-btn').addEventListener('click', function() {
-            const title = document.getElementById('title').value.trim();
-            const content = document.getElementById('content').value.trim();
+        const recordBtn = document.getElementById('record-btn');
+        const recordStatus = document.getElementById('record-status');
+        const recordingsContainer = document.getElementById('recordings-container');
 
-            if (title && content) {
-                // Kirim data ke PHP menggunakan fetch
-                fetch('save_diary.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
-                })
-                .then(response => response.text())
-                .then(data => {
-                    alert('Catatan berhasil disimpan!');
-                    location.reload(); // Refresh halaman untuk menampilkan catatan terbaru
-                })
-                .catch(error => {
-                    alert('Terjadi kesalahan saat menyimpan catatan.');
-                    console.error(error);
-                });
-            } else {
-                alert('Judul dan konten tidak boleh kosong.');
+        let mediaRecorder;
+        let audioChunks = [];
+
+        recordBtn.addEventListener('click', function () {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        mediaRecorder = new MediaRecorder(stream);
+
+                        mediaRecorder.start();
+                        recordStatus.classList.remove('hidden');
+                        recordBtn.textContent = '⏹ Stop Recording';
+
+                        mediaRecorder.ondataavailable = event => {
+                            audioChunks.push(event.data);
+                        };
+
+                        mediaRecorder.onstop = () => {
+                            recordStatus.classList.add('hidden');
+                            recordBtn.textContent = '🎤 Start Recording';
+
+                            const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+                            audioChunks = [];
+
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            const audioElement = document.createElement('audio');
+                            audioElement.src = audioUrl;
+                            audioElement.controls = true;
+
+                            const deleteButton = document.createElement('button');
+                            deleteButton.textContent = '🗑️ Delete';
+                            deleteButton.className = 'ml-2 px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition';
+
+                            const recordingItem = document.createElement('div');
+                            recordingItem.className = 'recording-item flex items-center';
+                            recordingItem.appendChild(audioElement);
+                            recordingItem.appendChild(deleteButton);
+
+                            recordingsContainer.appendChild(recordingItem);
+
+                            deleteButton.addEventListener('click', () => {
+                                recordingsContainer.removeChild(recordingItem);
+                                alert('Recording deleted successfully.');
+                                // TODO: Optionally, remove the recording from the server
+                            });
+
+                            // TODO: Upload audioBlob to the server if needed
+                        };
+                    })
+                    .catch(error => {
+                        alert('Microphone access denied.');
+                        console.error(error);
+                    });
+            } else if (mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
             }
         });
     </script>
