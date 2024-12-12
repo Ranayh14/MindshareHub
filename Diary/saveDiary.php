@@ -7,7 +7,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $title = $conn->real_escape_string(trim($_POST['title']));
     $content = $conn->real_escape_string(trim($_POST['content']));
 
-    $query = "INSERT INTO posts (content, user_id, user_username) VALUES ('$content', $user_id, '{$_SESSION['username']}')";
+    $query = "INSERT INTO dairys (content, user_id, user_username) VALUES ('$content', $user_id, '{$_SESSION['username']}')";
     if ($conn->query($query)) {
         echo "Diary berhasil disimpan.";
     } else {

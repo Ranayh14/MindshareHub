@@ -12,7 +12,6 @@ $query = "SELECT id, content,
 
 $userId = 1;
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
     $content = $_POST['content'];
@@ -123,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (title && content) {
                 // Kirim data ke PHP menggunakan fetch
-                fetch('save_diary.php', {
+                fetch('saveDiary.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
