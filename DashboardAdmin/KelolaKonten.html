@@ -30,6 +30,10 @@
                     <i class="fas fa-file-alt w-5 h-5"></i>
                     <span>Kelola Konten</span>
                 </a>
+                <a href="KelolaKomunitas.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                    <i class="fas fa-users w-5 h-5"></i>
+                    <span>Kelola Komunitas</span>
+                </a>
                 <a href="LaporanMasuk.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
@@ -38,17 +42,41 @@
                     <i class="fas fa-eye w-5 h-5"></i>
                     <span>Lihat Laporan</span>
                 </a>
+                <a href="#" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                    <i class="fas fa-sign-out-alt w-5 h-5"></i>
+                    <span>Keluar</span>
+                </a>
             </nav>
         </aside>
 
         <main class="flex-1 p-8">
             <div class="mb-8">
                 <h2 class="text-2xl font-bold">Kelola Konten</h2>
-                <!-- Add New Content Button -->
+                <!-- Form Tambah Konten -->
                 <div class="mt-4">
-                    <button class="bg-[#5865F2] text-white px-4 py-2 rounded-lg hover:bg-[#4752C4] transition duration-200">
+                    <button class="bg-[#5865F2] text-white px-4 py-2 rounded-lg hover:bg-[#4752C4] transition duration-200" onclick="toggleForm()">
                         Tambah Konten
                     </button>
+                </div>
+                <div id="contentForm" class="hidden mt-4 bg-[#2f3136] p-4 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold">Tambah Konten Baru</h3>
+                    <form id="addContentForm" onsubmit="submitContent(event)">
+                        <div class="mt-2">
+                            <label class="block text-gray-300">Judul Konten:</label>
+                            <input type="text" id="contentTitle" class="mt-1 p-2 w-full bg-[#202225] text-gray-100 rounded" required>
+                        </div>
+                        <div class="mt-2">
+                            <label class="block text-gray-300">Catatan:</label>
+                            <textarea id="contentNotes" class="mt-1 p-2 w-full bg-[#202225] text-gray-100 rounded" rows="4" required></textarea>
+                        </div>
+                        <div class="mt-2">
+                            <label class="block text-gray-300">Gambar:</label>
+                            <input type="file" id="contentImage" accept="image/*" class="mt-1 p-2 w-full bg-[#202225] text-gray-100 rounded">
+                        </div>
+                        <div class="mt-4">
+                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-400 transition duration-200">Kirim</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -63,7 +91,7 @@
                             <th class="px-4 py-2 text-gray-400">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="contentTable">
                         <tr class="hover:bg-[#35393f]">
                             <td class="px-4 py-2">1</td>
                             <td class="px-4 py-2">Konten Pertama</td>
@@ -78,25 +106,52 @@
                                 </button>
                             </td>
                         </tr>
-                        <tr class="hover:bg-[#35393f]">
-                            <td class="px-4 py-2">2</td>
-                            <td class="px-4 py-2">Konten Kedua</td>
-                            <td class="px-4 py-2">2024-11-15</td>
-                            <td class="px-4 py-2 text-red-400">Dibatalkan</td>
-                            <td class="px-4 py-2">
-                                <button class="text-yellow-500 hover:text-yellow-300">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="text-red-500 hover:text-red-300 ml-2">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- Add more rows here -->
+                        <!-- Tambahkan lebih banyak baris di sini -->
                     </tbody>
                 </table>
             </div>
         </main>
     </div>
+
+    <script>
+        function toggleForm() {
+            const form = document.getElementById('contentForm');
+            form.classList.toggle('hidden');
+        }
+
+        function submitContent(event) {
+            event.preventDefault();
+
+            const title = document.getElementById('contentTitle').value;
+            const notes = document.getElementById('contentNotes').value;
+            const image = document.getElementById('contentImage').files[0];
+
+            // Simulasi pengiriman konten dan notifikasi ke pengguna
+            alert(`Konten baru telah ditambahkan:\nJudul: ${title}\nCatatan: ${notes}\nGambar: ${image ? image.name : 'Tidak ada gambar'}`);
+
+            // Tambahkan konten ke tabel
+            const table = document.getElementById('contentTable');
+            const rowCount = table.rows.length + 1;
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td class="px-4 py-2">${rowCount}</td>
+                <td class="px-4 py-2">${title}</td>
+                <td class="px-4 py-2">${new Date().toLocaleDateString()}</td>
+                <td class="px-4 py-2 text-green-400">Dipublikasikan</td>
+                <td class="px-4 py-2">
+                    <button class="text-yellow-500 hover:text-yellow-300">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-red-500 hover:text-red-300 ml-2">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            // Reset form
+            document.getElementById('addContentForm').reset();
+            toggleForm();
+        }
+    </script>
 </body>
 </html>
