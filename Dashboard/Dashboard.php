@@ -5,7 +5,7 @@ include('../conn.php');
 
 // Redirect jika belum login
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: ../login/login.html");
     exit;
 }
 ?>
