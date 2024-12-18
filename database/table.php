@@ -16,7 +16,8 @@ $sql_post = "CREATE TABLE IF NOT EXISTS posts (
     user_id INT NOT NULL,
     user_username VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    image_path VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) 
 )";
 
 $sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (

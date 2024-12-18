@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include('../conn.php');
@@ -69,13 +70,18 @@ if (!isset($_SESSION['user_id'])) {
                     <div class="avatar"></div>
                     <h2 class="text-lg font-semibold mb-3 opacity-90">Buat Postingan Baru</h2>
                 </div>
-                <form action="post.php" method="POST">
+                <form action="post.php" method="POST" enctype="multipart/form-data">
                     <textarea 
                         name="postContent" 
                         rows="4" 
                         class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-black"
                         placeholder="Tulis sesuatu..."
                         required></textarea>
+                    <input 
+                        type="file" 
+                        name="postImage" 
+                        accept="image/*" 
+                        class="mt-3 block w-full text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-md cursor-pointer focus:outline-none"> 
                     <button 
                         type="submit" 
                         class="mt-3 bg-white text-purple-600 px-4 py-2 rounded hover:bg-purple-600 hover:text-white opacity-90">
@@ -87,7 +93,7 @@ if (!isset($_SESSION['user_id'])) {
             <!-- Posts -->
             <div>
                 <?php
-                    $sql = "SELECT posts.id, posts.content, posts.created_at, users.username 
+                    $sql = "SELECT posts.id, posts.content, posts.created_at, posts.image_path, users.username 
                             FROM posts 
                             JOIN users ON posts.user_id = users.id 
                             ORDER BY posts.created_at DESC";
@@ -113,6 +119,14 @@ if (!isset($_SESSION['user_id'])) {
                             echo '        </div>';
                             echo '    </div>';
                             echo '    <div class="post-content mt-2 text-white">' . htmlspecialchars($row['content']) . '</div>';
+
+                            // Tampilkan gambar jika ada
+                            echo '    <div class="post-image mt-2 flex justify-center ">';
+                                if ($row['image_path']) {
+                                    echo '<img src="../uploads/' . htmlspecialchars($row['image_path']) . '" alt="Gambar Postingan" class="mt-2">';
+                                }
+                            echo '    </div>';
+                            
                             echo '</div>';
                         }
                     } else {
