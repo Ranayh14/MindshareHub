@@ -69,12 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea id="content" class="note-input w-full h-48 p-5 bg-[#2d2d3d] text-white text-base rounded outline-none resize-none mb-5" placeholder="Tulis disini..."></textarea>
 
         <div class="voice-note mt-5">
-            <button id="record-btn" class="px-4 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                <span id="record-btn-text"> Start Recording</span>
+            <input type="file" id="audio-upload" accept="audio/*" class="hidden" />
+            <button id="upload-btn" class="px-4 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                Upload Audio
             </button>
-            <p id="record-status" class="text-sm text-[#8e8ea0] mt-2 hidden">Recording...</p>
             <div id="recordings-container" class="space-y-4 mt-4"></div>
         </div>
+
     </div>
 
     <div class="notes-sidebar w-72 bg-[#13141f] h-screen p-5 flex flex-col">
@@ -89,6 +90,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
+        document.getElementById('upload-btn').addEventListener('click', function () {
+            document.getElementById('audio-upload').click();
+        });
+
+        document.getElementById('audio-upload').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const recordingsContainer = document.getElementById('recordings-container');
+                const audioElement = document.createElement('audio');
+                audioElement.controls = true;
+                audioElement.src = URL.createObjectURL(file);
+                recordingsContainer.appendChild(audioElement);
+
+                // Anda dapat mengirim file audio ke server jika diperlukan
+                const formData = new FormData();
+                formData.append('audio', file);
+
+                fetch('saveAudio.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    alert('Audio berhasil diunggah!');
+                })
+                .catch(error => {
+                    console.error('Terjadi kesalahan saat mengunggah audio:', error);
+                });
+            }
+        });
+
         document.getElementById('save-btn').addEventListener('click', function() {
             const title = document.getElementById('title').value.trim();
             const content = document.getElementById('content').value.trim();
