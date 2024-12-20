@@ -6,9 +6,10 @@
     <title>Sidebar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
 </head>
 <body>
-    <div class="sidebar w-60  h-screen p-5 flex flex-col justify-between">
+    <div class="sidebar w-70  h-screen p-5 flex flex-col justify-between">
         <div>
             <div class="logo text-xl font-bold mb-8 text-white">MindshareHub</div>
             <nav class="menu space-y-2">
@@ -39,10 +40,21 @@
                 </a>
             </nav>
         </div>
-        <div class="user-profile flex items-center justify-between text-[#8e8ea0]">
-            <div class="user-avatar w-10 h-10 bg-[#2d2d3d] rounded-full mr-3"></div>
-            <span>User1234</span>
-            <button class="more-options">•••</button>
+        <div class="flex items-center p-4 bg-purple-700 rounded-full">
+            <img alt="User profile picture" class="rounded-full mr-2" height="30" src="https://storage.googleapis.com/a1aa/image/vpFbuBQSu6LwNJADhiVP5b1OuoExmfWPdjHPBfqWjWA3zL6TA.jpg" width="30"/>
+            <div>
+                <div class="flex items-center">
+                    <span class="text-white">
+                        User1234
+                    </span>
+                    <i class="fas fa-heart text-red-500 ml-2"></i>
+                </div>
+                <div class="w-full bg-gray-600 rounded-full h-2.5 mt-1">
+                    <div class="bg-red-500 h-2.5 rounded-full" style="width: 100%">
+                    </div>
+                </div>
+            </div>
+            <i class="fas fa-ellipsis-h text-gray-400 ml-auto"></i>
         </div>
     </div>
 </body>

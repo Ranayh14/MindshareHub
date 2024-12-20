@@ -67,12 +67,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea id="content" class="note-input w-full h-48 p-5 bg-[#2d2d3d] text-white text-base rounded outline-none resize-none mb-5" placeholder="Tulis disini..."></textarea>
 
         <div class="voice-note mt-5">
-            <button id="record-btn" class="px-4 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                <span id="record-btn-text"> Start Recording</span>
+            <input type="file" id="audio-upload" accept="audio/*" class="hidden" />
+            <button id="upload-btn" class="px-4 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                Upload Audio
             </button>
-            <p id="record-status" class="text-sm text-[#8e8ea0] mt-2 hidden">Recording...</p>
             <div id="recordings-container" class="space-y-4 mt-4"></div>
         </div>
+
     </div>
 
     <div class="notes-sidebar w-72 bg-[#13141f] h-screen p-5 flex flex-col">
