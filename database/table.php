@@ -10,7 +10,7 @@ $sql_user = "CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 
-$sql_post = "CREATE TABLE IF NOT EXISTS posts (
+$sql_post = "CREATE OR REPLACE TABLE posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT NOT NULL,
     user_id INT NOT NULL,
