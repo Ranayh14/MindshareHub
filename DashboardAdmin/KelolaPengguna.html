@@ -104,6 +104,9 @@
                 actionCell.innerHTML = '<button class="bg-green-500 text-white px-2 py-1 rounded" onclick="activateUser(\'' + username + '\', ' + userId + ')">Aktifkan</button>';
 
                 alert(`Pengguna ${username} telah dibanned dan statusnya diubah menjadi Nonaktif.`);
+
+                // TODO: Kirim permintaan ke server untuk mem-banned pengguna
+                // Misalnya menggunakan fetch atau XMLHttpRequest
             }
         }
 
@@ -120,6 +123,9 @@
                 actionCell.innerHTML = '<button class="bg-red-500 text-white px-2 py-1 rounded" onclick="banUser(\'' + username + '\', ' + userId + ')">Banned</button>';
 
                 alert(`Pengguna ${username} telah diaktifkan kembali.`);
+
+                // TODO: Kirim permintaan ke server untuk mengaktifkan pengguna kembali
+                // Misalnya menggunakan fetch atau XMLHttpRequest
             }
         }
     </script>
