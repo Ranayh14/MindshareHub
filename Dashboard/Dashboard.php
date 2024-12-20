@@ -5,7 +5,7 @@ include('../conn.php');
 
 // Redirect jika belum login
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: ../login/login.html");
     exit;
 }
 ?>
@@ -93,10 +93,10 @@ if (!isset($_SESSION['user_id'])) {
             <!-- Posts -->
             <div>
                 <?php
-                    $sql = "SELECT posts.id, posts.content, posts.created_at, posts.image_path, users.username 
-                            FROM posts 
-                            JOIN users ON posts.user_id = users.id 
-                            ORDER BY posts.created_at DESC";
+                    $sql = "SELECT posts.id, posts.content, posts.created_at, posts.likes, users.username, posts.image_path
+                            FROM posts
+                            JOIN users ON posts.user_id = users.id
+                            ORDER BY posts.created_at DESC";            
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
@@ -121,13 +121,24 @@ if (!isset($_SESSION['user_id'])) {
                             echo '    <div class="post-content mt-2 text-white">' . htmlspecialchars($row['content']) . '</div>';
 
                             // Tampilkan gambar jika ada
+                            echo '<div>';
                             echo '    <div class="post-image mt-2 flex justify-center ">';
                                 if ($row['image_path']) {
                                     echo '<img src="../uploads/' . htmlspecialchars($row['image_path']) . '" alt="Gambar Postingan" class="mt-2">';
-                                }
-                            echo '    </div>';
-                            
+                                }                            
+                            echo '    </div">';
                             echo '</div>';
+                            echo '<div class="action flex items-center text-gray-400 mt-4">';
+                            echo '<span class="like cursor-pointer" data-liked="false" onclick="toggleLike(this, ' . $row['id'] . ')">';
+                            echo '  <i class="fas fa-heart ml-4 mr-2 transition-colors hover:text-red-500"></i>';
+                            echo '</span>';
+                            echo '<span class="like-count">' . $row['likes'] .'&nbsp;'. '</span> Likes';
+                            echo '  <button onclick="navigateToComments(' . $row['id'] . ')" class="ml-4">';
+                            echo '    <i class="fas fa-comment mr-2"></i>';
+                            echo '  </button>';
+                            echo '</div>';
+                            echo '</div>';
+                            echo '    </div>';
                         }
                     } else {
                         echo '<div class="post">Belum ada postingan.</div>';
@@ -201,6 +212,7 @@ if (!isset($_SESSION['user_id'])) {
             };
         }
 
+
         document.querySelectorAll('.post form button').forEach(button => {
             button.addEventListener('click', function (event) {
                 event.preventDefault();
@@ -220,6 +232,61 @@ if (!isset($_SESSION['user_id'])) {
             });
         });
     });
+
+    function toggleLike(postId) {
+        fetch('update_like.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ postId }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const post = document.querySelector(`.post[data-post-id="${postId}"]`);
+                    const likeButton = post.querySelector('.like');
+                    const likeCount = post.querySelector('.like-count');
+
+                    if (data.liked) {
+                        likeButton.textContent = '<i class="fas fa-heart ml-4 mr-2" style="color: red;"></i>';
+                        likeCount.textContent = parseInt(likeCount.textContent) + 1;
+                    } else {
+                        likeButton.textContent = '<i class="fas fa-heart ml-4 mr-2"></i>';
+                        likeCount.textContent = parseInt(likeCount.textContent) - 1;
+                    }
+                }
+            });
+    }
+
+    function navigateToComments(postId) {
+        window.location.href = `comments.php?post_id=${postId}`;
+    }
+
+    function toggleLike(element, postId) {
+        const likeCountSpan = element.nextElementSibling;
+        let likeCount = parseInt(likeCountSpan.textContent);
+
+        fetch('../Dashboard/update_like.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ post_id: postId }),
+        })
+            .then(response => response.json())
+            .then(data => {
+            if (data.status === 'liked') {
+                likeCount++;
+                element.setAttribute('data-liked', 'true');
+                element.querySelector('i').classList.add('text-red-500');
+            } else if (data.status === 'unliked') {
+                likeCount--;
+                element.setAttribute('data-liked', 'false');
+                element.querySelector('i').classList.remove('text-red-500');
+            }
+            likeCountSpan.textContent = likeCount;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+
     </script>
 
 </body>

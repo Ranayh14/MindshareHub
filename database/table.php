@@ -14,10 +14,19 @@ $sql_post = "CREATE TABLE IF NOT EXISTS posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT NOT NULL,
     user_id INT NOT NULL,
-    user_username VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     image_path VARCHAR(255) DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) 
+    likes INT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)";
+
+$sql_likePost = "CREATE TABLE IF NOT EXISTS post_likes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    UNIQUE(post_id, user_id),
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
 $sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (
@@ -48,6 +57,15 @@ catch (mysqli_sql_exception) {
 try {   
     if(mysqli_query($conn, $sql_diarys)) {
         echo "tabel Diary berhasil dibuat <br>";
+    }
+}
+catch (mysqli_sql_exception) {
+    echo "Tabel Diary gagal dibuat";
+}
+
+try {   
+    if(mysqli_query($conn, $sql_likePost)) {
+        echo "tabel like post berhasil dibuat <br>";
     }
 }
 catch (mysqli_sql_exception) {

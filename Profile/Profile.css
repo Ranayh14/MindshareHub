@@ -1,167 +1,231 @@
-/* General Reset */
+/* Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-/* Body Styling */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #2c2f33; /* Discord dark gray */
-    color: #ffffff; /* Light text */
-    min-height: 100vh; /* Ensure it fills the entire height */
+    background-color: #1a1b26;
+    color: white;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
-
-/* Container Layout */
-.container {
-    display: flex;
-    max-width: 1200px;
-    width: 100%; /* Ensure it spans full width */
-    margin: 0 auto;
-    padding: 20px;
-    height: 100vh; /* Full viewport height */
-    overflow: hidden; /* Prevent overflow */
 }
 
 /* Sidebar Styling */
-.sidebar, .right-sidebar {
-    width: 20%;
-    padding: 15px;
-    background-color: #23272a; /* Sidebar dark color */
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+.sidebar {
+    width: 240px;
+    background-color: #13141f;
+    height: 100vh;
+    padding: 20px;
 }
 
-.sidebar .logo {
-    font-size: 24px;
+.logo {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 30px;
     font-weight: bold;
-    color: #7289da; /* Discord blue */
-    margin-bottom: 20px;
 }
 
-.sidebar nav ul {
-    list-style: none;
-}
-
-.sidebar nav ul li {
-    margin: 15px 0;
-}
-
-.sidebar nav ul li a {
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    color: #8e8ea0;
     text-decoration: none;
-    color: #ffffff; /* Light text */
-    font-size: 18px;
-    display: block;
-    padding: 8px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    margin-bottom: 5px;
+    border-radius: 8px;
 }
 
-.sidebar nav ul li a:hover {
-    background-color: #7289da; /* Hover with Discord blue */
+.menu-item:hover {
+    background-color: #2d2d3d;
 }
 
-.sidebar .tweet-btn {
-    background-color: #7289da; /* Discord blue */
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    font-size: 16px;
-    border-radius: 20px;
-    cursor: pointer;
+.menu-item i {
+    margin-right: 10px;
 }
 
 /* Main Content Styling */
 .main-content {
     flex: 1;
-    padding: 15px;
-    background-color: #23272a; /* Main content background */
-    border-radius: 10px;
-    overflow-y: auto; /* Scrollable if content overflows */
+    padding: 20px;
+}
+
+.header {
+    margin-bottom: 30px;
 }
 
 .header h1 {
     font-size: 24px;
-    margin-bottom: 20px;
-    color: #ffffff;
-}
-
-.tweet-box {
-    margin-bottom: 20px;
-}
-
-.tweet-box textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #99aab5; /* Light gray border */
-    border-radius: 10px;
-    resize: none;
-    font-size: 16px;
-    background-color: #2c2f33; /* Discord input background */
-    color: #ffffff;
-}
-
-.tweet-actions {
-    text-align: right;
-    margin-top: 10px;
-}
-
-.feed .tweet {
-    border-bottom: 1px solid #99aab5; /* Light gray separator */
-    padding: 10px 0;
-}
-
-.feed .tweet h3 {
-    font-size: 18px;
-    margin-bottom: 5px;
-    color: #ffffff;
-}
-
-/* Right Sidebar Styling */
-.right-sidebar {
-    width: 20%;
-    padding: 15px;
-    background-color: #23272a; /* Sidebar dark color */
-    border-radius: 10px;
-}
-
-.search-box input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #99aab5; /* Light gray border */
-    border-radius: 20px;
-    margin-bottom: 20px;
-    background-color: #2c2f33; /* Dark input */
-    color: #ffffff;
-}
-
-.trending h3 {
-    font-size: 18px;
     margin-bottom: 10px;
-    color: #ffffff;
 }
 
-.trending ul {
-    list-style: none;
+/* Post Styling */
+.post {
+    background-color: #1e1f2e;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
-.trending ul li {
-    margin: 10px 0;
-    color: #7289da; /* Discord blue for trends */
+.post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #2d2d3d;
+    margin-right: 10px;
+}
+
+.post-content {
+    color: #a0a0b0;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.post-info {
+    color: #8e8ea0;
+}
+
+.post-author {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 2px;
+}
+
+.post-time {
+    font-size: 0.9em;
+}
+
+/* Right Sidebar */
+.right-sidebar {
+    padding: 20px;
+    background-color: #13141f;
+    color: white;
+}
+
+/* Search Bar Styles */
+.search-container {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.search-bar {
+    width: 100%;
+    padding: 10px 36px 10px 16px;
+    border-radius: 20px;
+    border: none;
+    background-color: #2c2c2c;
+    color: white;
+    font-size: 14px;
+}
+
+.search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+}
+
+/* Section Card Styles */
+.section-card {
+    background-color: #2c2c2c;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.section-card h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+/* Category Styles */
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.category {
+    padding: 8px 12px;
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    font-size: 14px;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.trending ul li:hover {
-    text-decoration: underline;
+.category:hover {
+    background-color: #454545;
 }
 
-/* Fix Full Height */
-html, body {
+/* User Rankings Styles */
+.user-rankings {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.user-rank-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.rank {
+    font-weight: 600;
+    min-width: 20px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background-color: #454545;
+    border-radius: 50%;
+}
+
+.user-name {
+    font-size: 14px;
+}
+
+/* Atur gambar agar selalu di tengah */
+.carousel-item img {
+    object-fit: cover; /* Mengatur gambar agar proporsional */
     height: 100%;
+    width: auto;
+    margin: auto;
+}
+
+/* Tombol navigasi carousel */
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.carousel-button:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.carousel-button-prev {
+    left: 1rem;
+}
+
+.carousel-button-next {
+    right: 1rem;
 }
