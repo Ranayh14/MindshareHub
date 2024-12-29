@@ -22,25 +22,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if ($result->num_rows > 0) {
                 $user = $result->fetch_assoc();
 
-                // Verifikasi password
-                if (password_verify($password, $user['pass'])) {
-                    // Simpan data pengguna ke dalam session
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['roles'] = $user['roles'];
-                    $_SESSION['user_id'] = $user['id'];
-
-                    // Redirect berdasarkan role
-                    if ($user['roles'] === 'admin') {
-                        header("Location: /DashboardAdmin/DashboardAdmin.html");
-                    } elseif ($user['roles'] === 'user') {
-                        header("Location: /Dashboard/Dashboard.php");
-                    } else {
-                        // Jika role tidak valid
-                        $error = "Peran tidak dikenali.";
-                    }
-                    exit();
+                // Periksa apakah pengguna dibanned
+                if ($user['is_banned']) {
+                    // Ambil alasan banned
+                    $banReason = $user['ban_reason'];
+                    $_SESSION['ban_reason'] = $banReason;  // Simpan alasan dalam session
+                    $error = "Akun Anda telah dibanned. Alasan: " . htmlspecialchars($banReason);
                 } else {
-                    $error = "Password salah!";
+                    // Verifikasi password
+                    if (password_verify($password, $user['pass'])) {
+                        // Simpan data pengguna ke dalam session
+                        $_SESSION['username'] = $user['username'];
+                        $_SESSION['roles'] = $user['roles'];
+                        $_SESSION['user_id'] = $user['id'];
+
+                        // Redirect berdasarkan role
+                        if ($user['roles'] === 'admin') {
+                            header("Location: /DashboardAdmin/DashboardAdmin.html");
+                        } elseif ($user['roles'] === 'user') {
+                            header("Location: /Dashboard/Dashboard.php");
+                        } else {
+                            // Jika role tidak valid
+                            $error = "Peran tidak dikenali.";
+                        }
+                        exit();
+                    } else {
+                        $error = "Password salah!";
+                    }
                 }
             } else {
                 $error = "Email tidak ditemukan!";
@@ -59,4 +67,3 @@ if (isset($error)) {
     header("Location: /login/login.html?error=" . urlencode($error));
     exit();
 }
-?>

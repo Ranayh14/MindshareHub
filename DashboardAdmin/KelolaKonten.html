@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
     </style>
 </head>
+
 <body class="bg-[#2f3136] text-gray-100">
     <div class="min-h-screen flex">
         <!-- Sidebar -->
@@ -22,7 +24,7 @@
                     <i class="fas fa-home w-5 h-5"></i>
                     <span>Beranda</span>
                 </a>
-                <a href="KelolaPengguna.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="KelolaPengguna.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-user-friends w-5 h-5"></i>
                     <span>Kelola Pengguna</span>
                 </a>
@@ -37,10 +39,6 @@
                 <a href="LaporanMasuk.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
-                </a>
-                <a href="ViewReport.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-eye w-5 h-5"></i>
-                    <span>Lihat Laporan</span>
                 </a>
                 <a href="#" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-5 h-5"></i>
@@ -148,10 +146,28 @@
                 </td>
             `;
 
+            // Mengirim notifikasi ke database
+            fetch('add_notification.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title: title, notes: notes })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Notifikasi berhasil dikirim.");
+                } else {
+                    console.error("Gagal mengirim notifikasi.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+
             // Reset form
             document.getElementById('addContentForm').reset();
             toggleForm();
         }
     </script>
 </body>
+
 </html>

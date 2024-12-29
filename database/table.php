@@ -1,15 +1,20 @@
 <?php
 include("../conn.php");
 
+// Kode untuk membuat tabel users
 $sql_user = "CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     pass VARCHAR(255) NOT NULL,
     roles ENUM('admin', 'user') DEFAULT 'user',
+    is_banned BOOLEAN DEFAULT FALSE,
+    ban_reason TEXT,
+    ban_date DATETIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 
+// Kode untuk membuat tabel posts
 $sql_post = "CREATE TABLE IF NOT EXISTS posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT NOT NULL,
@@ -20,6 +25,7 @@ $sql_post = "CREATE TABLE IF NOT EXISTS posts (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
+// Kode untuk membuat tabel post_likes
 $sql_likePost = "CREATE TABLE IF NOT EXISTS post_likes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL,
@@ -29,6 +35,7 @@ $sql_likePost = "CREATE TABLE IF NOT EXISTS post_likes (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
+// Kode untuk membuat tabel diarys
 $sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
@@ -36,39 +43,54 @@ $sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 
+// Kode untuk membuat tabel notifications
+$sql_notifications = "CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    notes TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)";
+
+// Eksekusi setiap query untuk membuat tabel
 try {   
-    if(mysqli_query($conn, $sql_user)) {
-        echo "tabel users berhasil dibuat <br>";
+    if (mysqli_query($conn, $sql_user)) {
+        echo "Tabel users berhasil dibuat <br>";
     }
-}
-catch (mysqli_sql_exception) {
-    echo "Tabel users gagal dibuat";
+} catch (mysqli_sql_exception) {
+    echo "Tabel users gagal dibuat <br>";
 }
 
 try {   
-    if(mysqli_query($conn, $sql_post)) {
-        echo "tabel post berhasil dibuat <br>";
+    if (mysqli_query($conn, $sql_post)) {
+        echo "Tabel posts berhasil dibuat <br>";
     }
-}
-catch (mysqli_sql_exception) {
-    echo "Tabel post gagal dibuat";
+} catch (mysqli_sql_exception) {
+    echo "Tabel posts gagal dibuat <br>";
 }
 
 try {   
-    if(mysqli_query($conn, $sql_diarys)) {
-        echo "tabel Diary berhasil dibuat <br>";
+    if (mysqli_query($conn, $sql_diarys)) {
+        echo "Tabel diary berhasil dibuat <br>";
     }
-}
-catch (mysqli_sql_exception) {
-    echo "Tabel Diary gagal dibuat";
+} catch (mysqli_sql_exception) {
+    echo "Tabel diary gagal dibuat <br>";
 }
 
 try {   
-    if(mysqli_query($conn, $sql_likePost)) {
-        echo "tabel like post berhasil dibuat <br>";
+    if (mysqli_query($conn, $sql_likePost)) {
+        echo "Tabel like post berhasil dibuat <br>";
     }
+} catch (mysqli_sql_exception) {
+    echo "Tabel like post gagal dibuat <br>";
 }
-catch (mysqli_sql_exception) {
-    echo "Tabel Diary gagal dibuat";
+
+try {   
+    if (mysqli_query($conn, $sql_notifications)) {
+        echo "Tabel notifications berhasil dibuat <br>";
+    }
+} catch (mysqli_sql_exception) {
+    echo "Tabel notifications gagal dibuat <br>";
 }
 ?>
