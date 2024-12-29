@@ -5,14 +5,22 @@ $secret = 'XVQ2UIGO75XRUKJO';
 $link = \Sonata\GoogleAuthenticator\GoogleQrUrl::generate('MindshareHub', $secret, 'MindshareHub');
 $g = new \Sonata\GoogleAuthenticator\GoogleAuthenticator();
 
+$error = ''; // Variabel untuk menyimpan pesan error
+
 if (isset($_POST['submit'])) {
     $code = $_POST['pass-code'];
     if ($g->checkCode($secret, $code)) {
-        header("Location: resetPassword.php");
+        header("Location: gpTahap3.html");
     } else {
-        echo "<script>alert('Pin Salah'); window.history.back();</script>";
+      $error = "Pin Salah. Silakan coba lagi.";
     }
 }
+
+// // Redirect jika mengisi email
+// if (!isset($_SESSION['email'])) {
+//   header("Location: ../gantiPassword/gpTahap1.html");
+//   exit;
+// }
 ?>
 
 <!DOCTYPE html>
@@ -84,8 +92,26 @@ if (isset($_POST['submit'])) {
           </div>
         </div>
     
+        <!-- Alert Error -->
+        <?php if ($error): ?>
+          <div id="alert-password" class="max-w-md mx-auto relative flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 rounded-lg fade-in" role="alert">
+            <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 1 0 1 1v4h1a1 1 0 0 1 0 2Z"/>
+            </svg>
+            <div class="ms-3 text-sm font-medium">
+              <?= htmlspecialchars($error); ?>
+            </div>
+            <button type="button" aria-label="Close" onclick="closeAlert()" style="background: none; border: none; cursor: pointer; padding: 0; position: absolute; top: 8px; right: 8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+                <line x1="6" y1="18" x2="18" y2="6"></line>
+              </svg>
+            </button>
+          </div>
+        <?php endif; ?>
+
         <div class="flex justify-center items-center">
-          <form action="resetPassword.html" method="POST" class="space-y-6 p-5 max-w-md w-full rounded-lg shadow-md bg-white bg-opacity-20 backdrop-blur-lg">
+          <form action="gpTahap2.php" method="POST" class="space-y-6 p-5 max-w-md w-full rounded-lg shadow-md bg-white bg-opacity-20 backdrop-blur-lg">
             <div>
               <label for="pass-code" class="block text-lg font-medium mb-1 text-white">Kode OTP</label>
               <input type="text" id="pass-code" name="pass-code" placeholder="Masukkan Kode OTP" maxlength="6" required
@@ -104,5 +130,14 @@ if (isset($_POST['submit'])) {
       </div>
     </div>
   </div>
+
+  <script>
+    function closeAlert() {
+      const alertElement = document.getElementById('alert-password');
+      if (alertElement) {
+        alertElement.style.display = 'none'; // Sembunyikan alert
+      }
+    }
+  </script>
 </body>
 </html>

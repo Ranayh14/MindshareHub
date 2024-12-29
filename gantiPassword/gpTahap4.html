@@ -7,6 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
   <style>
     @tailwind base;
     @tailwind components;
@@ -60,19 +61,25 @@
           <div class="w-32 h-32 mx-auto mb-3 flex items-center justify-center">
             <img src="/Asset/Logo MindsahreHub-07.png" alt="Logo" class="w-32 h-32">
           </div>
-          <h2 class="text-4xl font-bold">Lupa kata sandi?</h2>
+          <h2 class="text-4xl font-bold">Konfirmasi Kata Sandi Baru!</h2>
         </div>
     
         <div class="flex justify-center items-center">
-          <form action="otp.php" method="POST" class="space-y-6 p-5 max-w-md w-full rounded-lg shadow-md bg-white bg-opacity-20 backdrop-blur-lg">
+          <form onsubmit="confirmPassword(event)" action="gpTahap4Update.php" method="POST" class="space-y-6 p-5 max-w-md w-full rounded-lg shadow-md bg-white bg-opacity-20 backdrop-blur-lg">
             <div>
-              <label for="email" class="block text-lg font-medium mb-1">Email</label>
-              <input type="email" id="email" name="email" placeholder="contoh@gmail.com" required
-                class="w-full px-4 py-2 rounded-lg bg-gray-100 text-gray-800 border border-purple-600 focus:ring focus:ring-purple-400 outline-none text-sm transition duration-200 ease-in-out shadow-sm hover:shadow-lg">
+              <label for="password" class="block text-lg font-medium mb-1">Kata Sandi</label>
+              <div class="relative">
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Masukkan Kata Sandi Baru" required
+                  class="w-full px-4 py-3 rounded-lg bg-gray-100 text-gray-800 border border-purple-600 focus:ring focus:ring-purple-400 outline-none text-sm transition duration-200 ease-in-out shadow-sm hover:shadow-lg">
+                <span class="absolute inset-y-0 right-3 flex items-center text-gray-400 cursor-pointer" onclick="togglePassword()">
+                  <i class="fi fi-rr-eye"></i>
+                </span>
+              </div>
             </div>
+            <input type="hidden" name="password" id="password"> <!-- Password Baru -->
             <button type="submit"
               class="w-full py-2 bg-white hover:bg-purple-900 hover:text-white text-purple-900 text-lg font-semibold rounded-lg shadow-lg transition duration-200 ease-in-out transform hover:scale-105">
-              Kirim OTP
+              Kirim
             </button>
             <p class="text-center mt-4 text-sm">
               <a href="/login/login.html" class="text-white hover:underline font-semibold">Masuk Disini</a> | 
@@ -83,5 +90,36 @@
       </div>
     </div>
   </div>
+
+  <script>
+    const storedPassword = localStorage.getItem('password');
+    document.getElementById('password').value = storedPassword;
+
+    function confirmPassword(event) {
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (confirmPassword !== storedPassword) {
+        event.preventDefault();
+        alert('Kata sandi tidak cocok. Silakan coba lagi.');
+        return;
+      }
+    }
+    
+    function togglePassword() {
+      var passwordField = document.getElementById("confirm_password");
+      var icon = document.querySelector(".fi-rr-eye");
+  
+      // Toggle password visibility
+      if (passwordField.type === "password") {
+        passwordField.type = "text";  // Show password
+        icon.classList.remove("fi-rr-eye");
+        icon.classList.add("fi-rr-eye-crossed");  // Change icon to 'eye-crossed'
+      } else {
+        passwordField.type = "password";  // Hide password
+        icon.classList.remove("fi-rr-eye-crossed");
+        icon.classList.add("fi-rr-eye");  // Revert icon to 'eye'
+      }
+    }
+  </script>
 </body>
 </html>
