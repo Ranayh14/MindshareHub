@@ -100,9 +100,9 @@ include('../conn.php');
 
             <!-- Tabs -->
             <nav class="bg-customMain text-gray-400 flex justify-center border-b border-gray-700 space-x-12 mr-8 ml-4">
-                <a href="profile.php" class="px-4 py-2 text-white border-b-2 border-transparent border-white">Posts</a>
+                <a href="profile.php" class="px-4 py-2 hover:text-white border-b-2 border-transparent hover:border-white">Posts</a>
                 <a href="profileComment.php" class="px-4 py-2 hover:text-white border-b-2 border-transparent hover:border-white">Replies</a>
-                <a href="profileLike.php" class="px-4 py-2 hover:text-white border-b-2 border-transparent hover:border-white">Likes</a>
+                <a href="profileLike.php" class="px-4 py-2 text-white border-b-2 border-transparent border-white">Likes</a>
             </nav>
 
             <!-- Posts -->
@@ -123,7 +123,7 @@ include('../conn.php');
                     </p>
                     <div class="flex items-center text-gray-400">
                         <i class="fas fa-comment mr-2"></i> 13
-                        <i class="fas fa-heart ml-4 mr-2"></i> 24
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
                     </div>
                 </div>
                 <div class="post p-4 rounded-lg mr-4">
@@ -142,7 +142,7 @@ include('../conn.php');
                     </p>
                     <div class="flex items-center text-gray-400">
                         <i class="fas fa-comment mr-2"></i> 13
-                        <i class="fas fa-heart ml-4 mr-2"></i> 24
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
                     </div>
                 </div>
                 <div class="post p-4 rounded-lg mr-4">
@@ -161,7 +161,7 @@ include('../conn.php');
                     </p>
                     <div class="flex items-center text-gray-400">
                         <i class="fas fa-comment mr-2"></i> 13
-                        <i class="fas fa-heart ml-4 mr-2"></i> 24
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
                     </div>
                 </div>
                 <div class="post p-4 rounded-lg mr-4">
@@ -180,7 +180,7 @@ include('../conn.php');
                     </p>
                     <div class="flex items-center text-gray-400">
                         <i class="fas fa-comment mr-2"></i> 13
-                        <i class="fas fa-heart ml-4 mr-2"></i> 24
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
                     </div>
                 </div>
                 <div class="post p-4 rounded-lg mr-4">
@@ -199,7 +199,7 @@ include('../conn.php');
                     </p>
                     <div class="flex items-center text-gray-400">
                         <i class="fas fa-comment mr-2"></i> 13
-                        <i class="fas fa-heart ml-4 mr-2"></i> 24
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
                     </div>
                 </div>
                 <div class="post p-4 rounded-lg mr-4">
@@ -218,7 +218,7 @@ include('../conn.php');
                     </p>
                     <div class="flex items-center text-gray-400">
                         <i class="fas fa-comment mr-2"></i> 13
-                        <i class="fas fa-heart ml-4 mr-2"></i> 24
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
                     </div>
                 </div>
                 <div class="post p-4 rounded-lg mr-4">
@@ -237,7 +237,7 @@ include('../conn.php');
                     </p>
                     <div class="flex items-center text-gray-400">
                         <i class="fas fa-comment mr-2"></i> 13
-                        <i class="fas fa-heart ml-4 mr-2"></i> 24
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
                     </div>
                 </div>
                 <div class="post p-4 rounded-lg mr-4">
@@ -256,7 +256,45 @@ include('../conn.php');
                     </p>
                     <div class="flex items-center text-gray-400">
                         <i class="fas fa-comment mr-2"></i> 13
-                        <i class="fas fa-heart ml-4 mr-2"></i> 24
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
+                    </div>
+                </div>
+                <div class="post p-4 rounded-lg mr-4">
+                    <div class="flex items-center">
+                        <img alt="User profile picture" class="rounded-full mr-2" height="40" src="https://storage.googleapis.com/a1aa/image/vpFbuBQSu6LwNJADhiVP5b1OuoExmfWPdjHPBfqWjWA3zL6TA.jpg" width="40">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="font-bold">User1234</span>
+                                <i class="fas fa-heart text-red-500 ml-2"></i>
+                            </div>
+                            <span class="text-gray-400 text-sm">2h yang lalu</span>
+                        </div>
+                    </div>
+                    <p class="mb-2">
+                        Aku sedang patah hati. Setiap memikirkan dia, aku sedih dan ingin menyendiri. Akibatnya, aku sering menolak ajakan teman-teman dan merasa kesepian. Sudah mencoba move on, tapi belum berhasil. Ada yang pernah mengalami hal ini? Bagaimana cara mengatasinya? Butuh saran dan dukungan. Terima kasih!
+                    </p>
+                    <div class="flex items-center text-gray-400">
+                        <i class="fas fa-comment mr-2"></i> 13
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
+                    </div>
+                </div>
+                <div class="post p-4 rounded-lg mr-4">
+                    <div class="flex items-center">
+                        <img alt="User profile picture" class="rounded-full mr-2" height="40" src="https://storage.googleapis.com/a1aa/image/vpFbuBQSu6LwNJADhiVP5b1OuoExmfWPdjHPBfqWjWA3zL6TA.jpg" width="40">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="font-bold">User1234</span>
+                                <i class="fas fa-heart text-red-500 ml-2"></i>
+                            </div>
+                            <span class="text-gray-400 text-sm">2h yang lalu</span>
+                        </div>
+                    </div>
+                    <p class="mb-2">
+                        Aku sedang patah hati. Setiap memikirkan dia, aku sedih dan ingin menyendiri. Akibatnya, aku sering menolak ajakan teman-teman dan merasa kesepian. Sudah mencoba move on, tapi belum berhasil. Ada yang pernah mengalami hal ini? Bagaimana cara mengatasinya? Butuh saran dan dukungan. Terima kasih!
+                    </p>
+                    <div class="flex items-center text-gray-400">
+                        <i class="fas fa-comment mr-2"></i> 13
+                        <i class="fas fa-heart text-red-500 ml-4 mr-2"></i> 24
                     </div>
                 </div>
             </main>
