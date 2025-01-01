@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
 </head>
 <body>
-    <div class="sidebar w-70  h-screen p-5 flex flex-col justify-between">
+    <div class="sidebar w-70 h-screen p-5 flex flex-col justify-between bg-[#1a1a2e]">
         <div>
             <div class="logo text-xl font-bold mb-8 text-white">MindshareHub</div>
             <nav class="menu space-y-2">
@@ -19,20 +19,22 @@
                     </span>
                     Home
                 </a>
-                <a href="/notif/notif.php" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
+                <a href="/notif/notif.php" 
+                   class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
                     <span class="icon w-6 h-6 flex items-center justify-center mr-3">
                         <i class="fi fi-rr-bell"></i>
                     </span>
                     Notifications
                 </a>
-
-                <a href="/Diary/Diary.php" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
+                <a href="/Diary/Diary.php" 
+                   class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
                     <span class="icon w-6 h-6 flex items-center justify-center mr-3">
                         <i class="fi fi-rr-book"></i>
                     </span>
                     Diary
                 </a>
-                <a href="/Profile/profile.php" class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
+                <a href="/Profile/profile.php" 
+                   class="menu-item flex items-center p-3 text-[#8e8ea0] hover:bg-[#2d2d3d] hover:text-white rounded transition">
                     <span class="icon w-6 h-6 flex items-center justify-center mr-3">
                         <i class="fi fi-rr-user"></i>
                     </span>
@@ -50,8 +52,7 @@
                     <i class="fas fa-heart text-red-500 ml-2"></i>
                 </div>
                 <div class="w-full bg-gray-600 rounded-full h-2.5 mt-1">
-                    <div class="bg-red-500 h-2.5 rounded-full" style="width: 100%">
-                    </div>
+                    <div class="bg-red-500 h-2.5 rounded-full" style="width: 100%"></div>
                 </div>
             </div>
             <i class="fas fa-ellipsis-h text-gray-400 ml-auto"></i>
@@ -65,7 +66,7 @@
             
             menuItems.forEach(item => {
                 if (item.getAttribute("href") === currentPath) {
-                    item.classList.remove("text-black"); // Remove default text color
+                    item.classList.remove("text-[#8e8ea0]"); // Remove default text color
                     item.classList.add("bg-gray-800", "text-white"); // Add active styles
                 }
             });

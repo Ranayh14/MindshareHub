@@ -7,7 +7,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     try {
         // Ambil data dari form
         $email = $conn->real_escape_string(trim($_POST['email']));
-        $password = trim($_POST['password']);
 
         // Query untuk memeriksa pengguna berdasarkan email
         $query = "SELECT * FROM users WHERE email = ?";
@@ -29,29 +28,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $_SESSION['ban_reason'] = $banReason;  // Simpan alasan dalam session
                     $error = "Akun Anda telah dibanned. Alasan: " . htmlspecialchars($banReason);
                 } else {
-                    // Verifikasi password
-                    if (password_verify($password, $user['pass'])) {
-                        // Simpan data pengguna ke dalam session
-                        $_SESSION['username'] = $user['username'];
-                        $_SESSION['roles'] = $user['roles'];
-                        $_SESSION['user_id'] = $user['id'];
-
-                        // Redirect berdasarkan role
-                        if ($user['roles'] === 'admin') {
-                            header("Location: /DashboardAdmin/DashboardAdmin.html");
-                        } elseif ($user['roles'] === 'user') {
-                            header("Location: /Dashboard/Dashboard.php");
-                        } else {
-                            // Jika role tidak valid
-                            $error = "Peran tidak dikenali.";
-                        }
-                        exit();
-                    } else {
-                        $error = "Email atau Password salah!";
-                    }
+                    $_SESSION['email'] = $email;
+                    header("Location: /gantiPassword/gpTahap2.php");
                 }
             } else {
-                $error = "Email atau Password salah!";
+                $error = "Email tidak ditemukan!";
             }
             $stmt->close();
         } else {
@@ -64,6 +45,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 // Tampilkan pesan error jika ada
 if (isset($error)) {
-    header("Location: /login/login.html?error=" . urlencode($error));
-    exit();
+    header("Location: /gantiPassword/gpTahap1.html?error=" . urlencode($error));
 }
