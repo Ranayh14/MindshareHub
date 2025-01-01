@@ -14,6 +14,15 @@ $sql_user = "CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 
+// Kode untuk membuat tabel content
+$sql_content = "CREATE TABLE IF NOT EXISTS content (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    notes TEXT NOT NULL,
+    image VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+
 // Kode untuk membuat tabel posts
 $sql_post = "CREATE TABLE IF NOT EXISTS posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,7 +68,15 @@ try {
         echo "Tabel users berhasil dibuat <br>";
     }
 } catch (mysqli_sql_exception) {
-    echo "Tabel users gagal dibuat <br>";
+    echo "Tabel users gagal dibuat: " . mysqli_error($conn) . "<br>";
+}
+
+try {   
+    if (mysqli_query($conn, $sql_content)) {
+        echo "Tabel content berhasil dibuat <br>";
+    }
+} catch (mysqli_sql_exception) {
+    echo "Tabel content gagal dibuat: " . mysqli_error($conn) . "<br>";
 }
 
 try {   
@@ -67,7 +84,7 @@ try {
         echo "Tabel posts berhasil dibuat <br>";
     }
 } catch (mysqli_sql_exception) {
-    echo "Tabel posts gagal dibuat <br>";
+    echo "Tabel posts gagal dibuat: " . mysqli_error($conn) . "<br>";
 }
 
 try {   
@@ -75,7 +92,7 @@ try {
         echo "Tabel diary berhasil dibuat <br>";
     }
 } catch (mysqli_sql_exception) {
-    echo "Tabel diary gagal dibuat <br>";
+    echo "Tabel diary gagal dibuat: " . mysqli_error($conn) . "<br>";
 }
 
 try {   
@@ -83,7 +100,7 @@ try {
         echo "Tabel like post berhasil dibuat <br>";
     }
 } catch (mysqli_sql_exception) {
-    echo "Tabel like post gagal dibuat <br>";
+    echo "Tabel like post gagal dibuat: " . mysqli_error($conn) . "<br>";
 }
 
 try {   
@@ -91,6 +108,9 @@ try {
         echo "Tabel notifications berhasil dibuat <br>";
     }
 } catch (mysqli_sql_exception) {
-    echo "Tabel notifications gagal dibuat <br>";
+    echo "Tabel notifications gagal dibuat: " . mysqli_error($conn) . "<br>";
 }
+
+// Menutup koneksi
+mysqli_close($conn);
 ?>

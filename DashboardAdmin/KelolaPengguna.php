@@ -12,7 +12,8 @@ function banUser($userId, $reason) {
 // Fungsi untuk mengaktifkan kembali pengguna
 function activateUser($userId) {
     global $conn;
-    $stmt = $conn->prepare("UPDATE users SET is_banned = FALSE, ban_reason = NULL, ban_date = NULL WHERE id = ?");
+    // Hanya menghapus status banned dan tanggal banned
+    $stmt = $conn->prepare("UPDATE users SET is_banned = FALSE, ban_date = NULL WHERE id = ?");
     $stmt->bind_param("i", $userId);
     return $stmt->execute();
 }
@@ -20,7 +21,7 @@ function activateUser($userId) {
 // Fungsi untuk mengambil semua pengguna (hanya yang bukan admin)
 function getAllUsers() {
     global $conn;
-    $result = $conn->query("SELECT id, username, email, is_banned FROM users WHERE roles = 'user'");
+    $result = $conn->query("SELECT id, username, email, is_banned, ban_reason FROM users WHERE roles = 'user'");
 
     if (!$result) {
         die("Query Error: " . $conn->error);
@@ -41,7 +42,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($data['action'] === 'activate') {
         $userId = $data['userId'];
         $success = activateUser($userId);
-        echo json_encode(['success' => $success]);
+        
+        // Ambil alasan banned dari database
+        $stmt = $conn->prepare("SELECT ban_reason FROM users WHERE id = ?");
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ban_reason = $result->fetch_assoc()['ban_reason'];
+        
+        echo json_encode(['success' => $success, 'ban_reason' => $ban_reason]);
     }
     exit;
 }
@@ -81,7 +90,7 @@ $users = getAllUsers();
                     <i class="fas fa-user-friends w-5 h-5"></i>
                     <span>Kelola Pengguna</span>
                 </a>
-                <a href="KelolaKonten.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="KelolaKonten.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-file-alt w-5 h-5"></i>
                     <span>Kelola Konten</span>
                 </a>
@@ -115,6 +124,7 @@ $users = getAllUsers();
                             <th class="px-4 py-2 text-gray-200">Email</th>
                             <th class="px-4 py-2 text-gray-200">Status</th>
                             <th class="px-4 py-2 text-gray-200">Aksi</th>
+                            <th class="px-4 py-2 text-gray-200">Alasan Banned</th> <!-- Kolom untuk alasan banned -->
                         </tr>
                     </thead>
                     <tbody id="userTable">
@@ -139,6 +149,9 @@ $users = getAllUsers();
                                         </select>
                                         <button class="bg-red-500 text-white px-2 py-1 rounded" onclick="banUser('<?php echo htmlspecialchars($user['username']); ?>', <?php echo $user['id']; ?>)">Banned</button>
                                     <?php endif; ?>
+                                </td>
+                                <td class="px-4 py-2 text-gray-300" id="reason<?php echo $user['id']; ?>">
+                                    <?php echo $user['ban_reason'] ? htmlspecialchars($user['ban_reason']) : 'Tidak ada alasan'; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -178,6 +191,9 @@ $users = getAllUsers();
                         const actionCell = userRow.querySelector('td:nth-child(5)');
                         actionCell.innerHTML = '<button class="bg-green-500 text-white px-2 py-1 rounded" onclick="activateUser(\'' + username + '\', ' + userId + ')">Aktifkan</button>';
 
+                        const reasonCell = userRow.querySelector('td:nth-child(6)');
+                        reasonCell.textContent = reason; // Update alasan banned
+
                         alert(`Pengguna ${username} telah dibanned dengan alasan: "${reason}".`);
                     } else {
                         alert('Gagal mem-banned pengguna.');
@@ -206,6 +222,10 @@ $users = getAllUsers();
 
                         const actionCell = userRow.querySelector('td:nth-child(5)');
                         actionCell.innerHTML = '<button class="bg-red-500 text-white px-2 py-1 rounded" onclick="banUser(\'' + username + '\', ' + userId + ')">Banned</button>';
+
+                        // Update alasan banned saat diaktifkan kembali
+                        const reasonCell = userRow.querySelector('td:nth-child(6)');
+                        reasonCell.textContent = data.ban_reason ? data.ban_reason : 'Tidak ada alasan';
 
                         alert(`Pengguna ${username} telah diaktifkan kembali.`);
                     } else {
