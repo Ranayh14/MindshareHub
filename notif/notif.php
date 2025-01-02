@@ -30,7 +30,7 @@ $result = mysqli_stmt_get_result($stmt);
 <body>
 
     <div class="fixed top-0 left-0 h-screen w-64 z-50">
-        <?php include('../slicing/sidebar.html'); ?>
+        <?php include('../slicing/sidebar.php'); ?>
     </div>
 
     <div class="ml-64 flex-1 p-6">

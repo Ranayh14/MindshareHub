@@ -11,7 +11,9 @@ $sql_user = "CREATE TABLE IF NOT EXISTS users (
     is_banned BOOLEAN DEFAULT FALSE,
     ban_reason TEXT,
     ban_date DATETIME,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    profile_picture VARCHAR(255) DEFAULT NULL,
+    progress_percentage INT DEFAULT 0
 )";
 
 // Kode untuk membuat tabel content
@@ -62,6 +64,17 @@ $sql_notifications = "CREATE TABLE IF NOT EXISTS notifications (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
+$sql_report ="CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    reported_by INT NOT NULL,
+    reason VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES posts(id),
+    FOREIGN KEY (reported_by) REFERENCES users(id)
+)";
+
 // Eksekusi setiap query untuk membuat tabel
 try {   
     if (mysqli_query($conn, $sql_user)) {
@@ -109,6 +122,14 @@ try {
     }
 } catch (mysqli_sql_exception) {
     echo "Tabel notifications gagal dibuat: " . mysqli_error($conn) . "<br>";
+}
+
+try {   
+    if (mysqli_query($conn, $sql_report)) {
+        echo "Tabel report berhasil dibuat <br>";
+    }
+} catch (mysqli_sql_exception) {
+    echo "Tabel report gagal dibuat: " . mysqli_error($conn) . "<br>";
 }
 
 // Menutup koneksi
