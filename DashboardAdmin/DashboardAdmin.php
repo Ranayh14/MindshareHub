@@ -1,3 +1,23 @@
+<?php
+// Mengimpor koneksi database
+include("../conn.php");
+
+// Menghitung total pengguna
+$total_pengguna_query = "SELECT COUNT(*) as total FROM users";
+$result = mysqli_query($conn, $total_pengguna_query);
+$row = mysqli_fetch_assoc($result);
+$total_pengguna = $row['total'];
+
+// Menghitung total pengguna baru
+$total_pengguna_baru_query = "SELECT COUNT(*) as total FROM users WHERE created_at >= CURDATE()";
+$result_baru = mysqli_query($conn, $total_pengguna_baru_query);
+$row_baru = mysqli_fetch_assoc($result_baru);
+$total_pengguna_baru = $row_baru['total'];
+
+// Menutup koneksi
+mysqli_close($conn);
+?>
+
 <!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
@@ -19,7 +39,7 @@
                 <h1 class="text-2xl font-semibold text-white">PusatAdmin</h1>
             </div>
             <nav class="space-y-4">
-                <a href="DashboardAdmin.html" class="flex items-center space-x-2 p-2 rounded-lg bg-[#5865F2] text-white">
+                <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg bg-[#5865F2] text-white">
                     <i class="fas fa-home w-5 h-5"></i>
                     <span>Beranda</span>
                 </a>
@@ -31,7 +51,7 @@
                     <i class="fas fa-file-alt w-5 h-5"></i>
                     <span>Kelola Konten</span>
                 </a>
-                <a href="KelolaKomunitas.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-users w-5 h-5"></i>
                     <span>Kelola Komunitas</span>
                 </a>
@@ -39,8 +59,7 @@
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
                 </a>
-                
-                <a href="#" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="LogoutAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-5 h-5"></i>
                     <span>Keluar</span>
                 </a>
@@ -62,7 +81,17 @@
                             <i class="fas fa-users w-6 h-6"></i>
                         </span>
                     </div>
-                    <p class="text-3xl font-bold mt-2 text-white">150</p>
+                    <p class="text-3xl font-bold mt-2 text-white"><?php echo $total_pengguna; ?></p>
+                </div>
+
+                <div class="transform transition-transform duration-200 hover:scale-105 bg-gradient-to-r from-[#3b82f6] to-[#1e40af] p-6 rounded-lg shadow-lg cursor-pointer" onclick="showModal('totalPenggunaBaru')">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-gray-200">Total Pengguna Baru</h3>
+                        <span class="text-white">
+                            <i class="fas fa-user-plus w-6 h-6"></i>
+                        </span>
+                    </div>
+                    <p class="text-3xl font-bold mt-2 text-white"><?php echo $total_pengguna_baru; ?></p>
                 </div>
 
                 <div class="transform transition-transform duration-200 hover:scale-105 bg-gradient-to-r from-[#f04747] to-[#d32f2f] p-6 rounded-lg shadow-lg cursor-pointer" onclick="showModal('laporanAktif')">
@@ -75,7 +104,7 @@
                     <p class="text-3xl font-bold mt-2 text-white">12</p>
                 </div>
 
-                <div class="transform transition-transform duration-200 hover:scale-105 bg-gradient-to-r from-[#3b82f6] to-[#1e40af] p-6 rounded-lg shadow-lg cursor-pointer" onclick="showModal('masalahTerselesaikan')">
+                <div class="transform transition-transform duration-200 hover:scale-105 bg-gradient-to-r from-[#34D399] to-[#059669] p-6 rounded-lg shadow-lg cursor-pointer" onclick="showModal('masalahTerselesaikan')">
                     <div class="flex items-center justify-between">
                         <h3 class="text-gray-200">Masalah Terselesaikan</h3>
                         <span class="text-white">
@@ -83,16 +112,6 @@
                         </span>
                     </div>
                     <p class="text-3xl font-bold mt-2 text-white">5</p>
-                </div>
-
-                <div class="transform transition-transform duration-200 hover:scale-105 bg-gradient-to-r from-[#34D399] to-[#059669] p-6 rounded-lg shadow-lg cursor-pointer" onclick="showModal('totalPenggunaBaru')">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-gray-200">Total Pengguna Baru</h3>
-                        <span class="text-white">
-                            <i class="fas fa-user-plus w-6 h-6"></i>
-                        </span>
-                    </div>
-                    <p class="text-3xl font-bold mt-2 text-white">20</p>
                 </div>
             </div>
 
@@ -153,7 +172,7 @@
             switch(type) {
                 case 'totalPenggunaBaru':
                     title.textContent = 'Total Pengguna Baru Hari Ini';
-                    content.textContent = 'Ada 20 pengguna baru yang bergabung hari ini.';
+                    content.textContent = 'Ada <?php echo $total_pengguna_baru; ?> pengguna baru yang bergabung hari ini.';
                     break;
                 case 'laporanAktif':
                     title.textContent = 'Laporan Aktif Hari Ini';

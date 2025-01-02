@@ -8,57 +8,72 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Menangani penambahan konten
+// Tangani penambahan, pengeditan, dan penghapusan konten
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action']) && $_POST['action'] === 'add') {
-        $title = $_POST['contentTitle'];
-        $notes = $_POST['contentNotes'];
+    $action = $_POST['action'] ?? null;
 
-        // Masukkan konten ke dalam tabel
-        $insert_content_sql = "INSERT INTO content (title, notes, created_at) VALUES (?, ?, NOW())";
-        $stmt = mysqli_prepare($conn, $insert_content_sql);
-        mysqli_stmt_bind_param($stmt, "ss", $title, $notes);
-        mysqli_stmt_execute($stmt);
+    switch ($action) {
+        case 'add':
+            $title = $_POST['contentTitle'] ?? '';
+            $notes = $_POST['contentNotes'] ?? '';
 
-        // Dapatkan semua pengguna untuk notifikasi
-        $sql = "SELECT id FROM users";
-        $result = mysqli_query($conn, $sql);
-
-        if ($result) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $user_id = $row['id'];
-
-                // Masukkan notifikasi ke dalam tabel
-                $insert_notification_sql = "INSERT INTO notifications (user_id, title, notes, created_at) VALUES (?, ?, ?, NOW())";
-                $stmt = mysqli_prepare($conn, $insert_notification_sql);
-                mysqli_stmt_bind_param($stmt, "iss", $user_id, $title, $notes);
+            // Validasi input
+            if ($title && $notes) {
+                $insert_content_sql = "INSERT INTO content (title, notes, created_at) VALUES (?, ?, NOW())";
+                $stmt = mysqli_prepare($conn, $insert_content_sql);
+                mysqli_stmt_bind_param($stmt, "ss", $title, $notes);
                 mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+
+                // Dapatkan semua pengguna untuk notifikasi
+                $sql = "SELECT id FROM users";
+                $result = mysqli_query($conn, $sql);
+
+                if ($result) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $user_id = $row['id'];
+                        $insert_notification_sql = "INSERT INTO notifications (user_id, title, notes, created_at) VALUES (?, ?, ?, NOW())";
+                        $stmt = mysqli_prepare($conn, $insert_notification_sql);
+                        mysqli_stmt_bind_param($stmt, "iss", $user_id, $title, $notes);
+                        mysqli_stmt_execute($stmt);
+                        mysqli_stmt_close($stmt);
+                    }
+                }
             }
-        }
-    } elseif (isset($_POST['action']) && $_POST['action'] === 'edit') {
-        $content_id = $_POST['contentId'];
-        $title = $_POST['contentTitle'];
-        $notes = $_POST['contentNotes'];
+            break;
 
-        // Update konten dalam tabel
-        $update_content_sql = "UPDATE content SET title = ?, notes = ? WHERE id = ?";
-        $stmt = mysqli_prepare($conn, $update_content_sql);
-        mysqli_stmt_bind_param($stmt, "ssi", $title, $notes, $content_id);
-        mysqli_stmt_execute($stmt);
-    } elseif (isset($_POST['action']) && $_POST['action'] === 'delete') {
-        $content_id = $_POST['contentId'];
+        case 'edit':
+            $content_id = $_POST['contentId'] ?? null;
+            $title = $_POST['contentTitle'] ?? '';
+            $notes = $_POST['contentNotes'] ?? '';
 
-        // Hapus konten dari tabel
-        $delete_content_sql = "DELETE FROM content WHERE id = ?";
-        $stmt = mysqli_prepare($conn, $delete_content_sql);
-        mysqli_stmt_bind_param($stmt, "i", $content_id);
-        mysqli_stmt_execute($stmt);
+            if ($content_id && $title && $notes) {
+                $update_content_sql = "UPDATE content SET title = ?, notes = ? WHERE id = ?";
+                $stmt = mysqli_prepare($conn, $update_content_sql);
+                mysqli_stmt_bind_param($stmt, "ssi", $title, $notes, $content_id);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+            }
+            break;
 
-        // Hapus notifikasi terkait konten dari tabel notifikasi
-        $delete_notification_sql = "DELETE FROM notifications WHERE notes = (SELECT notes FROM content WHERE id = ?)";
-        $stmt = mysqli_prepare($conn, $delete_notification_sql);
-        mysqli_stmt_bind_param($stmt, "i", $content_id);
-        mysqli_stmt_execute($stmt);
+        case 'delete':
+            $content_id = $_POST['contentId'] ?? null;
+
+            if ($content_id) {
+                $delete_content_sql = "DELETE FROM content WHERE id = ?";
+                $stmt = mysqli_prepare($conn, $delete_content_sql);
+                mysqli_stmt_bind_param($stmt, "i", $content_id);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+
+                // Hapus notifikasi terkait konten
+                $delete_notification_sql = "DELETE FROM notifications WHERE notes = (SELECT notes FROM content WHERE id = ?)";
+                $stmt = mysqli_prepare($conn, $delete_notification_sql);
+                mysqli_stmt_bind_param($stmt, "i", $content_id);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+            }
+            break;
     }
 
     // Redirect setelah operasi
@@ -79,18 +94,14 @@ $result = mysqli_query($conn, $sql);
     <title>Kelola Konten - Forum Anonim</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="bg-[#2f3136] text-gray-100">
     <div class="min-h-screen flex">
         <aside class="w-64 bg-[#202225] p-6">
-            <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-white">Pusat Admin</h1>
-            </div>
+            <h1 class="text-2xl font-semibold text-white mb-6">Pusat Admin</h1>
             <nav class="space-y-4">
-                <a href="DashboardAdmin.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-home w-5 h-5"></i>
                     <span>Beranda</span>
                 </a>
@@ -102,7 +113,7 @@ $result = mysqli_query($conn, $sql);
                     <i class="fas fa-file-alt w-5 h-5"></i>
                     <span>Kelola Konten</span>
                 </a>
-                <a href="KelolaKomunitas.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-users w-5 h-5"></i>
                     <span>Kelola Komunitas</span>
                 </a>
@@ -110,7 +121,7 @@ $result = mysqli_query($conn, $sql);
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
                 </a>
-                <a href="#" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="LogoutAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-5 h-5"></i>
                     <span>Keluar</span>
                 </a>
@@ -120,11 +131,9 @@ $result = mysqli_query($conn, $sql);
         <main class="flex-1 p-8">
             <div class="mb-8">
                 <h2 class="text-2xl font-bold">Kelola Konten</h2>
-                <div class="mt-4">
-                    <button class="bg-[#5865F2] text-white px-4 py-2 rounded-lg hover:bg-[#4752C4] transition duration-200" onclick="toggleForm()">
-                        Tambah Konten
-                    </button>
-                </div>
+                <button class="bg-[#5865F2] text-white px-4 py-2 rounded-lg hover:bg-[#4752C4] transition duration-200" onclick="toggleForm()">
+                    Tambah Konten
+                </button>
                 <div id="contentForm" class="hidden mt-4 bg-[#2f3136] p-4 rounded-lg shadow-lg">
                     <h3 class="text-lg font-semibold">Tambah Konten Baru</h3>
                     <form method="POST" id="addContentForm">
@@ -189,6 +198,7 @@ $result = mysqli_query($conn, $sql);
         function toggleForm() {
             const form = document.getElementById('contentForm');
             form.classList.toggle('hidden');
+            document.getElementById('addContentForm').reset(); // Reset form saat menambah konten
         }
 
         function editContent(id, title, notes) {

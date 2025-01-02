@@ -16,10 +16,10 @@
 
         <aside class="w-64 bg-[#202225] p-6">
             <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-white">PusatAdmin</h1>
+                <h1 class="text-2xl font-semibold text-white">Pusat Admin</h1>
             </div>
             <nav class="space-y-4">
-                <a href="DashboardAdmin.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-home w-5 h-5"></i>
                     <span>Beranda</span>
                 </a>
@@ -31,7 +31,7 @@
                     <i class="fas fa-file-alt w-5 h-5"></i>
                     <span>Kelola Konten</span>
                 </a>
-                <a href="KelolaKomunitas.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-users w-5 h-5"></i>
                     <span>Kelola Komunitas</span>
                 </a>
@@ -39,8 +39,7 @@
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
                 </a>
-                
-                <a href="#" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="LogoutAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-5 h-5"></i>
                     <span>Keluar</span>
                 </a>
@@ -73,7 +72,7 @@
                                     <th class="px-4 py-2 text-gray-400">Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="reportTableBody">
                                 <tr class="hover:bg-[#35393f]">
                                     <td class="px-4 py-2">1</td>
                                     <td class="px-4 py-2">Masalah Pengguna</td>
@@ -102,16 +101,15 @@
         // Filter function
         function filterReports() {
             const searchTerm = searchInput.value.toLowerCase();
-            const filterStatus = filterSelect.value;
+            const filterStatus = filterSelect.value.toLowerCase();
             const rows = reportTableBody.getElementsByTagName('tr');
 
             Array.from(rows).forEach(row => {
                 const cells = row.getElementsByTagName('td');
-                const userId = cells[0].textContent.toLowerCase();
                 const issue = cells[1].textContent.toLowerCase();
-                const status = cells[2].textContent;
+                const status = cells[3].textContent.toLowerCase();
 
-                const matchesSearch = userId.includes(searchTerm) || issue.includes(searchTerm);
+                const matchesSearch = issue.includes(searchTerm);
                 const matchesFilter = filterStatus === '' || status.includes(filterStatus);
 
                 if (matchesSearch && matchesFilter) {

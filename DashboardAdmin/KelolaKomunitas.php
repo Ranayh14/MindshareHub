@@ -1,3 +1,13 @@
+<?php
+// Menghubungkan ke database
+include("../conn.php");
+
+// Ambil data pengguna dari database
+$sql = "SELECT username FROM users";
+$result = mysqli_query($conn, $sql);
+
+// Mulai output HTML
+?>
 <!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
@@ -31,7 +41,7 @@
                 <h1 class="text-2xl font-semibold text-white">PusatAdmin</h1>
             </div>
             <nav class="space-y-4">
-                <a href="DashboardAdmin.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-home w-5 h-5"></i>
                     <span>Beranda</span>
                 </a>
@@ -43,7 +53,7 @@
                     <i class="fas fa-file-alt w-5 h-5"></i>
                     <span>Kelola Konten</span>
                 </a>
-                <a href="KelolaKomunitas.html" class="flex items-center space-x-2 p-2 rounded-lg bg-[#5865F2] text-white">
+                <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg bg-[#5865F2] text-white">
                     <i class="fas fa-users w-5 h-5"></i>
                     <span>Kelola Komunitas</span>
                 </a>
@@ -51,8 +61,7 @@
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
                 </a>
-                
-                <a href="#" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="LogoutAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-5 h-5"></i>
                     <span>Keluar</span>
                 </a>
@@ -100,10 +109,22 @@
                 <h3 class="text-lg font-semibold">Daftar Pengguna</h3>
                 <input type="text" id="userSearch" class="mt-2 p-2 w-full bg-[#202225] text-gray-100 rounded" placeholder="Cari pengguna..." onkeyup="filterUsers()">
                 <ul id="userList" class="mt-4 text-gray-300">
-                    <li class="user-item cursor-pointer" onclick="goToProfile('User1234')">User1234</li>
-                    <li class="user-item cursor-pointer" onclick="goToProfile('User5678')">User5678</li>
-                    <li class="user-item cursor-pointer" onclick="goToProfile('User91011')">User91011</li>
-                    <!-- Tambahkan lebih banyak pengguna di sini -->
+                    <?php
+                    if ($result) {
+                        if (mysqli_num_rows($result) > 0) {
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo '<li class="user-item">' . htmlspecialchars($row['username']) . '</li>';
+                            }
+                        } else {
+                            echo '<li>Tidak ada pengguna ditemukan.</li>';
+                        }
+                    } else {
+                        echo '<li>Kesalahan dalam mengambil data.</li>';
+                    }
+
+                    // Menutup koneksi
+                    mysqli_close($conn);
+                    ?>
                 </ul>
             </div>
 
@@ -127,19 +148,8 @@
             
             users.forEach(user => {
                 const userName = user.textContent.toLowerCase();
-                if (userName.includes(searchInput)) {
-                    user.style.display = 'block';
-                } else {
-                    user.style.display = 'none';
-                }
+                user.style.display = userName.includes(searchInput) ? 'block' : 'none';
             });
-        }
-
-        function goToProfile(userName) {
-            // Alihkan ke halaman profil pengguna
-            alert(`Alihkan ke profil ${userName}`);
-            // Ganti URL dengan halaman profil yang sesuai
-            window.location.href = `Profile.html?user=${userName}`;
         }
     </script>
 </body>
