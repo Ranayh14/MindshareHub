@@ -1,6 +1,7 @@
 <?php
 include("../conn.php");
 
+// Membuat tabel users
 $sql_user = "CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -10,7 +11,8 @@ $sql_user = "CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 
-$sql_post = "CREATE OR REPLACE TABLE posts (
+// Membuat tabel posts
+$sql_post = "CREATE TABLE IF NOT EXISTS posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT NOT NULL,
     user_id INT NOT NULL,
@@ -20,6 +22,7 @@ $sql_post = "CREATE OR REPLACE TABLE posts (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
+// Membuat tabel post_likes
 $sql_likePost = "CREATE TABLE IF NOT EXISTS post_likes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL,
@@ -29,46 +32,42 @@ $sql_likePost = "CREATE TABLE IF NOT EXISTS post_likes (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
+// Membuat tabel diarys (penyesuaian dengan user_id)
 $sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    user_id INT NOT NULL,  -- Menambahkan kolom user_id
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- Menambahkan constraint foreign key
 )";
 
-try {   
-    if(mysqli_query($conn, $sql_user)) {
-        echo "tabel users berhasil dibuat <br>";
+// Eksekusi query dengan try-catch
+try {
+    if (mysqli_query($conn, $sql_user)) {
+        echo "Tabel users berhasil dibuat.<br>";
+    } else {
+        echo "Tabel users gagal dibuat: " . mysqli_error($conn) . "<br>";
     }
-}
-catch (mysqli_sql_exception) {
-    echo "Tabel users gagal dibuat";
-}
 
-try {   
-    if(mysqli_query($conn, $sql_post)) {
-        echo "tabel post berhasil dibuat <br>";
+    if (mysqli_query($conn, $sql_post)) {
+        echo "Tabel posts berhasil dibuat.<br>";
+    } else {
+        echo "Tabel posts gagal dibuat: " . mysqli_error($conn) . "<br>";
     }
-}
-catch (mysqli_sql_exception) {
-    echo "Tabel post gagal dibuat";
-}
 
-try {   
-    if(mysqli_query($conn, $sql_diarys)) {
-        echo "tabel Diary berhasil dibuat <br>";
+    if (mysqli_query($conn, $sql_likePost)) {
+        echo "Tabel post_likes berhasil dibuat.<br>";
+    } else {
+        echo "Tabel post_likes gagal dibuat: " . mysqli_error($conn) . "<br>";
     }
-}
-catch (mysqli_sql_exception) {
-    echo "Tabel Diary gagal dibuat";
-}
 
-try {   
-    if(mysqli_query($conn, $sql_likePost)) {
-        echo "tabel like post berhasil dibuat <br>";
+    if (mysqli_query($conn, $sql_diarys)) {
+        echo "Tabel diarys berhasil dibuat.<br>";
+    } else {
+        echo "Tabel diarys gagal dibuat: " . mysqli_error($conn) . "<br>";
     }
-}
-catch (mysqli_sql_exception) {
-    echo "Tabel Diary gagal dibuat";
+} catch (mysqli_sql_exception $e) {
+    echo "Terjadi kesalahan: " . $e->getMessage();
 }
 ?>

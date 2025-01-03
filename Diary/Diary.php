@@ -2,9 +2,9 @@
 include("../conn.php");
 session_start();
 
-// Ambil data catatan dari database
-$user_id = $_SESSION['user_id'];
-$query = "SELECT id, title, content, LEFT(title, 50) AS snippet FROM posts WHERE user_id = $user_id ORDER BY created_at DESC";
+// Ambil data catatan diary dari database
+$user_id = $_SESSION['user_id'];  // Pastikan session user_id sudah diset sebelumnya
+$query = "SELECT id, title, content, LEFT(title, 50) AS snippet FROM diarys WHERE user_id = $user_id ORDER BY created_at DESC";
 $result = $conn->query($query);
 
 $userId = $user_id;
@@ -17,19 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action == 'save') {
         // Menyimpan catatan baru
-        $sql = "INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO diarys (title, content, user_id) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('ssi', $title, $content, $userId);
         $stmt->execute();
     } elseif ($action == 'update' && !empty($editId)) {
         // Memperbarui catatan yang ada
-        $sql = "UPDATE posts SET title = ?, content = ?, is_edited = TRUE WHERE id = ? AND user_id = ?";
+        $sql = "UPDATE diarys SET title = ?, content = ? WHERE id = ? AND user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('ssii', $title, $content, $editId, $userId);
         $stmt->execute();
     } elseif ($action == 'delete' && !empty($editId)) {
         // Menghapus catatan
-        $sql = "DELETE FROM posts WHERE id = ? AND user_id = ?";
+        $sql = "DELETE FROM diarys WHERE id = ? AND user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('ii', $editId, $userId);
         $stmt->execute();
@@ -73,7 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
             <div id="recordings-container" class="space-y-4 mt-4"></div>
         </div>
-
     </div>
 
     <div class="notes-sidebar w-72 bg-[#13141f] h-screen p-5 flex flex-col">
