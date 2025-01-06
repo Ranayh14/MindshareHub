@@ -2,6 +2,32 @@
 session_start();
 include("../conn.php");
 
+// Cek apakah pengguna sudah login
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// Ambil roles pengguna
+$user_id = $_SESSION['user_id'];
+$sql_user = "SELECT roles FROM users WHERE id = ?";
+$stmt_user = $conn->prepare($sql_user);
+$stmt_user->bind_param("i", $user_id);
+$stmt_user->execute();
+$result_user = $stmt_user->get_result();
+
+if ($result_user->num_rows === 0) {
+    die("Pengguna tidak ditemukan.");
+}
+
+$user = $result_user->fetch_assoc();
+$is_admin = ($user['roles'] === 'admin'); // Memperbaiki pengecekan
+
+// Cek apakah pengguna adalah admin
+if (!$is_admin) {
+    die("Akses ditolak. Hanya admin yang dapat mengakses halaman ini.");
+}
+
 // Cek apakah form dikirim
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $action = $_POST['action'];
@@ -10,29 +36,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $title = $_POST['contentTitle'];
         $notes = $_POST['contentNotes'];
 
-        // Simpan konten ke database
-        $sql = "INSERT INTO content (title, notes) VALUES ('$title', '$notes')";
-        if (mysqli_query($conn, $sql)) {
-            // Ambil ID pengguna dari session
-            $user_id = $_SESSION['user_id']; // Pastikan session user_id sudah ada
+        // Validasi input
+        if (!empty($title) && !empty($notes)) {
+            // Simpan konten ke database dengan user_id = 2
+            $admin_user_id = 2; // Asumsi admin memiliki user_id 2
+            $sql = "INSERT INTO content (user_id, title, notes) VALUES (?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("iss", $admin_user_id, $title, $notes);
 
-            // Simpan notifikasi ke database
-            $sql_notifications = "INSERT INTO notifications (user_id, title, notes) VALUES (?, ?, ?)";
-            $stmt = $conn->prepare($sql_notifications);
-            $stmt->bind_param("iss", $user_id, $title, $notes);
-            $stmt->execute();
+            if ($stmt->execute()) {
+                // Simpan notifikasi ke database
+                $sql_notifications = "INSERT INTO notifications (user_id, title, notes) VALUES (?, ?, ?)";
+                $stmt_notifications = $conn->prepare($sql_notifications);
+                $stmt_notifications->bind_param("iss", $admin_user_id, $title, $notes);
+                $stmt_notifications->execute();
+                $stmt_notifications->close();
+
+                // Redirect setelah menambah konten
+                header("Location: KelolaKonten.php");
+                exit();
+            } else {
+                echo "Error: " . $stmt->error;
+            }
             $stmt->close();
-
-            // Redirect setelah menambah konten
-            header("Location: KelolaKonten.php");
-            exit();
         } else {
-            echo "Error: " . mysqli_error($conn);
+            echo "Judul dan catatan tidak boleh kosong.";
         }
     } elseif ($action == 'delete') {
         $contentId = $_POST['contentId'];
-        $sql = "DELETE FROM content WHERE id = $contentId";
-        mysqli_query($conn, $sql);
+        $sql = "DELETE FROM content WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $contentId);
+        $stmt->execute();
+        $stmt->close();
 
         // Redirect setelah menghapus konten
         header("Location: KelolaKonten.php");
@@ -131,9 +167,6 @@ $result = mysqli_query($conn, "SELECT * FROM content ORDER BY created_at DESC");
                             echo '<td class="px-4 py-2">' . date('Y-m-d', strtotime($row['created_at'])) . '</td>';
                             echo '<td class="px-4 py-2 text-green-400">Dipublikasikan</td>';
                             echo '<td class="px-4 py-2">
-                                    <button class="text-yellow-500 hover:text-yellow-300" onclick="editContent(' . $row['id'] . ', \'' . htmlspecialchars($row['title']) . '\', \'' . htmlspecialchars($row['notes']) . '\')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
                                     <form method="POST" class="inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus konten ini?\');">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="contentId" value="' . $row['id'] . '">
@@ -156,15 +189,6 @@ $result = mysqli_query($conn, "SELECT * FROM content ORDER BY created_at DESC");
             const form = document.getElementById('contentForm');
             form.classList.toggle('hidden');
             document.getElementById('addContentForm').reset(); // Reset form saat menambah konten
-        }
-
-        function editContent(id, title, notes) {
-            const form = document.getElementById('contentForm');
-            form.classList.remove('hidden');
-            document.querySelector('input[name="action"]').value = 'edit';
-            document.querySelector('input[name="contentId"]').value = id;
-            document.querySelector('input[name="contentTitle"]').value = title;
-            document.querySelector('textarea[name="contentNotes"]').value = notes;
         }
     </script>
 </body>
