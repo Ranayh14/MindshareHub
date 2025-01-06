@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <!-- Sidebar -->
     <div class="fixed top-0 left-0 h-screen w-64 z-50">
-        <?php include('../slicing/sidebar.html'); ?>
+        <?php include('../slicing/sidebar.php'); ?>
     </div>
 
     <!-- Main Content -->

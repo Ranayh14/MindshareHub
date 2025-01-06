@@ -65,7 +65,58 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Simpan data ke database
         $query = "INSERT INTO users (username, email, pass, roles) VALUES ('$username', '$email', '$hashed_password', '$role')";
         if ($conn->query($query) === TRUE) {
-            echo "<script>alert('Registrasi berhasil! Username Anda: $username'); window.location.href='/login/login.html';</script>";
+            // Tampilkan modal pemberitahuan
+            echo "
+            <!DOCTYPE html>
+            <html lang='en'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <title>Password Terupdate</title>
+                <script src='https://cdn.tailwindcss.com'></script>
+                <script>
+                    // Alihkan pengguna setelah beberapa detik
+                    setTimeout(() => {
+                        window.location.href = '/login/login.html'; 
+                    }, 3000); // 3 detik
+                </script>
+                <style>
+                    @tailwind base;
+                    @tailwind components;
+                    @tailwind utilities;
+
+                    @layer utilities {
+                    .bg-customPurple {
+                        background-color: rgba(43, 27, 84, 1);
+                    }
+                    }
+
+                    .modal {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: rgba(0, 0, 0, 0.6);
+                    }
+                </style>
+            </head>
+            <body class='bg-customPurple h-screen flex items-center justify-center'>
+                <div class='modal flex items-center'>
+                    <div class='bg-white p-6 rounded-lg shadow-lg text-center'>
+                        <div class='w-32 h-32 mx-auto mb-3 flex items-center justify-center'>
+                            <img src='/Asset/Logo MindsahreHub.png' alt='Logo' class='w-32 h-32'>
+                        </div>
+                        <h2 class='text-2xl font-semibold text-green-600'>Registrasi berhasil! Username Anda: $username</h2>
+                        <p class='mt-4 text-gray-600'>Anda akan diarahkan ke halaman login dalam beberapa detik...</p>
+                    </div>
+                </div>
+            </body>
+            </html>";
+            exit();
         } else {
             echo "<script>alert('Terjadi kesalahan: " . $conn->error . "'); window.history.back();</script>";
         }
