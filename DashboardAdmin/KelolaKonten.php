@@ -1,89 +1,47 @@
 <?php
 session_start();
-include("../conn.php"); // Pastikan path sesuai
+include("../conn.php");
 
-// Redirect jika belum login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
+// Cek apakah form dikirim
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $action = $_POST['action'];
 
-// Tangani penambahan, pengeditan, dan penghapusan konten
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? null;
+    if ($action == 'add') {
+        $title = $_POST['contentTitle'];
+        $notes = $_POST['contentNotes'];
 
-    switch ($action) {
-        case 'add':
-            $title = $_POST['contentTitle'] ?? '';
-            $notes = $_POST['contentNotes'] ?? '';
+        // Simpan konten ke database
+        $sql = "INSERT INTO content (title, notes) VALUES ('$title', '$notes')";
+        if (mysqli_query($conn, $sql)) {
+            // Ambil ID pengguna dari session
+            $user_id = $_SESSION['user_id']; // Pastikan session user_id sudah ada
 
-            // Validasi input
-            if ($title && $notes) {
-                $insert_content_sql = "INSERT INTO content (title, notes, created_at) VALUES (?, ?, NOW())";
-                $stmt = mysqli_prepare($conn, $insert_content_sql);
-                mysqli_stmt_bind_param($stmt, "ss", $title, $notes);
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
+            // Simpan notifikasi ke database
+            $sql_notifications = "INSERT INTO notifications (user_id, title, notes) VALUES (?, ?, ?)";
+            $stmt = $conn->prepare($sql_notifications);
+            $stmt->bind_param("iss", $user_id, $title, $notes);
+            $stmt->execute();
+            $stmt->close();
 
-                // Dapatkan semua pengguna untuk notifikasi
-                $sql = "SELECT id FROM users";
-                $result = mysqli_query($conn, $sql);
+            // Redirect setelah menambah konten
+            header("Location: KelolaKonten.php");
+            exit();
+        } else {
+            echo "Error: " . mysqli_error($conn);
+        }
+    } elseif ($action == 'delete') {
+        $contentId = $_POST['contentId'];
+        $sql = "DELETE FROM content WHERE id = $contentId";
+        mysqli_query($conn, $sql);
 
-                if ($result) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        $user_id = $row['id'];
-                        $insert_notification_sql = "INSERT INTO notifications (user_id, title, notes, created_at) VALUES (?, ?, ?, NOW())";
-                        $stmt = mysqli_prepare($conn, $insert_notification_sql);
-                        mysqli_stmt_bind_param($stmt, "iss", $user_id, $title, $notes);
-                        mysqli_stmt_execute($stmt);
-                        mysqli_stmt_close($stmt);
-                    }
-                }
-            }
-            break;
-
-        case 'edit':
-            $content_id = $_POST['contentId'] ?? null;
-            $title = $_POST['contentTitle'] ?? '';
-            $notes = $_POST['contentNotes'] ?? '';
-
-            if ($content_id && $title && $notes) {
-                $update_content_sql = "UPDATE content SET title = ?, notes = ? WHERE id = ?";
-                $stmt = mysqli_prepare($conn, $update_content_sql);
-                mysqli_stmt_bind_param($stmt, "ssi", $title, $notes, $content_id);
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
-            }
-            break;
-
-        case 'delete':
-            $content_id = $_POST['contentId'] ?? null;
-
-            if ($content_id) {
-                $delete_content_sql = "DELETE FROM content WHERE id = ?";
-                $stmt = mysqli_prepare($conn, $delete_content_sql);
-                mysqli_stmt_bind_param($stmt, "i", $content_id);
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
-
-                // Hapus notifikasi terkait konten
-                $delete_notification_sql = "DELETE FROM notifications WHERE notes = (SELECT notes FROM content WHERE id = ?)";
-                $stmt = mysqli_prepare($conn, $delete_notification_sql);
-                mysqli_stmt_bind_param($stmt, "i", $content_id);
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
-            }
-            break;
+        // Redirect setelah menghapus konten
+        header("Location: KelolaKonten.php");
+        exit();
     }
-
-    // Redirect setelah operasi
-    header("Location: KelolaKonten.php");
-    exit;
 }
 
 // Ambil semua konten dari database
-$sql = "SELECT id, title, notes, created_at FROM content ORDER BY created_at DESC";
-$result = mysqli_query($conn, $sql);
+$result = mysqli_query($conn, "SELECT * FROM content ORDER BY created_at DESC");
 ?>
 
 <!DOCTYPE html>
@@ -92,9 +50,8 @@ $result = mysqli_query($conn, $sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Konten - Forum Anonim</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#2f3136] text-gray-100">
     <div class="min-h-screen flex">
@@ -117,7 +74,7 @@ $result = mysqli_query($conn, $sql);
                     <i class="fas fa-users w-5 h-5"></i>
                     <span>Kelola Komunitas</span>
                 </a>
-                <a href="LaporanMasuk.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="laporanMasuk.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
                 </a>
