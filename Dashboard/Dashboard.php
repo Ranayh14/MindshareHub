@@ -121,11 +121,10 @@ function time_ago($datetime, $full = false) {
                     $user_id = $_SESSION['user_id'];
                     $sql = "SELECT posts.id, posts.content, posts.created_at, posts.likes, posts.user_id, users.username, posts.image_path,
                         (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS liked,
-                        (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count
+                        (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS total_comments
                     FROM posts
                     JOIN users ON posts.user_id = users.id
-                    ORDER BY posts.created_at DESC";                                                                                
-
+                    ORDER BY posts.created_at DESC";
                     $stmt = $conn->prepare($sql);
                     $stmt->bind_param("i", $user_id);
                     $stmt->execute();
@@ -167,29 +166,27 @@ function time_ago($datetime, $full = false) {
 
                             // Bagian aksi like dan komentar
                             echo '<div class="action flex items-center text-gray-300 mt-4">';
-                            echo '<span class="like cursor-pointer flex items-center" data-liked="' . ($isLiked ? 'true' : 'false') . '" onclick="toggleLike(this, ' . $row['id'] . ')">';
+                            echo '<span class="like cursor-pointer flex items-center mr-4" data-liked="' . ($isLiked ? 'true' : 'false') . '" onclick="toggleLike(this, ' . $row['id'] . ')">';
                             echo '  <i class="fas fa-heart mr-2 ' . ($isLiked ? 'text-red-500' : '') . '"></i>';
                             echo '  <span>' . $row['likes'] . ' Likes</span>';
                             echo '</span>';
                             echo '<button onclick="toggleComments(' . $row['id'] . ')" class="ml-6 flex items-center text-gray-300 hover:text-gray-500 focus:outline-none">';
                             echo '    <i class="fas fa-comment mr-2"></i>';
-                            if ($row['comment_count'] > 0) {
-                                echo '    <span>Komentar (' . $row['comment_count'] . ')</span>';
+                            if ($row['total_comments'] > 0) {
+                                echo '    <span>Komentar (' . $row['total_comments'] . ')</span>';
                             } else {
                                 echo '    <span>Komentar</span>';
                             }
                             echo '</button>';
                             echo '</div>';
-
-                            // Bagian komentar yang tersembunyi
                             echo '<div class="comments-section mt-4 hidden" id="comments-' . htmlspecialchars($row['id']) . '">';
                             echo '    <div class="existing-comments mb-4 space-y-4">';
                             echo '        <!-- Komentar akan dimuat di sini secara dinamis -->';
                             echo '    </div>';
-                            echo '    <form class="add-comment-form" action="javascript:void(0)" onsubmit="submitComment(event, ' . htmlspecialchars($row['id']) . ')">';
+                            echo '    <form class="add-comment-form" onsubmit="submitComment(event, ' . htmlspecialchars($row['id']) . ')">';
                             echo '        <div class="flex items-center space-x-3">';
                             echo '            <div class="avatar w-8 h-8 bg-gray-300 rounded-full"></div>'; // Avatar placeholder
-                            echo '            <textarea name="comment" rows="1" class="flex-1 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-white bg-gray-800 resize-none" placeholder="Tambahkan komentar..." required></textarea>';
+                            echo '            <textarea name="comment" rows="1" class="flex-1 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-white bg-gray-700 resize-none" placeholder="Tambahkan komentar..." required></textarea>';
                             echo '            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none">Kirim</button>';
                             echo '        </div>';
                             echo '    </form>';
@@ -389,44 +386,44 @@ function time_ago($datetime, $full = false) {
                     existingCommentsDiv.innerHTML = '';
                     data.comments.forEach(comment => {
                         const commentDiv = document.createElement('div');
-                        commentDiv.classList.add('comment', 'p-3', 'bg-gray-800', 'rounded-lg', 'shadow-sm', comment.parent_id ? 'ml-8 border-l-4 border-gray-700' : '');
-                        
-                        // **Set ID unik untuk setiap komentar**
-                        commentDiv.id = `comment-${comment.id}`;
-
+                        commentDiv.classList.add('comment', 'p-3', 'bg-[#191a25]', 'rounded-lg', 'shadow-sm');
+                        // Bagian yang memuat komentar di JavaScript
                         commentDiv.innerHTML = `
-                            <div class="flex items-center mb-2">
+                            <div class="flex items-center mb-2 bg">
                                 <div class="avatar w-8 h-8 bg-gray-300 rounded-full"></div>
-                                <div class="username font-semibold ml-2 text-white">${comment.username}</div>
-                                <div class="comment-time text-sm text-gray-400 ml-auto">${timeAgo(comment.created_at)}</div>
+                                <div class="username font-semibold ml-2">${comment.username}</div>
+                                <div class="comment-time text-sm text-gray-500 ml-auto">${timeAgo(comment.created_at)}</div>
                             </div>
-                            <div class="comment-text text-white">${comment.comment}</div>
-                            <div class="comment-actions flex space-x-2 mt-2">
-                                <span class="like-comment cursor-pointer flex items-center" onclick="toggleLikeComment(this, ${comment.id})">
-                                    <i class="fas fa-heart mr-1 ${comment.liked ? 'text-red-500' : 'text-white'}"></i>
-                                    <span>${comment.likes}</span>
+                            <div class="comment-text text-white bg-[#191a25] p-2 rounded-md">${comment.comment}</div>
+                            <div class="comment-actions flex items-center mt-2">
+                                <span class="like-comment cursor-pointer flex items-center mr-4" data-liked="${comment.liked_by_user}" onclick="toggleCommentLike(this, ${comment.id})">
+                                    <i class="fas fa-heart mr-1 ${comment.liked_by_user ? 'text-red-500' : 'text-gray-400'}"></i>
+                                    <span>${comment.total_likes}</span>
                                 </span>
-                                <span class="reply-comment cursor-pointer flex items-center" onclick="replyToComment(${comment.id}, '${comment.username}')">
-                                    <i class="fas fa-reply mr-1 text-white"></i>
+                                <!-- Fitur Reply akan ditambahkan di sini -->
+                                <span class="reply-comment cursor-pointer flex items-center mr-4" onclick="replyToComment('${comment.username}')">
+                                    <i class="fas fa-reply mr-1 text-gray-400"></i>
                                     <span>Reply</span>
                                 </span>
-                                ${comment.is_owner ? `
-                                    <span class="edit-comment cursor-pointer flex items-center" onclick="editComment(${comment.id}, '${escapeHtml(comment.comment)}')">
-                                        <i class="fas fa-edit mr-1 text-white"></i>
+                                <!-- Tombol Edit dan Delete jika komentar milik user sendiri -->
+                                ${comment.username === '<?php echo htmlspecialchars($_SESSION['username']); ?>' ? `
+                                    <span class="edit-comment cursor-pointer flex items-center mr-4" onclick="editComment(${comment.id}, this)">
+                                        <i class="fas fa-edit mr-1 text-gray-400"></i>
                                         <span>Edit</span>
                                     </span>
-                                    <span class="delete-comment cursor-pointer flex items-center" onclick="deleteComment(${comment.id})">
-                                        <i class="fas fa-trash mr-1 text-white"></i>
+                                    <span class="delete-comment cursor-pointer flex items-center mr-4" onclick="deleteComment(${comment.id}, this)">
+                                        <i class="fas fa-trash mr-1 text-gray-400"></i>
                                         <span>Hapus</span>
                                     </span>
                                 ` : `
                                     <span class="report-comment cursor-pointer flex items-center" onclick="reportComment(${comment.id})">
-                                        <i class="fas fa-exclamation-triangle mr-1 text-white"></i>
-                                        <span>Report</span>
+                                        <i class="fas fa-flag mr-1 text-gray-400"></i>
+                                        <span>Laporkan</span>
                                     </span>
                                 `}
                             </div>
                         `;
+
                         existingCommentsDiv.appendChild(commentDiv);
                     });
                 } else {
@@ -441,6 +438,192 @@ function time_ago($datetime, $full = false) {
             existingCommentsDiv.innerHTML = '<div class="text-red-500">Terjadi kesalahan saat memuat komentar.</div>';
         });
     }
+
+    function submitComment(event, postId) {
+        event.preventDefault();
+        const form = event.target;
+        const textarea = form.querySelector('textarea[name="comment"]');
+        const comment = textarea.value.trim();
+        const parentIdInput = form.querySelector('input[name="parent_id"]');
+        const parentId = parentIdInput ? parentIdInput.value.trim() : null;
+
+        if (comment === '') {
+            alert('Komentar tidak boleh kosong.');
+            return;
+        }
+
+        // Persiapkan data yang akan dikirimkan
+        const params = new URLSearchParams();
+        params.append('post_id', postId);
+        params.append('comment', comment);
+        if (parentId) {
+            params.append('parent_id', parentId);
+        }
+
+        fetch('add_comment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response Data:', data); // Debugging
+            if (data.status === 'success') {
+                // Tambahkan komentar baru ke bagian existing-comments
+                const existingCommentsDiv = document.querySelector('#comments-' + postId + ' .existing-comments');
+                if (existingCommentsDiv.innerHTML.includes('Belum ada komentar.') || existingCommentsDiv.innerHTML.includes('Gagal memuat komentar.')) {
+                    existingCommentsDiv.innerHTML = '';
+                }
+
+                const commentData = data.comment;
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment', 'p-3', 'bg-[#191a25]', 'rounded-lg', 'shadow-sm');
+
+                commentDiv.innerHTML = `
+                    <div class="flex items-center mb-2">
+                        <div class="avatar w-8 h-8 bg-gray-300 rounded-full"></div>
+                        <div class="username font-semibold ml-2">${commentData.username}</div>
+                        <div class="comment-time text-sm text-gray-500 ml-auto">${timeAgo(commentData.created_at)}</div>
+                    </div>
+                    <div class="comment-text text-white bg-[#191a25] p-2 rounded-md">${commentData.comment}</div>
+                    <div class="comment-actions flex items-center mt-2">
+                        <span class="like-comment cursor-pointer flex items-center mr-4" data-liked="${commentData.liked_by_user}" onclick="toggleCommentLike(this, ${commentData.id})">
+                            <i class="fas fa-heart mr-1 ${commentData.liked_by_user ? 'text-red-500' : 'text-gray-400'}"></i>
+                            <span>${commentData.total_likes}</span>
+                        </span>
+                        <span class="reply-comment cursor-pointer flex items-center mr-4" onclick="replyToComment('${commentData.username}')">
+                            <i class="fas fa-reply mr-1 text-gray-400"></i>
+                            <span>Reply</span>
+                        </span>
+                        ${commentData.username === '<?php echo htmlspecialchars($_SESSION['username']); ?>' ? `
+                            <span class="edit-comment cursor-pointer flex items-center mr-4" onclick="editComment(${commentData.id}, this)">
+                                <i class="fas fa-edit mr-1 text-gray-400"></i>
+                                <span>Edit</span>
+                            </span>
+                            <span class="delete-comment cursor-pointer flex items-center mr-4" onclick="deleteComment(${commentData.id}, this)">
+                                <i class="fas fa-trash mr-1 text-gray-400"></i>
+                                <span>Hapus</span>
+                            </span>
+                        ` : `
+                            <span class="report-comment cursor-pointer flex items-center" onclick="reportComment(${commentData.id})">
+                                <i class="fas fa-flag mr-1 text-gray-400"></i>
+                                <span>Laporkan</span>
+                            </span>
+                        `}
+                    </div>
+                `;
+
+                existingCommentsDiv.appendChild(commentDiv);
+
+                // Reset form
+                form.reset();
+                if (parentIdInput) {
+                    parentIdInput.value = '';
+                }
+            } else {
+                alert(data.message || 'Gagal menambahkan komentar.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat menambahkan komentar.');
+        });
+    }
+
+    // Fungsi untuk menangani like/unlike pada komentar
+    function toggleCommentLike(element, commentId) {
+        fetch('update_like_comment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ comment_id: commentId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'liked') {
+                element.querySelector('i').classList.add('text-red-500');
+                element.querySelector('i').classList.remove('text-gray-400');
+            } else if (data.status === 'unliked') {
+                element.querySelector('i').classList.remove('text-red-500');
+                element.querySelector('i').classList.add('text-gray-400');
+            }
+            element.querySelector('span').textContent = data.total_likes;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Fungsi untuk membalas komentar
+    function replyToComment(username) {
+        const textarea = document.querySelector('.add-comment-form textarea');
+        if (textarea) {
+            textarea.value += `@${username} `;
+            textarea.focus();
+        }
+    }
+
+    // Fungsi untuk mengedit komentar
+    function editComment(commentId, element) {
+        const commentDiv = element.parentElement.parentElement.querySelector('.comment-text');
+        const originalText = commentDiv.textContent;
+        const newText = prompt('Edit Komentar:', originalText);
+        if (newText !== null) {
+            // Kirim permintaan edit ke server
+            fetch('edit_comment.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ comment_id: commentId, comment: newText }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    commentDiv.textContent = newText;
+                } else {
+                    alert(data.message || 'Gagal mengedit komentar.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+
+    // Fungsi untuk menghapus komentar
+    function deleteComment(commentId, element) {
+        if (confirm('Apakah Anda yakin ingin menghapus komentar ini?')) {
+            fetch('delete_comment.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ comment_id: commentId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Hapus elemen komentar dari DOM
+                    const commentDiv = element.parentElement.parentElement.parentElement;
+                    commentDiv.remove();
+                } else {
+                    alert(data.message || 'Gagal menghapus komentar.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+
+    // Fungsi untuk melaporkan komentar
+    function reportComment(commentId) {
+        // Implementasikan modal report komentar atau langsung kirim laporan
+        const description = prompt('Masukkan deskripsi laporan Anda:');
+        if (description !== null && description.trim() !== '') {
+            fetch('report_comment.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ comment_id: commentId, description: description }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Komentar telah dilaporkan.');
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+
 
     // Fungsi untuk mengubah waktu ke format "time ago" (sama seperti sebelumnya)
     function timeAgo(datetime) {
@@ -467,234 +650,6 @@ function time_ago($datetime, $full = false) {
             return minutes + ' menit yang lalu';
         } else {
             return 'baru saja';
-        }
-    }
-
-    // Fungsi untuk menangani like/unlike pada komentar
-    function toggleLikeComment(element, commentId) {
-        fetch('update_like_comment.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ comment_id: commentId }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Like/Unlike Response:', data); // Tambahkan logging
-            if (data.status === 'liked') {
-                // Ubah ikon menjadi merah
-                element.querySelector('i').classList.add('text-red-500');
-                element.querySelector('i').classList.remove('text-white');
-                // Update jumlah like
-                element.querySelector('span').textContent = data.likes + ' Likes';
-            } else if (data.status === 'unliked') {
-                // Ubah ikon menjadi putih
-                element.querySelector('i').classList.remove('text-red-500');
-                element.querySelector('i').classList.add('text-white');
-                // Update jumlah like
-                element.querySelector('span').textContent = data.likes + ' Likes';
-            } else {
-                alert(data.message || 'Gagal melakukan like/unlike komentar.');
-            }
-        })
-        .catch(error => console.error('Like/Unlike Fetch Error:', error));
-    }
-
-    // Variabel global untuk menyimpan parent_id saat reply
-    let currentParentId = null;
-
-    // Fungsi untuk menangani reply pada komentar
-    function replyToComment(commentId, username) {
-        const commentsSection = document.getElementById(`comments-${commentId}`);
-        if (commentsSection) {
-            // Scroll ke bagian komentar
-            commentsSection.scrollIntoView({ behavior: 'smooth' });
-
-            // Fokus pada textarea komentar
-            const textarea = commentsSection.querySelector('textarea[name="comment"]');
-            if (textarea) {
-                textarea.focus();
-                textarea.value = `@${username} `; // Tambahkan tag @username
-                currentParentId = commentId; // Set parent_id
-            }
-        }
-    }
-
-    function submitComment(event, postId) {
-        console.log("submitComment function called");
-        event.preventDefault();
-        const form = event.target;
-        const textarea = form.querySelector('textarea[name="comment"]');
-        const comment = textarea.value.trim();
-
-        console.log("Submitting comment:", { postId, comment, parentId: currentParentId });
-
-        if (comment === '') {
-            alert('Komentar tidak boleh kosong.');
-            return;
-        }
-
-        // Menentukan parent_id jika ada
-        const parentId = currentParentId ? currentParentId : null;
-
-        const params = new URLSearchParams();
-        params.append('post_id', postId);
-        params.append('comment', comment);
-        if (parentId) {
-            params.append('parent_id', parentId);
-        }
-
-        fetch('add_comment.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Response Data:', data); // Tambahkan logging
-            if (data.status === 'success') {
-                // Tambahkan komentar baru ke bagian existing-comments
-                const existingCommentsDiv = document.querySelector('#comments-' + postId + ' .existing-comments');
-                if (existingCommentsDiv.innerHTML.includes('Belum ada komentar.') || existingCommentsDiv.innerHTML.includes('Gagal memuat komentar.')) {
-                    existingCommentsDiv.innerHTML = '';
-                }
-
-                const commentData = data.comment;
-                const commentDiv = document.createElement('div');
-                commentDiv.classList.add('comment', 'p-3', 'bg-gray-800', 'rounded-lg', 'shadow-sm', commentData.parent_id ? 'ml-8 border-l-4 border-gray-700' : '');
-                commentDiv.id = `comment-${commentData.id}`;
-
-                commentDiv.innerHTML = `
-                    <div class="flex items-center mb-2">
-                        <div class="avatar w-8 h-8 bg-gray-300 rounded-full" style="background-image: url('${commentData.profile_picture}'); background-size: cover; background-position: center;"></div>
-                        <div class="username font-semibold ml-2 text-white">${commentData.username}</div>
-                        <div class="comment-time text-sm text-gray-400 ml-auto">${timeAgo(commentData.created_at)}</div>
-                    </div>
-                    <div class="comment-text text-white">${commentData.comment}</div>
-                    <div class="comment-actions flex space-x-2 mt-2">
-                        <span class="like-comment cursor-pointer flex items-center" onclick="toggleLikeComment(this, ${commentData.id})">
-                            <i class="fas fa-heart mr-1 ${commentData.liked ? 'text-red-500' : 'text-white'}"></i>
-                            <span>${commentData.likes}</span>
-                        </span>
-                        <span class="reply-comment cursor-pointer flex items-center" onclick="replyToComment(${commentData.id}, '${commentData.username}')">
-                            <i class="fas fa-reply mr-1 text-white"></i>
-                            <span>Reply</span>
-                        </span>
-                        ${commentData.is_owner ? `
-                            <span class="edit-comment cursor-pointer flex items-center" onclick="editComment(${commentData.id}, '${escapeHtml(commentData.comment)}')">
-                                <i class="fas fa-edit mr-1 text-white"></i>
-                                <span>Edit</span>
-                            </span>
-                            <span class="delete-comment cursor-pointer flex items-center" onclick="deleteComment(${commentData.id})">
-                                <i class="fas fa-trash mr-1 text-white"></i>
-                                <span>Hapus</span>
-                            </span>
-                        ` : `
-                            <span class="report-comment cursor-pointer flex items-center" onclick="reportComment(${commentData.id})">
-                                <i class="fas fa-exclamation-triangle mr-1 text-white"></i>
-                                <span>Report</span>
-                            </span>
-                        `}
-                    </div>
-                `;
-                existingCommentsDiv.appendChild(commentDiv);
-
-                // Reset formulir dan parent_id
-                form.reset();
-                currentParentId = null;
-            } else {
-                alert(data.message || 'Gagal menambahkan komentar.');
-            }
-        })
-        .catch(error => {
-            console.error('Fetch Error:', error); // Tambahkan logging error
-            alert('Terjadi kesalahan saat menambahkan komentar.');
-        });
-    }
-
-    function editComment(commentId, currentComment) {
-        const newComment = prompt("Edit Komentar:", currentComment);
-        if (newComment !== null) {
-            if (newComment.trim() === '') {
-                alert('Komentar tidak boleh kosong.');
-                return;
-            }
-
-            fetch('edit_comment.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ comment_id: commentId, new_comment: newComment })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert(data.message);
-                    // Reload komentar atau perbarui komentar secara dinamis
-                    location.reload();
-                } else {
-                    alert(data.message || 'Gagal mengedit komentar.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat mengedit komentar.');
-            });
-        }
-    }
-
-    function deleteComment(commentId) {
-        if (confirm('Apakah Anda yakin ingin menghapus komentar ini?')) {
-            fetch('delete_comment.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ comment_id: commentId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert(data.message);
-                    // Hapus komentar dari UI secara dinamis
-                    const commentDiv = document.getElementById(`comment-${commentId}`);
-                    if (commentDiv) {
-                        commentDiv.remove();
-                    }
-                } else {
-                    alert(data.message || 'Gagal menghapus komentar.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat menghapus komentar.');
-            });
-        }
-    }
-
-    function reportComment(commentId) {
-        const reason = prompt("Alasan Melaporkan Komentar:", "Spam, Konten Menyinggung, Lainnya");
-        if (reason !== null && reason.trim() !== '') {
-            const description = prompt("Deskripsi Laporan:", "Silakan jelaskan masalah Anda.");
-            if (description !== null && description.trim() !== '') {
-                fetch('report_comment.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ comment_id: commentId, reason: reason, description: description })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert(data.message);
-                    } else {
-                        alert(data.message || 'Gagal melaporkan komentar.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Terjadi kesalahan saat melaporkan komentar.');
-                });
-            } else {
-                alert('Deskripsi tidak boleh kosong.');
-            }
-        } else {
-            alert('Alasan tidak boleh kosong.');
         }
     }
     </script>

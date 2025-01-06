@@ -106,7 +106,6 @@ $sql_reportComments = "CREATE TABLE IF NOT EXISTS comment_reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     comment_id INT NOT NULL,
     user_id INT NOT NULL,
-    reason VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
