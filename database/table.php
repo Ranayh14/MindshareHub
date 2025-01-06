@@ -19,10 +19,12 @@ $sql_user = "CREATE TABLE IF NOT EXISTS users (
 // Kode untuk membuat tabel content
 $sql_content = "CREATE TABLE IF NOT EXISTS content (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     title VARCHAR(100) NOT NULL,
     notes TEXT NOT NULL,
     image VARCHAR(255) DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
 // Kode untuk membuat tabel posts
