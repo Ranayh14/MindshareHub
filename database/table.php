@@ -66,7 +66,7 @@ $sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- Menambahkan constraint foreign key
 )";
 
-$sql_report ="CREATE TABLE reports (
+$sql_report ="CREATE TABLE IF NOT EXISTS reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL,
     reported_by INT NOT NULL,
@@ -81,9 +81,33 @@ $sql_comments = "CREATE TABLE IF NOT EXISTS comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL,
     user_id INT NOT NULL,
+    parent_id INT NULL,
     comment TEXT NOT NULL,
+    likes INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
+)";
+
+$sql_commentlikes = "CREATE TABLE IF NOT EXISTS comment_likes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    comment_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE (comment_id, user_id) -- Mencegah duplikasi like
+)";
+
+$sql_reportComments = "CREATE TABLE IF NOT EXISTS comment_reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    comment_id INT NOT NULL,
+    user_id INT NOT NULL,
+    reason VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
@@ -135,6 +159,18 @@ try {
         echo "Tabel comments berhasil dibuat.<br>";
     } else {
         echo "Tabel comments gagal dibuat: " . mysqli_error($conn) . "<br>";
+    }
+
+    if (mysqli_query($conn, $sql_commentlikes)) {
+        echo "Tabel comment_likes berhasil dibuat.<br>";
+    } else {
+        echo "Tabel comment_likes gagal dibuat: " . mysqli_error($conn) . "<br>";
+    }
+
+    if (mysqli_query($conn, $sql_reportComments)) {
+        echo "Tabel comment_reports berhasil dibuat.<br>";
+    } else {
+        echo "Tabel comment_reports gagal dibuat: " . mysqli_error($conn) . "<br>";
     }
 } catch (mysqli_sql_exception $e) {
     echo "Terjadi kesalahan: " . $e->getMessage();
