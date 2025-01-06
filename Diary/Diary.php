@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-[#1a1b26] text-white flex">
     <!-- sidebar -->
     <div>
-        <?php include('../slicing/sidebar.html'); ?>
+        <?php include('../slicing/sidebar.php'); ?>
     </div>
 
     <div class="main-content flex-1 p-5">

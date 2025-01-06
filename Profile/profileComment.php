@@ -100,8 +100,8 @@ include('../conn.php');
 
             <!-- Tabs -->
             <nav class="bg-customMain text-gray-400 flex justify-center border-b border-gray-700 space-x-12 mr-8 ml-4">
-                <a href="profile.php" class="px-4 py-2 text-white border-b-2 border-transparent border-white">Posts</a>
-                <a href="profileComment.php" class="px-4 py-2 hover:text-white border-b-2 border-transparent hover:border-white">Replies</a>
+                <a href="profile.php" class="px-4 py-2 hover:text-white border-b-2 border-transparent hover:border-white">Posts</a>
+                <a href="profileComment.php" class="px-4 py-2 text-white border-b-2 border-transparent border-white">Replies</a>
                 <a href="profileLike.php" class="px-4 py-2 hover:text-white border-b-2 border-transparent hover:border-white">Likes</a>
             </nav>
 

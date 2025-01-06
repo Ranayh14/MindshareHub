@@ -7,30 +7,8 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: ../login/login.html");
     exit;
 }
-
-// Fungsi untuk mengubah waktu ke format "time ago"
-function time_ago($datetime, $full = false) {
-    $now = new DateTime;
-    $ago = new DateTime($datetime);
-    $diff = $now->diff($ago);
-    $units = [
-        'y' => 'tahun',
-        'm' => 'bulan',
-        'd' => 'hari',
-        'h' => 'jam',
-        'i' => 'menit',
-        's' => 'detik',
-    ];
-    $string = [];
-    foreach ($units as $k => $v) {
-        if ($diff->$k) {
-            $string[] = $diff->$k . ' ' . $v;
-        }
-    }
-    if (!$full) $string = array_slice($string, 0, 1);
-    return $string ? implode(', ', $string) . ' yang lalu' : 'baru saja';
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,7 +64,7 @@ function time_ago($datetime, $full = false) {
         </div>
 
         <div class="content">
-            <div class="new-post-form p-4 rounded-lg mb-6 mt-6 post bg-customPurple">
+            <div class="new-post-form p-4 rounded-lg mb-6 mt-6 post">
                 <div class="justify-center">
                     <div class="avatar"></div>
                     <h2 class="text-lg font-semibold mb-3 opacity-90">Buat Postingan Baru</h2>
@@ -115,64 +93,52 @@ function time_ago($datetime, $full = false) {
             <div>
                 <?php
                     $user_id = $_SESSION['user_id'];
-                    $sql = "SELECT posts.id, posts.content, posts.created_at, posts.likes, posts.user_id, users.username, posts.image_path,
-                                (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS liked
+                    $sql = "SELECT posts.id, posts.content, posts.created_at, posts.likes, users.username, posts.image_path
                             FROM posts
                             JOIN users ON posts.user_id = users.id
-                            ORDER BY posts.created_at DESC";
-
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("i", $user_id);
-                    $stmt->execute();
-                    $result = $stmt->get_result(); 
+                            ORDER BY posts.created_at DESC";            
+                    $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            $isOwner = $row['user_id'] === $user_id; // Cek apakah postingan milik user sendiri
-                            $isLiked = $row['liked'] > 0; // Jika user telah menyukai postingan
-                            echo '<div class="post relative p-4 rounded-lg mb-4 bg-customPurple text-white">';
+                            echo '<div class="post relative">';
                             echo '    <div class="post-header flex justify-between items-center">';
                             echo '        <div class="flex items-center">';
                             echo '            <div class="avatar"></div>';
                             echo '            <div class="post-author text-lg ml-2">' . htmlspecialchars($row['username']) . '</div>';
                             echo '            <div class="post-time pl-4 text-sm">' . time_ago($row['created_at']) . '</div>'; 
                             echo '        </div>';
-                            echo '    <div class="post-options">';
-                            echo '        <div class="relative">';
-                            echo '            <button id="options-button-' . htmlspecialchars($row['id']) . '" onclick="toggleOptions(' . htmlspecialchars($row['id']) . ')" class="options-button text-xl text-bold">⋮</button>';
-                            echo '            <div id="options-' . htmlspecialchars($row['id']) . '" class="options-menu hidden bg-white border border-gray-300 rounded-md shadow-lg absolute top-0 right-0">';
-                            if ($isOwner) {
-                                echo '                <a href="edit_post.php?id=' . htmlspecialchars($row['id']) . '" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>';
-                                echo '                <a href="delete_post.php?id=' . htmlspecialchars($row['id']) . '" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</a>';
-                                echo '                <button onclick="closeOptions(' . htmlspecialchars($row['id']) . ')" class="block w-full text-left px-4 py-2 text-sm text-gray-500 hover:bg-gray-100">Batalkan</button>';
-                            } else {
-                                echo '                <button onclick="openReportModal(' . htmlspecialchars($row['id']) . ', \'' . addslashes(htmlspecialchars($row['content'])) . '\')" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Laporkan</button>';
-                                echo '                <button onclick="closeOptions(' . htmlspecialchars($row['id']) . ')" class="block w-full text-left px-4 py-2 text-sm text-gray-500 hover:bg-gray-100">Batalkan</button>';
-                            }
+                            echo '        <div class="post-options absolute top-0 right-0 mt-2 mr-6">';
+                            echo '            <div class="relative">';
+                            echo '                <button onclick="toggleOptions(' . htmlspecialchars($row['id']) . ')" class="options-button text-xl text-bold">⋮</button>';
+                            echo '                <div id="options-' . htmlspecialchars($row['id']) . '" class="options-menu hidden bg-white border border-gray-300 rounded-md shadow-lg absolute top-0 right-0">';
+                            echo '                    <a href="edit_post.php?id=' . htmlspecialchars($row['id']) . '" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>';
+                            echo '                    <a href="delete_post.php?id=' . htmlspecialchars($row['id']) . '" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</a>';
+                            echo '                </div>';
                             echo '            </div>';
                             echo '        </div>';
                             echo '    </div>';
-                            echo '    </div>';
-                            echo '    <div class="post-content mt-2">' . htmlspecialchars($row['content']) . '</div>';
+                            echo '    <div class="post-content mt-2 text-white">' . htmlspecialchars($row['content']) . '</div>';
 
                             // Tampilkan gambar jika ada
-                            if ($row['image_path']) {
-                                echo '<div class="post-image mt-2 flex justify-center">';
-                                echo '    <img src="../uploads/' . htmlspecialchars($row['image_path']) . '" alt="Gambar Postingan" class="rounded-lg shadow-md">';
-                                echo '</div>';
-                            }
-
+                            echo '<div>';
+                            echo '    <div class="post-image mt-2 flex justify-center ">';
+                                if ($row['image_path']) {
+                                    echo '<img src="../uploads/' . htmlspecialchars($row['image_path']) . '" alt="Gambar Postingan" class="mt-2">';
+                                }                            
+                            echo '    </div">';
+                            echo '</div>';
                             echo '<div class="action flex items-center text-gray-400 mt-4">';
-                            echo '<span class="like cursor-pointer" data-liked="' . ($isLiked ? 'true' : 'false') . '" onclick="toggleLike(this, ' . $row['id'] . ')">';
-                            echo '  <i class="fas fa-heart ml-4 mr-2 ' . ($isLiked ? 'text-red-500' : '') . '"></i>';
+                            echo '<span class="like cursor-pointer" data-liked="false" onclick="toggleLike(this, ' . $row['id'] . ')">';
+                            echo '  <i class="fas fa-heart ml-4 mr-2 transition-colors hover:text-red-500"></i>';
                             echo '</span>';
-                            echo '<span class="like-count">' . $row['likes'] . ' Likes</span>'; // Tambahkan teks "Likes"
+                            echo '<span class="like-count">' . $row['likes'] .'&nbsp;'. '</span> Likes';
                             echo '  <button onclick="navigateToComments(' . $row['id'] . ')" class="ml-4">';
                             echo '    <i class="fas fa-comment mr-2"></i>';
-                            echo '    <span>Komentar</span>'; // Tambahkan tulisan "Komentar" di sini
                             echo '  </button>';
                             echo '</div>';
                             echo '</div>';
+                            echo '    </div>';
                         }
                     } else {
                         echo '<div class="post">Belum ada postingan.</div>';
@@ -187,14 +153,26 @@ function time_ago($datetime, $full = false) {
         <?php include('../slicing/rightSidebar.html'); ?>
     </div>
 
+    <script>
+    function toggleOptions(postId) {
+        var optionsMenu = document.getElementById('options-' + postId);
+        if (optionsMenu.classList.contains('hidden')) {
+            optionsMenu.classList.remove('hidden');
+        } else {
+            optionsMenu.classList.add('hidden');
+        }
+    }
+    </script>
+
     <!-- Modal Report -->
     <div id="reportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-96 p-6">
-            <h2 class="text-lg font-bold mb-2 text-gray-800 dark:text-white">Report Post</h2>
-            <p class="text-sm mb-4 text-gray-600 dark:text-gray-300" id="reportContent">
-                "..."
+            <h2 class="text-lg font-bold mb-2 text-gray-800 dark:text-white">Report @username</h2>
+            <p class="text-sm mb-4 text-gray-600 dark:text-gray-300">
+                "Aku punya masalah dengan social anxiety. Setiap kali harus berinteraksi dengan orang banyak, aku merasa cemas dan ingin menghindar..."
             </p>
-            <form id="reportForm" action="report_post.php" method="POST">
+            
+            <form id="reportForm">
                 <label for="reason" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">ALASAN</label>
                 <select id="reason" name="reason" required class="w-full border border-gray-300 rounded-md shadow-sm p-2 mb-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     <option value="" disabled selected>Pilih alasan</option>
@@ -207,7 +185,6 @@ function time_ago($datetime, $full = false) {
                 <textarea id="description" name="description" rows="4" placeholder="Silahkan beritahu kami tentang masalah anda"
                     required class="w-full border border-gray-300 rounded-md shadow-sm p-2 mb-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
 
-                <input type="hidden" id="postId" name="post_id" value="">
                 <div class="flex justify-end space-x-2">
                     <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md shadow-sm hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600">Report</button>
@@ -230,35 +207,8 @@ function time_ago($datetime, $full = false) {
 
     <!-- Script JS -->
     <script>
-    function toggleOptions(postId) {
-        var optionsMenu = document.getElementById('options-' + postId);
-        if (optionsMenu.classList.contains('hidden')) {
-            optionsMenu.classList.remove('hidden');
-        } else {
-            optionsMenu.classList.add('hidden');
-        }
-    }
-
-    function closeOptions(postId) {
-        var optionsMenu = document.getElementById('options-' + postId);
-        var optionsButton = document.getElementById('options-button-' + postId);
-
-        if (optionsMenu) {
-            optionsMenu.classList.add('hidden');
-        }
-
-        if (optionsButton) {
-            optionsButton.textContent = '⋮'; // Kembalikan ke ikon titik tiga
-        }
-    }
-
-    function openReportModal(postId, content) {
-        console.log('Post ID:', postId); // Debug postId
-        console.log('Content:', content); // Debug content
-
+    function openModal() {
         document.getElementById('reportModal').classList.remove('hidden');
-        document.getElementById('postId').value = postId; // Set nilai post_id
-        document.getElementById('reportContent').innerText = `"${content}"`;
     }
 
     function closeModal() {
@@ -269,19 +219,14 @@ function time_ago($datetime, $full = false) {
         event.preventDefault();
         const reason = document.getElementById('reason').value;
         const description = document.getElementById('description').value;
-        const postId = document.getElementById('postId').value;
 
-        // Kirim data ke server dalam format x-www-form-urlencoded
+        // Kirim data ke server
         fetch('report_post.php', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json'
             },
-            body: new URLSearchParams({
-                reason: reason,
-                description: description,
-                post_id: postId
-            })
+            body: JSON.stringify({ reason, description })
         })
         .then(response => response.json())
         .then(data => {
@@ -290,11 +235,79 @@ function time_ago($datetime, $full = false) {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan saat mengirim laporan.');
         });
     });
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('modalConfirmation');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const confirmButton = document.getElementById('confirmButton');
+        const cancelButton = document.getElementById('cancelButton');
 
+        function showModal(action, callback) {
+            modal.classList.remove('hidden');
+            modalTitle.innerText = `Konfirmasi ${action}`;
+            modalBody.innerText = `Apakah Anda yakin ingin ${action.toLowerCase()} konten ini?`;
+
+            confirmButton.onclick = function () {
+                callback();
+                modal.classList.add('hidden');
+            };
+
+            cancelButton.onclick = function () {
+                modal.classList.add('hidden');
+            };
+        }
+
+
+        document.querySelectorAll('.post form button').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                showModal('Posting', function () {
+                    event.target.closest('form').submit();
+                });
+            });
+        });
+
+        document.querySelectorAll('.post-options a').forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const actionType = link.innerText.trim().toLowerCase();
+                showModal(actionType, function () {
+                    window.location.href = link.href;
+                });
+            });
+        });
+    });
+
+    function toggleLike(postId) {
+        fetch('update_like.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ postId }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const post = document.querySelector(`.post[data-post-id="${postId}"]`);
+                    const likeButton = post.querySelector('.like');
+                    const likeCount = post.querySelector('.like-count');
+
+                    if (data.liked) {
+                        likeButton.textContent = '<i class="fas fa-heart ml-4 mr-2" style="color: red;"></i>';
+                        likeCount.textContent = parseInt(likeCount.textContent) + 1;
+                    } else {
+                        likeButton.textContent = '<i class="fas fa-heart ml-4 mr-2"></i>';
+                        likeCount.textContent = parseInt(likeCount.textContent) - 1;
+                    }
+                }
+            });
+    }
+
+    function navigateToComments(postId) {
+        window.location.href = `comments.php?post_id=${postId}`;
+    }
 
     function toggleLike(element, postId) {
         const likeCountSpan = element.nextElementSibling;
@@ -316,15 +329,39 @@ function time_ago($datetime, $full = false) {
                 element.setAttribute('data-liked', 'false');
                 element.querySelector('i').classList.remove('text-red-500');
             }
-            likeCountSpan.textContent = likeCount + ' Likes';
+            likeCountSpan.textContent = likeCount;
             })
             .catch(error => console.error('Error:', error));
     }
 
-    function navigateToComments(postId) {
-        window.location.href = `comments.php?post_id=${postId}`;
-    }
+
     </script>
 
 </body>
 </html>
+
+<?php
+function time_ago($datetime, $full = false) {
+    $now = new DateTime;
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+    $units = [
+        'y' => 'tahun',
+        'm' => 'bulan',
+        'd' => 'hari',
+        'h' => 'jam',
+        'i' => 'menit',
+        's' => 'detik',
+    ];
+    $string = [];
+    foreach ($units as $k => $v) {
+        if ($diff->$k) {
+            $string[] = $diff->$k . ' ' . $v;
+        }
+    }
+    if (!$full) $string = array_slice($string, 0, 1);
+    return $string ? implode(', ', $string) . ' yang lalu' : 'baru saja';
+}
+?>
+
+modifikasi kodingan Dashboard.php diatas menyesuaikan peraturan yang dijelaskan sebelumnya
