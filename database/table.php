@@ -59,6 +59,16 @@ $sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- Menambahkan constraint foreign key
 )";
 
+$sql_comments = "CREATE TABLE IF NOT EXISTS comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    comment TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)";
+
 // Eksekusi query dengan try-catch
 try {
     if (mysqli_query($conn, $sql_user)) {
@@ -83,6 +93,12 @@ try {
         echo "Tabel diarys berhasil dibuat.<br>";
     } else {
         echo "Tabel diarys gagal dibuat: " . mysqli_error($conn) . "<br>";
+    }
+
+    if (mysqli_query($conn, $sql_comments)) {
+        echo "Tabel comments berhasil dibuat.<br>";
+    } else {
+        echo "Tabel comments gagal dibuat: " . mysqli_error($conn) . "<br>";
     }
 } catch (mysqli_sql_exception $e) {
     echo "Terjadi kesalahan: " . $e->getMessage();
