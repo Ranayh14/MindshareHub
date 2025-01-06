@@ -130,7 +130,7 @@ function time_ago($datetime, $full = false) {
                         while ($row = $result->fetch_assoc()) {
                             $isOwner = $row['user_id'] === $user_id; // Cek apakah postingan milik user sendiri
                             $isLiked = $row['liked'] > 0; // Jika user telah menyukai postingan
-                            echo '<div class="post relative p-4 rounded-lg mb-4 bg-customPurple text-white">';
+                            echo '<div class="post relative p-4 rounded-lg mb-4 bg-customPurple text-white" id="post-' . htmlspecialchars($row['id']) . '">';
                             echo '    <div class="post-header flex justify-between items-center">';
                             echo '        <div class="flex items-center">';
                             echo '            <div class="avatar"></div>';
@@ -153,7 +153,7 @@ function time_ago($datetime, $full = false) {
                             echo '        </div>';
                             echo '    </div>';
                             echo '    </div>';
-                            echo '    <div class="post-content mt-2">' . htmlspecialchars($row['content']) . '</div>';
+                            echo '    <div class="post-content mt-2">' . nl2br(htmlspecialchars($row['content'])) . '</div>';
 
                             // Tampilkan gambar jika ada
                             if ($row['image_path']) {
@@ -162,17 +162,28 @@ function time_ago($datetime, $full = false) {
                                 echo '</div>';
                             }
 
+                            // Bagian aksi like dan komentar
                             echo '<div class="action flex items-center text-gray-400 mt-4">';
                             echo '<span class="like cursor-pointer" data-liked="' . ($isLiked ? 'true' : 'false') . '" onclick="toggleLike(this, ' . $row['id'] . ')">';
                             echo '  <i class="fas fa-heart ml-4 mr-2 ' . ($isLiked ? 'text-red-500' : '') . '"></i>';
                             echo '</span>';
                             echo '<span class="like-count">' . $row['likes'] . ' Likes</span>'; // Tambahkan teks "Likes"
-                            echo '  <button onclick="navigateToComments(' . $row['id'] . ')" class="ml-4">';
+                            echo '  <button onclick="toggleComments(' . $row['id'] . ')" class="ml-4">';
                             echo '    <i class="fas fa-comment mr-2"></i>';
                             echo '    <span>Komentar</span>'; // Tambahkan tulisan "Komentar" di sini
                             echo '  </button>';
                             echo '</div>';
+
+                            // Bagian komentar yang tersembunyi
+                            echo '<div class="comments-section mt-4 hidden" id="comments-' . htmlspecialchars($row['id']) . '">';
+                            echo '    <div class="existing-comments mb-4"></div>';
+                            echo '    <form class="add-comment-form" onsubmit="submitComment(event, ' . htmlspecialchars($row['id']) . ')">';
+                            echo '        <textarea name="comment" rows="2" class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-black" placeholder="Tambahkan komentar..." required></textarea>';
+                            echo '        <button type="submit" class="mt-2 bg-white text-purple-600 px-4 py-2 rounded hover:bg-purple-600 hover:text-white opacity-90">Kirim</button>';
+                            echo '    </form>';
                             echo '</div>';
+
+                            echo '</div>'; // Akhir div.post
                         }
                     } else {
                         echo '<div class="post">Belum ada postingan.</div>';
