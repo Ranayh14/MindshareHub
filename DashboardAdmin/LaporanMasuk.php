@@ -155,10 +155,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
         </main>
     </div>
 
+    <!-- Modal Konfirmasi Logout -->
+    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Anda yakin ingin logout?</h2>
+            <p class="mb-6">Semua sesi aktif akan diakhiri.</p>
+            <div class="flex space-x-4">
+                <a href="LogoutAdmin.php" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">
+                    Logout
+                </a>
+                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const searchInput = document.getElementById('searchInput');
         const filterSelect = document.getElementById('filterSelect');
         const reportTableBody = document.getElementById('reportTableBody');
+        const logoutButton = document.getElementById('logoutButton');
+        const logoutModal = document.getElementById('logoutModal');
 
         // Filter function
         function filterReports() {
@@ -178,49 +196,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
             });
         }
 
+        // Event listeners
         searchInput.addEventListener('input', filterReports);
         filterSelect.addEventListener('change', filterReports);
 
-        // Update status function
-function updateStatus(reportId, button) {
-    if (confirm('Apakah Anda yakin ingin menyelesaikan laporan ini?')) {
-        fetch('LaporanMasuk.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                'id': reportId,
-                'status': 'Selesai',
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Laporan berhasil diselesaikan!');
-
-                // Update the row status without refreshing
-                const row = button.closest('tr');
-                const statusCell = row.getElementsByTagName('td')[4];
-
-                statusCell.textContent = 'Selesai';
-                statusCell.classList.remove('text-yellow-400');
-                statusCell.classList.add('text-green-400');
-
-                button.textContent = 'Terselesaikan';
-                button.classList.remove('bg-yellow-500');
-                button.classList.add('bg-green-500');
-                button.disabled = true; // Disable the button after completion
-            } else {
-                alert('Gagal menyelesaikan laporan: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Terjadi kesalahan:', error);
-            alert('Terjadi kesalahan, coba lagi nanti.');
+        // Menampilkan modal ketika tombol logout diklik
+        logoutButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Mencegah navigasi langsung
+            logoutModal.classList.remove('hidden'); // Tampilkan modal
         });
-    }
-}
+
+        // Menutup modal
+        function closeModal() {
+            logoutModal.classList.add('hidden'); // Sembunyikan modal
+        }
+
+        // Update status function
+        function updateStatus(reportId, button) {
+            if (confirm('Apakah Anda yakin ingin menyelesaikan laporan ini?')) {
+                fetch('LaporanMasuk.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'id': reportId,
+                        'status': 'Selesai',
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Laporan berhasil diselesaikan!');
+
+                        // Update the row status without refreshing
+                        const row = button.closest('tr');
+                        const statusCell = row.getElementsByTagName('td')[4];
+
+                        statusCell.textContent = 'Selesai';
+                        statusCell.classList.remove('text-yellow-400');
+                        statusCell.classList.add('text-green-400');
+
+                        button.textContent = 'Terselesaikan';
+                        button.classList.remove('bg-yellow-500');
+                        button.classList.add('bg-green-500');
+                        button.disabled = true; // Disable the button after completion
+                    } else {
+                        alert('Gagal menyelesaikan laporan: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Terjadi kesalahan:', error);
+                    alert('Terjadi kesalahan, coba lagi nanti.');
+                });
+            }
+        }
 
         // Delete report function
         function deleteReport(reportId, button) {
