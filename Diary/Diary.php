@@ -3,35 +3,68 @@ include("../conn.php");
 session_start();
 
 // Ambil data catatan diary dari database
-$user_id = $_SESSION['user_id'];  // Pastikan session user_id sudah diset sebelumnya
+$user_id = $_SESSION['user_id'];
 $query = "SELECT id, title, content, LEFT(title, 50) AS snippet FROM diarys WHERE user_id = $user_id ORDER BY created_at DESC";
 $result = $conn->query($query);
 
-$userId = $user_id;
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_FILES['audio'])) {
+        // Handle audio upload
+        if (empty($_POST['title'])) {
+            echo json_encode(["status" => "error", "message" => "You must save a note with a title before recording."]);
+            exit;
+        }
+
+        $audioFile = $_FILES['audio'];
+        $targetDir = "../uploads/";
+        $fileName = uniqid() . "_" . basename($audioFile["name"]);
+        $targetFilePath = $targetDir . $fileName;
+
+        if (move_uploaded_file($audioFile["tmp_name"], $targetFilePath)) {
+            // Menyimpan catatan audio terkait
+            $note_id = $_POST['note_id'];
+            $sql = "INSERT INTO audio_notes (user_id, file_name, created_at, note_id) VALUES (?, ?, NOW(), ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param('isi', $user_id, $fileName, $note_id);
+            $stmt->execute();
+            echo json_encode(["status" => "success", "message" => "Audio uploaded successfully."]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Failed to upload audio."]);
+        }
+        exit;
+    }
+
+    // Handle actions for saving, updating, or deleting notes...
     $action = $_POST['action'];
     $title = $_POST['title'];
     $content = $_POST['content'];
-    $editId = $_POST['edit_id']; 
+    $editId = $_POST['edit_id'];
 
     if ($action == 'save') {
         // Menyimpan catatan baru
+        if (empty($title)) {
+            echo json_encode(["status" => "error", "message" => "Title is required to save a note."]);
+            exit;
+        }
         $sql = "INSERT INTO diarys (title, content, user_id) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param('ssi', $title, $content, $userId);
+        $stmt->bind_param('ssi', $title, $content, $user_id);
         $stmt->execute();
     } elseif ($action == 'update' && !empty($editId)) {
         // Memperbarui catatan yang ada
+        if (empty($title)) {
+            echo json_encode(["status" => "error", "message" => "Title is required to update the note."]);
+            exit;
+        }
         $sql = "UPDATE diarys SET title = ?, content = ? WHERE id = ? AND user_id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param('ssii', $title, $content, $editId, $userId);
+        $stmt->bind_param('ssii', $title, $content, $editId, $user_id);
         $stmt->execute();
     } elseif ($action == 'delete' && !empty($editId)) {
         // Menghapus catatan
         $sql = "DELETE FROM diarys WHERE id = ? AND user_id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param('ii', $editId, $userId);
+        $stmt->bind_param('ii', $editId, $user_id);
         $stmt->execute();
     }
 }
@@ -46,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#1a1b26] text-white flex">
-    <!-- sidebar -->
+    <!-- Sidebar -->
     <div>
         <?php include('../slicing/sidbar.html'); ?>
     </div>
@@ -80,43 +113,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div class="notes-sidebar w-72 bg-[#13141f] h-screen p-5 flex flex-col">
+        <h3 class="text-lg font-semibold">Catatan Anda</h3>
         <div class="notes-list flex-grow overflow-y-auto space-y-3" id="notes-list">
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="note-item p-4 bg-[#1e1f2e] rounded transition cursor-pointer hover:bg-[#2d2d3d]" data-id="<?php echo $row['id']; ?>" data-title="<?php echo htmlspecialchars($row['title']); ?>" data-content="<?php echo htmlspecialchars($row['content']); ?>">
-                    <h3 class="note-title text-base font-bold mb-1"> <?php echo htmlspecialchars($row['snippet']); ?>...</h3>
-                    <p class="note-snippet text-sm text-[#8e8ea0]"> <?php echo htmlspecialchars($row['content']); ?></p>
+            <?php if ($result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <div class="note-item p-4 bg-[#1e1f2e] rounded transition cursor-pointer hover:bg-[#2d2d3d]" data-id="<?php echo $row['id']; ?>" data-title="<?php echo htmlspecialchars($row['title']); ?>" data-content="<?php echo htmlspecialchars($row['content']); ?>">
+                        <h3 class="note-title text-base font-bold mb-1"><?php echo htmlspecialchars($row['snippet']); ?>...</h3>
+                        <p class="note-snippet text-sm text-[#8e8ea0]"><?php echo htmlspecialchars($row['content']); ?></p>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <div class="no-notes-message text-gray-500 text-center">
+                    Belum ada catatan.
                 </div>
-            <?php endwhile; ?>
-        </div>
-    </div>
-
-    <div id="save-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-[#2d2d3d] p-6 rounded shadow-md text-center">
-            <p class="text-white mb-4">Are you sure you want to save this note?</p>
-            <div class="flex justify-center space-x-4">
-                <button id="cancel-save-btn" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">No</button>
-                <button id="confirm-save-btn" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Yes</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-[#2d2d3d] p-6 rounded shadow-md text-center">
-            <p class="text-white mb-4">Are you sure you want to delete this note?</p>
-            <div class="flex justify-center space-x-4">
-                <button id="cancel-btn" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">No</button>
-                <button id="confirm-delete-btn" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="delete-recording-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-[#2d2d3d] p-6 rounded shadow-md text-center">
-            <p class="text-white mb-4">Are you sure you want to delete this recording?</p>
-            <div class="flex justify-center space-x-4">
-                <button id="cancel-delete-recording-btn" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">No</button>
-                <button id="confirm-delete-recording-btn" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes</button>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -127,20 +137,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const saveBtn = document.getElementById('save-btn');
         const newNoteBtn = document.getElementById('new-note-btn');
         const deleteBtn = document.getElementById('delete-btn');
-        const saveModal = document.getElementById('save-modal');
-        const deleteModal = document.getElementById('delete-modal');
-        const deleteRecordingModal = document.getElementById('delete-recording-modal');
-        const cancelSaveBtn = document.getElementById('cancel-save-btn');
-        const confirmSaveBtn = document.getElementById('confirm-save-btn');
-        const cancelBtn = document.getElementById('cancel-btn');
-        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-        const cancelDeleteRecordingBtn = document.getElementById('cancel-delete-recording-btn');
-        const confirmDeleteRecordingBtn = document.getElementById('confirm-delete-recording-btn');
+        const recordBtn = document.getElementById('record-btn');
+        const stopRecordBtn = document.getElementById('stop-record-btn');
+        const recordingsContainer = document.getElementById('recordings-container');
 
         let currentEditId = null;
-        let currentRecording = null;
+        let mediaRecorder;
+        let audioChunks = [];
 
-        // Handle note selection
         notesList.addEventListener('click', function (e) {
             const noteItem = e.target.closest('.note-item');
             if (!noteItem) return;
@@ -151,161 +155,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             titleInput.value = title;
             contentInput.value = content;
+
+            // Hapus semua rekaman yang ada
+            recordingsContainer.innerHTML = '';
+            loadAudioForNote(currentEditId);
         });
 
-        // Handle save button
+        function loadAudioForNote(noteId) {
+            fetch('get_audio.php?note_id=' + noteId)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(audio => {
+                        const audioItem = document.createElement('div');
+                        audioItem.classList.add('audio-item', 'flex', 'justify-between', 'items-center');
+                        audioItem.innerHTML = ` 
+                            <audio controls src="../uploads/${audio.file_name}"></audio>
+                            <button class="delete-audio-btn text-red-500" data-id="${audio.id}">Hapus</button>
+                            <p class="text-sm text-gray-400">Uploaded: ${audio.created_at}</p>
+                        `;
+                        recordingsContainer.appendChild(audioItem);
+                    });
+                });
+        }
+
         saveBtn.addEventListener('click', function () {
-            if (titleInput.value.trim() === '' || contentInput.value.trim() === '') {
-                alert('Title and content cannot be empty.');
+            if (titleInput.value.trim() === '') {
+                alert('Judul tidak boleh kosong.');
                 return;
             }
 
-            saveModal.classList.remove('hidden');
-        });
-
-        // Confirm save note
-        confirmSaveBtn.addEventListener('click', function () {
-            const title = titleInput.value;
-            const content = contentInput.value;
-
             const formData = new FormData();
-            formData.append('title', title);
-            formData.append('content', content);
+            formData.append('title', titleInput.value);
+            formData.append('content', contentInput.value);
             formData.append('action', currentEditId ? 'update' : 'save');
+            if (currentEditId) formData.append('edit_id', currentEditId);
 
-            if (currentEditId) {
-                formData.append('edit_id', currentEditId);
-            }
-
-            fetch('', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.text())
+            fetch('', { method: 'POST', body: formData })
                 .then(() => {
-                    alert('Note saved successfully!');
                     location.reload();
                 })
                 .catch(error => console.error('Error:', error));
-
-            saveModal.classList.add('hidden');
         });
 
-        cancelSaveBtn.addEventListener('click', function () {
-            saveModal.classList.add('hidden');
-        });
-
-        // New note
         newNoteBtn.addEventListener('click', function () {
             titleInput.value = '';
             contentInput.value = '';
             currentEditId = null;
+            recordingsContainer.innerHTML = ''; // Hapus semua rekaman
         });
 
-        // Delete note
         deleteBtn.addEventListener('click', function () {
             if (!currentEditId) {
-                alert('Please select a note to delete.');
+                alert('Silakan pilih catatan untuk dihapus.');
                 return;
             }
 
-            deleteModal.classList.remove('hidden');
-        });
-
-        cancelBtn.addEventListener('click', function () {
-            deleteModal.classList.add('hidden');
-        });
-
-        confirmDeleteBtn.addEventListener('click', function () {
             const formData = new FormData();
             formData.append('action', 'delete');
             formData.append('edit_id', currentEditId);
 
-            fetch('', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.text())
-                .then(() => {
-                    alert('Note deleted successfully!');
-                    location.reload();
-                })
+            fetch('', { method: 'POST', body: formData })
+                .then(() => location.reload())
                 .catch(error => console.error('Error:', error));
-
-            deleteModal.classList.add('hidden');
         });
 
-        // Audio Recording Feature
-        let mediaRecorder;
-        let audioChunks = [];
-        const recordBtn = document.getElementById('record-btn');
-        const stopRecordBtn = document.getElementById('stop-record-btn');
-        const recordingsContainer = document.getElementById('recordings-container');
+        recordBtn.addEventListener('click', async () => {
+            if (titleInput.value.trim() === '') {
+                alert('Silakan isi judul sebelum merekam.');
+                return;
+            }
 
-        // Start recording
-        recordBtn.addEventListener('click', function () {
-            if (navigator.mediaDevices) {
-                navigator.mediaDevices.getUserMedia({ audio: true })
-                    .then(stream => {
-                        mediaRecorder = new MediaRecorder(stream);
-                        mediaRecorder.ondataavailable = event => {
-                            audioChunks.push(event.data);
-                        };
-                        mediaRecorder.onstop = () => {
-                            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                            const audioUrl = URL.createObjectURL(audioBlob);
-                            const audioElement = document.createElement('audio');
-                            audioElement.controls = true;
-                            audioElement.src = audioUrl;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
 
-                            // Add delete button for each recording
-                            const deleteBtn = document.createElement('button');
-                            deleteBtn.textContent = 'Delete Recording';
-                            deleteBtn.classList.add('px-4', 'py-2', 'bg-red-500', 'text-white', 'rounded', 'hover:bg-red-600', 'transition');
-                            deleteBtn.onclick = () => {
-                                currentRecording = audioElement;
-                                deleteRecordingModal.classList.remove('hidden');
-                                deleteBtn.remove();
-                            };
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
 
-                            const recordingContainer = document.createElement('div');
-                            recordingContainer.classList.add('flex', 'items-center', 'space-x-4'); // Flex container for audio and delete button
-                            recordingContainer.appendChild(audioElement);
-                            recordingContainer.appendChild(deleteBtn);
-                            recordingsContainer.appendChild(recordingContainer);
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    uploadAudio(audioBlob);
+                    audioChunks = [];
+                };
 
-                            // Make delete button visible only after recording is available
-                            deleteBtn.classList.remove('hidden');
-
-                            audioChunks = []; // Reset after each recording
-                        };
-
-                        mediaRecorder.start();
-                        recordBtn.classList.add('hidden');
-                        stopRecordBtn.classList.remove('hidden');
-                    })
-                    .catch(err => console.error("Error accessing media devices.", err));
+                mediaRecorder.start();
+                recordBtn.classList.add('hidden');
+                stopRecordBtn.classList.remove('hidden');
+            } catch (error) {
+                alert('Tidak bisa mengakses mikrofon: ' + error.message);
             }
         });
 
-        // Stop recording
-        stopRecordBtn.addEventListener('click', function () {
+        stopRecordBtn.addEventListener('click', () => {
             mediaRecorder.stop();
             stopRecordBtn.classList.add('hidden');
             recordBtn.classList.remove('hidden');
         });
 
-        // Handle delete recording
-        confirmDeleteRecordingBtn.addEventListener('click', function () {
-            if (currentRecording) {
-                currentRecording.remove();
-            }
-            deleteRecordingModal.classList.add('hidden');
-        });
+        async function uploadAudio(audioBlob) {
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.webm');
+            formData.append('title', titleInput.value);
+            formData.append('note_id', currentEditId);  // Kirimkan note_id untuk catatan yang sedang diedit
 
-        cancelDeleteRecordingBtn.addEventListener('click', function () {
-            deleteRecordingModal.classList.add('hidden');
-        });
+            try {
+                const response = await fetch('', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert(result.message);
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                alert('Gagal mengunggah rekaman.');
+            }
+        }
     </script>
 </body>
 </html>
