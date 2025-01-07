@@ -77,9 +77,9 @@ $stmt->close();
                     <span class="text-white">
                         <?php echo htmlspecialchars($userName); ?>
                     </span>
-                    <i class="fas fa-heart text-red-500 ml-2"></i>
+                    <i class="fas fa-heart text-gray-400 ml-2"></i>
                 </div>
-                <div class="w-full bg-gray-600 rounded-full h-2.5 mt-1">
+                <div class="w-full bg-gray-400 rounded-full h-2.5 mt-1">
                     <div class="bg-red-500 h-2.5 rounded-full" style="width: <?php echo htmlspecialchars($userProgressPercentage); ?>%"></div>
                 </div>
             </div>

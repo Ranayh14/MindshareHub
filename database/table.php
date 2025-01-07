@@ -63,11 +63,12 @@ $sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
-    user_id INT NOT NULL,  -- Menambahkan kolom user_id
+    user_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- Menambahkan constraint foreign key
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
+// Kode untuk membuat tabel reports
 $sql_report = "CREATE TABLE IF NOT EXISTS reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL,
@@ -75,12 +76,12 @@ $sql_report = "CREATE TABLE IF NOT EXISTS reports (
     reason VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('aktif', 'selesai', 'ditolak') DEFAULT 'aktif',  -- Status untuk laporan
+    status ENUM('aktif', 'selesai', 'ditolak') DEFAULT 'aktif',
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (reported_by) REFERENCES users(id)
 )";
 
-
+// Kode untuk membuat tabel comments
 $sql_comments = "CREATE TABLE IF NOT EXISTS comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL,
@@ -94,6 +95,7 @@ $sql_comments = "CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
 )";
 
+// Kode untuk membuat tabel comment_likes
 $sql_commentlikes = "CREATE TABLE IF NOT EXISTS comment_likes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     comment_id INT NOT NULL,
@@ -101,9 +103,10 @@ $sql_commentlikes = "CREATE TABLE IF NOT EXISTS comment_likes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE (comment_id, user_id) -- Mencegah duplikasi like
+    UNIQUE (comment_id, user_id)
 )";
 
+// Kode untuk membuat tabel comment_reports
 $sql_reportComments = "CREATE TABLE IF NOT EXISTS comment_reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     comment_id INT NOT NULL,
@@ -113,6 +116,15 @@ $sql_reportComments = "CREATE TABLE IF NOT EXISTS comment_reports (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)";
+
+// Kode untuk membuat tabel audio_notes
+$sql_audioNotes = "CREATE TABLE IF NOT EXISTS audio_notes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 )";
 
 // Eksekusi query dengan try-catch
@@ -175,6 +187,12 @@ try {
         echo "Tabel comment_reports berhasil dibuat.<br>";
     } else {
         echo "Tabel comment_reports gagal dibuat: " . mysqli_error($conn) . "<br>";
+    }
+
+    if (mysqli_query($conn, $sql_audioNotes)) {
+        echo "Tabel audio_notes berhasil dibuat.<br>";
+    } else {
+        echo "Tabel audio_notes gagal dibuat: " . mysqli_error($conn) . "<br>";
     }
 } catch (mysqli_sql_exception $e) {
     echo "Terjadi kesalahan: " . $e->getMessage();

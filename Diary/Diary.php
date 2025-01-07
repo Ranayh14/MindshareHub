@@ -8,10 +8,10 @@ $query = "SELECT id, title, content, LEFT(title, 50) AS snippet FROM diarys WHER
 $result = $conn->query($query);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Menangani unggahan audio
     if (isset($_FILES['audio'])) {
-        // Handle audio upload
         if (empty($_POST['title'])) {
-            echo json_encode(["status" => "error", "message" => "You must save a note with a title before recording."]);
+            echo json_encode(["status" => "error", "message" => "Anda harus menyimpan catatan dengan judul sebelum merekam."]);
             exit;
         }
 
@@ -27,61 +27,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare($sql);
             $stmt->bind_param('isi', $user_id, $fileName, $note_id);
             $stmt->execute();
-            echo json_encode(["status" => "success", "message" => "Audio uploaded successfully."]);
+            echo json_encode(["status" => "success", "message" => "Audio berhasil diunggah."]);
         } else {
-            echo json_encode(["status" => "error", "message" => "Failed to upload audio."]);
+            echo json_encode(["status" => "error", "message" => "Gagal mengunggah audio."]);
         }
         exit;
     }
 
-    // Handle actions for saving, updating, or deleting notes...
-    $action = $_POST['action'];
-    $title = $_POST['title'];
-    $content = $_POST['content'];
-    $editId = $_POST['edit_id'];
+    // Menangani aksi untuk menyimpan, memperbarui, atau menghapus catatan
+    $action = $_POST['action'] ?? null;
+    $title = $_POST['title'] ?? '';
+    $content = $_POST['content'] ?? '';
+    $editId = $_POST['edit_id'] ?? null;
 
-    if ($action == 'save') {
-        // Menyimpan catatan baru
+    if ($action === 'save') {
         if (empty($title)) {
-            echo json_encode(["status" => "error", "message" => "Title is required to save a note."]);
+            echo json_encode(["status" => "error", "message" => "Judul diperlukan untuk menyimpan catatan."]);
             exit;
         }
         $sql = "INSERT INTO diarys (title, content, user_id) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('ssi', $title, $content, $user_id);
         $stmt->execute();
-    } elseif ($action == 'update' && !empty($editId)) {
-        // Memperbarui catatan yang ada
+        echo json_encode(["status" => "success", "id" => $stmt->insert_id, "title" => $title, "content" => $content]);
+    } elseif ($action === 'update' && !empty($editId)) {
         if (empty($title)) {
-            echo json_encode(["status" => "error", "message" => "Title is required to update the note."]);
+            echo json_encode(["status" => "error", "message" => "Judul diperlukan untuk memperbarui catatan."]);
             exit;
         }
         $sql = "UPDATE diarys SET title = ?, content = ? WHERE id = ? AND user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('ssii', $title, $content, $editId, $user_id);
         $stmt->execute();
-    } elseif ($action == 'delete' && !empty($editId)) {
-        // Menghapus catatan
+        echo json_encode(["status" => "success", "id" => $editId, "title" => $title, "content" => $content]);
+    } elseif ($action === 'delete' && !empty($editId)) {
         $sql = "DELETE FROM diarys WHERE id = ? AND user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('ii', $editId, $user_id);
         $stmt->execute();
+        echo json_encode(["status" => "success"]);
     }
+
+    // Menangani penghapusan audio tertentu
+    if ($action === 'delete_audio' && !empty($_POST['audio_id'])) {
+        $audio_id = $_POST['audio_id'];
+        $sql = "DELETE FROM audio_notes WHERE id = ? AND user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ii', $audio_id, $user_id);
+        $stmt->execute();
+        echo json_encode(["status" => "success", "message" => "Rekaman audio berhasil dihapus."]);
+        exit;
+    }
+
+    // Menangani penghapusan semua audio untuk catatan tertentu
+    if ($action === 'delete_all_audio' && !empty($editId)) {
+        $sql = "DELETE FROM audio_notes WHERE note_id = ? AND user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ii', $editId, $user_id);
+        $stmt->execute();
+        echo json_encode(["status" => "success", "message" => "Semua rekaman audio berhasil dihapus."]);
+        exit;
+    }
+
+    exit;
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindshareHub - Diary</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/Dashboard/Dashboard.css">
 </head>
 <body class="bg-[#1a1b26] text-white flex">
     <!-- Sidebar -->
     <div>
-        <?php include('../slicing/sidbar.html'); ?>
+        <?php include('../slicing/sidebar.php'); ?>
     </div>
 
     <div class="main-content flex-1 p-5">
@@ -91,10 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="actions flex space-x-2">
                 <button id="new-note-btn" class="new-note-btn px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-                    <span class="mr-2">+</span> New notes
+                    <span class="mr-2">+</span> Catatan Baru
                 </button>
-                <button id="save-btn" class="save-btn px-4 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition">Save</button>
-                <button id="delete-btn" class="delete-btn px-4 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition">Delete</button>
+                <button id="save-btn" class="save-btn px-4 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition">Simpan</button>
+                <button id="delete-btn" class="delete-btn px-4 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition">Hapus</button>
             </div>
         </div>
 
@@ -103,10 +127,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Voice Note Section -->
         <div class="voice-note mt-5">
             <button id="record-btn" class="px-4 py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">
-                Start Recording
+                Mulai Merekam
             </button>
             <button id="stop-record-btn" class="px-4 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition hidden">
-                Stop Recording
+                Hentikan Rekaman
+            </button>
+            <button id="delete-all-audio-btn" class="px-4 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition hidden">
+                Hapus Semua Rekaman
             </button>
             <div id="recordings-container" class="space-y-4 mt-4"></div>
         </div>
@@ -139,6 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const deleteBtn = document.getElementById('delete-btn');
         const recordBtn = document.getElementById('record-btn');
         const stopRecordBtn = document.getElementById('stop-record-btn');
+        const deleteAllAudioBtn = document.getElementById('delete-all-audio-btn');
         const recordingsContainer = document.getElementById('recordings-container');
 
         let currentEditId = null;
@@ -165,16 +193,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             fetch('get_audio.php?note_id=' + noteId)
                 .then(response => response.json())
                 .then(data => {
+                    recordingsContainer.innerHTML = ''; // Hapus rekaman sebelumnya
                     data.forEach(audio => {
                         const audioItem = document.createElement('div');
                         audioItem.classList.add('audio-item', 'flex', 'justify-between', 'items-center');
                         audioItem.innerHTML = ` 
                             <audio controls src="../uploads/${audio.file_name}"></audio>
                             <button class="delete-audio-btn text-red-500" data-id="${audio.id}">Hapus</button>
-                            <p class="text-sm text-gray-400">Uploaded: ${audio.created_at}</p>
+                            <p class="text-sm text-gray-400">Diunggah: ${audio.created_at}</p>
                         `;
                         recordingsContainer.appendChild(audioItem);
                     });
+                    deleteAllAudioBtn.classList.remove('hidden'); // Tampilkan tombol hapus semua
                 });
         }
 
@@ -191,17 +221,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (currentEditId) formData.append('edit_id', currentEditId);
 
             fetch('', { method: 'POST', body: formData })
-                .then(() => {
-                    location.reload();
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        alert('Catatan berhasil disimpan.');
+                        if (!currentEditId) {
+                            addNoteToSidebar(result);
+                        } else {
+                            updateNoteInSidebar(result);
+                        }
+                        clearInputs(); // Kosongkan input setelah menyimpan
+                    } else {
+                        alert(result.message);
+                    }
                 })
                 .catch(error => console.error('Error:', error));
         });
 
         newNoteBtn.addEventListener('click', function () {
-            titleInput.value = '';
-            contentInput.value = '';
-            currentEditId = null;
-            recordingsContainer.innerHTML = ''; // Hapus semua rekaman
+            clearInputs(); // Kosongkan input untuk catatan baru
         });
 
         deleteBtn.addEventListener('click', function () {
@@ -215,7 +253,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             formData.append('edit_id', currentEditId);
 
             fetch('', { method: 'POST', body: formData })
-                .then(() => location.reload())
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        alert('Catatan berhasil dihapus.');
+                        notesList.querySelector(`.note-item[data-id="${currentEditId}"]`).remove();
+                        clearInputs(); // Kosongkan input setelah menghapus
+                    }
+                })
                 .catch(error => console.error('Error:', error));
         });
 
@@ -262,15 +307,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 const response = await fetch('', { method: 'POST', body: formData });
                 const result = await response.json();
-                if (result.status === 'success') {
-                    alert(result.message);
-                } else {
-                    alert(result.message);
-                }
+                alert(result.message);
+                loadAudioForNote(currentEditId); // Muat ulang audio untuk catatan yang diperbarui
             } catch (error) {
                 alert('Gagal mengunggah rekaman.');
             }
         }
+
+        function addNoteToSidebar(note) {
+            const noteItem = document.createElement('div');
+            noteItem.classList.add('note-item', 'p-4', 'bg-[#1e1f2e]', 'rounded', 'cursor-pointer');
+            noteItem.setAttribute('data-id', note.id);
+            noteItem.setAttribute('data-title', note.title);
+            noteItem.setAttribute('data-content', note.content);
+            noteItem.innerHTML = `
+                <h3 class="note-title text-base font-bold mb-1">${note.title}</h3>
+                <p class="note-snippet text-sm text-[#8e8ea0]">${note.content}</p>
+            `;
+            notesList.appendChild(noteItem);
+        }
+
+        function updateNoteInSidebar(note) {
+            const noteItem = notesList.querySelector(`.note-item[data-id="${note.id}"]`);
+            noteItem.setAttribute('data-title', note.title);
+            noteItem.setAttribute('data-content', note.content);
+            noteItem.querySelector('.note-title').textContent = note.title;
+            noteItem.querySelector('.note-snippet').textContent = note.content;
+        }
+
+        function clearInputs() {
+            titleInput.value = '';
+            contentInput.value = '';
+            currentEditId = null;
+            recordingsContainer.innerHTML = ''; // Kosongkan rekaman
+        }
+
+        // Menangani penghapusan audio tertentu
+        recordingsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-audio-btn')) {
+                const audioId = e.target.getAttribute('data-id');
+
+                const formData = new FormData();
+                formData.append('audio_id', audioId);
+                formData.append('action', 'delete_audio'); // Tambahkan action untuk menghapus audio
+
+                fetch('', { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                            alert('Rekaman audio berhasil dihapus.');
+                            loadAudioForNote(currentEditId); // Muat ulang audio untuk catatan yang diperbarui
+                        } else {
+                            alert(result.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+
+        // Menangani penghapusan semua rekaman
+        deleteAllAudioBtn.addEventListener('click', function () {
+            if (!currentEditId) {
+                alert('Silakan pilih catatan untuk menghapus semua rekaman.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'delete_all_audio');
+            formData.append('edit_id', currentEditId);
+
+            fetch('', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        alert('Semua rekaman berhasil dihapus.');
+                        recordingsContainer.innerHTML = ''; // Kosongkan tampilan rekaman
+                    } else {
+                        alert(result.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
     </script>
 </body>
 </html>

@@ -37,11 +37,15 @@ function time_ago($datetime, $full = false) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindshareHub</title>
-    <link rel="stylesheet" href="Dashboard.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- Font Awesome untuk ikon -->
+    <!-- Flowbite CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
+
+    <!-- Flowbite JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+
+    <link rel="stylesheet" href="Dashboard.css">
 </head>
 <body>
 
@@ -203,12 +207,12 @@ function time_ago($datetime, $full = false) {
     </div>
 
     <!-- Right Sidebar -->
-    <div class="sticky top-0 right-0 h-screen w-64 bg-white z-50">
+    <div class="hidden lg:block sticky top-0 right-0 h-screen w-64 bg-gray-800 z-50">
         <?php include('../slicing/rightSidebar.html'); ?>
     </div>
 
     <!-- Modal Report (Menggunakan Flowbite) -->
-    <div id="reportModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full">
+    <div id="reportModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full flex items-center justify-center bg-black bg-opacity-70">
         <div class="relative p-4 w-full max-w-md h-full md:h-auto">
             <!-- Modal content -->
             <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -389,10 +393,24 @@ function time_ago($datetime, $full = false) {
                         commentDiv.classList.add('comment', 'p-3', 'bg-[#191a25]', 'rounded-lg', 'shadow-sm');
                         // Bagian yang memuat komentar di JavaScript
                         commentDiv.innerHTML = `
-                            <div class="flex items-center mb-2 bg">
+                            <div class="flex items-center mb-2">
                                 <div class="avatar w-8 h-8 bg-gray-300 rounded-full"></div>
                                 <div class="username font-semibold ml-2">${comment.username}</div>
-                                <div class="comment-time text-sm text-gray-500 ml-auto">${timeAgo(comment.created_at)}</div>
+                                <div class="comment-time pl-4 text-sm text-gray-300">${timeAgo(comment.created_at)}</div>
+                                <div class="relative ml-2">
+                                    <button onclick="toggleCommentOptions(${comment.id})" class="text-gray-500 hover:text-gray-700 focus:outline-none right-0 ml-[1080px]">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <div id="comment-options-${comment.id}" class="options-menu hidden absolute right-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg z-20">
+                                        ${comment.username === '<?php echo htmlspecialchars($_SESSION['username']); ?>' ? `
+                                            <button onclick="editComment(${comment.id}, this)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</button>
+                                            <button onclick="deleteComment(${comment.id}, this)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</button>
+                                        ` : `
+                                            <button onclick="reportComment(${comment.id})" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Laporkan</button>
+                                        `}
+                                        <button onclick="closeCommentOptions(${comment.id})" class="block w-full text-left px-4 py-2 text-sm text-gray-500 hover:bg-gray-100">Batalkan</button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="comment-text text-white bg-[#191a25] p-2 rounded-md">${comment.comment}</div>
                             <div class="comment-actions flex items-center mt-2">
@@ -400,27 +418,10 @@ function time_ago($datetime, $full = false) {
                                     <i class="fas fa-heart mr-1 ${comment.liked_by_user ? 'text-red-500' : 'text-gray-400'}"></i>
                                     <span>${comment.total_likes}</span>
                                 </span>
-                                <!-- Fitur Reply akan ditambahkan di sini -->
                                 <span class="reply-comment cursor-pointer flex items-center mr-4" onclick="replyToComment('${comment.username}')">
                                     <i class="fas fa-reply mr-1 text-gray-400"></i>
                                     <span>Reply</span>
                                 </span>
-                                <!-- Tombol Edit dan Delete jika komentar milik user sendiri -->
-                                ${comment.username === '<?php echo htmlspecialchars($_SESSION['username']); ?>' ? `
-                                    <span class="edit-comment cursor-pointer flex items-center mr-4" onclick="editComment(${comment.id}, this)">
-                                        <i class="fas fa-edit mr-1 text-gray-400"></i>
-                                        <span>Edit</span>
-                                    </span>
-                                    <span class="delete-comment cursor-pointer flex items-center mr-4" onclick="deleteComment(${comment.id}, this)">
-                                        <i class="fas fa-trash mr-1 text-gray-400"></i>
-                                        <span>Hapus</span>
-                                    </span>
-                                ` : `
-                                    <span class="report-comment cursor-pointer flex items-center" onclick="reportComment(${comment.id})">
-                                        <i class="fas fa-flag mr-1 text-gray-400"></i>
-                                        <span>Laporkan</span>
-                                    </span>
-                                `}
                             </div>
                         `;
 
@@ -483,7 +484,21 @@ function time_ago($datetime, $full = false) {
                     <div class="flex items-center mb-2">
                         <div class="avatar w-8 h-8 bg-gray-300 rounded-full"></div>
                         <div class="username font-semibold ml-2">${commentData.username}</div>
-                        <div class="comment-time text-sm text-gray-500 ml-auto">${timeAgo(commentData.created_at)}</div>
+                        <div class="comment-time pl-4 text-sm text-gray-300">${timeAgo(commentData.created_at)}</div>
+                        <div class="relative ml-2">
+                            <button onclick="toggleCommentOptions(${commentData.id})" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div id="comment-options-${commentData.id}" class="options-menu hidden absolute right-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg z-20">
+                                ${commentData.username === '<?php echo htmlspecialchars($_SESSION['username']); ?>' ? `
+                                    <button onclick="editComment(${commentData.id}, this)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</button>
+                                    <button onclick="deleteComment(${commentData.id}, this)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</button>
+                                ` : `
+                                    <button onclick="reportComment(${commentData.id})" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Laporkan</button>
+                                `}
+                                <button onclick="closeCommentOptions(${commentData.id})" class="block w-full text-left px-4 py-2 text-sm text-gray-500 hover:bg-gray-100">Batalkan</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="comment-text text-white bg-[#191a25] p-2 rounded-md">${commentData.comment}</div>
                     <div class="comment-actions flex items-center mt-2">
@@ -495,21 +510,6 @@ function time_ago($datetime, $full = false) {
                             <i class="fas fa-reply mr-1 text-gray-400"></i>
                             <span>Reply</span>
                         </span>
-                        ${commentData.username === '<?php echo htmlspecialchars($_SESSION['username']); ?>' ? `
-                            <span class="edit-comment cursor-pointer flex items-center mr-4" onclick="editComment(${commentData.id}, this)">
-                                <i class="fas fa-edit mr-1 text-gray-400"></i>
-                                <span>Edit</span>
-                            </span>
-                            <span class="delete-comment cursor-pointer flex items-center mr-4" onclick="deleteComment(${commentData.id}, this)">
-                                <i class="fas fa-trash mr-1 text-gray-400"></i>
-                                <span>Hapus</span>
-                            </span>
-                        ` : `
-                            <span class="report-comment cursor-pointer flex items-center" onclick="reportComment(${commentData.id})">
-                                <i class="fas fa-flag mr-1 text-gray-400"></i>
-                                <span>Laporkan</span>
-                            </span>
-                        `}
                     </div>
                 `;
 
@@ -562,7 +562,7 @@ function time_ago($datetime, $full = false) {
 
     // Fungsi untuk mengedit komentar
     function editComment(commentId, element) {
-        const commentDiv = element.parentElement.parentElement.querySelector('.comment-text');
+        const commentDiv = element.closest('.comment').querySelector('.comment-text');
         const originalText = commentDiv.textContent;
         const newText = prompt('Edit Komentar:', originalText);
         if (newText !== null) {
@@ -596,7 +596,7 @@ function time_ago($datetime, $full = false) {
             .then(data => {
                 if (data.status === 'success') {
                     // Hapus elemen komentar dari DOM
-                    const commentDiv = element.parentElement.parentElement.parentElement;
+                    const commentDiv = element.closest('.comment');
                     commentDiv.remove();
                 } else {
                     alert(data.message || 'Gagal menghapus komentar.');
@@ -624,6 +624,23 @@ function time_ago($datetime, $full = false) {
         }
     }
 
+    // Fungsi untuk membuka opsi komentar
+    function toggleCommentOptions(commentId) {
+        var optionsMenu = document.getElementById('comment-options-' + commentId);
+        if (optionsMenu.classList.contains('hidden')) {
+            optionsMenu.classList.remove('hidden');
+        } else {
+            optionsMenu.classList.add('hidden');
+        }
+    }
+
+    // Fungsi untuk menutup opsi komentar
+    function closeCommentOptions(commentId) {
+        var optionsMenu = document.getElementById('comment-options-' + commentId);
+        if (optionsMenu) {
+            optionsMenu.classList.add('hidden');
+        }
+    }
 
     // Fungsi untuk mengubah waktu ke format "time ago" (sama seperti sebelumnya)
     function timeAgo(datetime) {
