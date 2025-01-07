@@ -1,37 +1,37 @@
 <?php
-include("../conn.php");
+include("../conn.php"); // Pastikan file ini terhubung ke database Anda
 
-// Pastikan request adalah POST dan ID serta status ada
+// Memperbarui status laporan
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id']) && isset($_POST['status'])) {
     $reportId = $_POST['id'];
     $status = $_POST['status'];
 
-    // Perbarui status laporan di database
+    // Memperbarui status di tabel laporan
     $sql = "UPDATE reports SET status = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('si', $status, $reportId);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true]);  // Kirim respons sukses
+        echo json_encode(['success' => true]);  // Kirim respon sukses
     } else {
         echo json_encode(['success' => false, 'message' => 'Gagal memperbarui status laporan.']);
     }
 
     $stmt->close();
-    exit;  // Pastikan script berhenti di sini setelah memberikan respons
+    exit;  // Hentikan skrip setelah mengirimkan respon
 }
 
 // Menghapus laporan
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
     $reportId = $_POST['delete_id'];
 
-    // Hapus laporan dari database
+    // Menghapus laporan dari database
     $sql = "DELETE FROM reports WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $reportId);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true]);  // Kirim respons sukses
+        echo json_encode(['success' => true]);  // Kirim respon sukses
     } else {
         echo json_encode(['success' => false, 'message' => 'Gagal menghapus laporan.']);
     }
@@ -39,6 +39,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
     $stmt->close();
     exit;
 }
+
+// Menghapus laporan komentar
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_comment_id'])) {
+    $commentReportId = $_POST['delete_comment_id'];
+
+    // Menghapus laporan komentar dari database
+    $sql = "DELETE FROM comment_reports WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $commentReportId);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true]);  // Kirim respon sukses
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Gagal menghapus laporan komentar.']);
+    }
+
+    $stmt->close();
+    exit;
+}
+
+// Mengambil laporan dari database
+$sql = "
+    SELECT r.*, p.content AS post_content 
+    FROM reports r 
+    JOIN posts p ON r.post_id = p.id 
+    ORDER BY r.created_at DESC
+";
+$result = mysqli_query($conn, $sql);
+$no = 1;
+
+// Mengambil laporan komentar
+$sql_comment_reports = "
+    SELECT cr.*, c.comment AS comment_content, u.username 
+    FROM comment_reports cr 
+    JOIN comments c ON cr.comment_id = c.id 
+    JOIN users u ON cr.user_id = u.id 
+    ORDER BY cr.created_at DESC
+";
+$result_comment_reports = mysqli_query($conn, $sql_comment_reports);
+$no_comment_report = 1; // Inisialisasi variabel untuk nomor komentar
+
 ?>
 
 <!DOCTYPE html>
@@ -95,15 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
                 <div class="mb-8">
                     <h3 class="text-xl font-bold mb-4 text-white">Laporan Terbaru</h3>
                     
-                    <div class="flex mb-4">
-                        <input type="text" id="searchInput" placeholder="Cari..." class="w-full p-2 rounded-lg bg-[#202225] text-gray-300 border border-gray-600 focus:outline-none focus:border-[#5865F2]">
-                        <select id="filterSelect" class="ml-2 p-2 rounded-lg bg-[#202225] text-gray-300 border border-gray-600 focus:outline-none focus:border-[#5865F2]">
-                            <option value="">Semua Status</option>
-                            <option value="Menunggu">Menunggu</option>
-                            <option value="Selesai">Selesai</option>
-                        </select>
-                    </div>
-
                     <div class="overflow-x-auto">
                         <table class="min-w-full table-auto text-left text-gray-100 border-collapse">
                             <thead class="bg-[#202225]">
@@ -118,18 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
                             </thead>
                             <tbody id="reportTableBody">
                                 <?php
-                                include("../conn.php");
-
-                                // Ambil laporan dari database dengan join untuk mendapatkan informasi postingan
-                                $sql = "
-                                    SELECT r.*, p.content AS post_content 
-                                    FROM reports r 
-                                    JOIN posts p ON r.post_id = p.id 
-                                    ORDER BY r.created_at DESC
-                                ";
-                                $result = mysqli_query($conn, $sql);
-                                $no = 1;
-
+                                // Mengambil laporan dari database
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     $status = isset($row['status']) ? $row['status'] : 'Menunggu';
                                     echo '<tr class="hover:bg-[#35393f]">';
@@ -137,15 +158,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row['post_content']) . '</td>'; 
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row['description']) . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row['created_at']) . '</td>';
-                                    echo '<td class="px-4 py-2 ' . ($status == 'Selesai' ? 'text-green-400' : 'text-yellow-400') . '">' . htmlspecialchars($status) . '</td>';
+                                    echo '<td class="px-4 py-2 ' . ($status === 'Selesai' ? 'text-green-400' : 'text-yellow-400') . '">' . htmlspecialchars($status) . '</td>';
                                     echo '<td class="px-4 py-2">';
-                                    echo '<a href="DetailPostingan.php?id=' . $row['post_id'] . '" class="text-blue-500 hover:text-blue-700" title="Lihat Postingan"><i class="fas fa-eye"></i></a>'; 
-                                    echo ' <button onclick="updateStatus(' . $row['id'] . ', this)" class="bg-yellow-500 text-white px-2 py-1 rounded">Selesaikan</button>';
-                                    echo ' <button onclick="deleteReport(' . $row['id'] . ', this)" class="bg-red-500 text-white px-2 py-1 rounded ml-2"><i class="fas fa-trash"></i></button>';
+                                    echo '<button onclick="updateStatus(' . $row['id'] . ', this)" class="bg-yellow-500 text-white px-2 py-1 rounded">Selesaikan</button>';
+                                    // Mengubah tombol mata untuk meninjau postingan
+                                    echo ' <button onclick="window.location=\'Detailpostingan.php?id=' . $row['post_id'] . '\'" class="text-blue-500 hover:text-blue-300 ml-4"><i class="fas fa-eye"></i></button>';
+                                    echo ' <button onclick="deleteReport(' . $row['id'] . ', this)" class="bg-red-500 text-white px-2 py-1 rounded ml-4"><i class="fas fa-trash"></i></button>';
                                     echo '</td>';
                                     echo '</tr>';
                                 }
-                                mysqli_close($conn);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-white">Laporan Komentar</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full table-auto text-left text-gray-100 border-collapse">
+                            <thead class="bg-[#202225]">
+                                <tr>
+                                    <th class="px-4 py-2 text-gray-400">No</th>
+                                    <th class="px-4 py-2 text-gray-400">Komentar</th>
+                                    <th class="px-4 py-2 text-gray-400">Alasan</th>
+                                    <th class="px-4 py-2 text-gray-400">Deskripsi</th>
+                                    <th class="px-4 py-2 text-gray-400">Tanggal</th>
+                                    <th class="px-4 py-2 text-gray-400">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="commentReportTableBody">
+                                <?php
+                                while ($row_comment_report = mysqli_fetch_assoc($result_comment_reports)) {
+                                    echo '<tr class="hover:bg-[#35393f]">';
+                                    echo '<td class="px-4 py-2">' . $no_comment_report++ . '</td>';
+                                    echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['comment_content']) . '</td>';
+                                    echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['reason']) . '</td>';
+                                    echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['description']) . '</td>';
+                                    echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['created_at']) . '</td>';
+                                    echo '<td class="px-4 py-2">';
+                                    // Menambahkan tombol mata untuk meninjau komentar
+                                    echo ' <button onclick="window.location=\'DetailKomentar.php?id=' . $row_comment_report['comment_id'] . '\'" class="text-blue-500 hover:text-blue-300 ml-4"><i class="fas fa-eye"></i></button>';
+                                    echo '<button onclick="deleteCommentReport(' . $row_comment_report['id'] . ', this)" class="bg-red-500 text-white px-2 py-1 rounded ml-4"><i class="fas fa-trash"></i></button>';
+                                    echo '</td>';
+                                    echo '</tr>';
+                                }
                                 ?>
                             </tbody>
                         </table>
@@ -155,63 +212,58 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
         </main>
     </div>
 
-    <!-- Modal Konfirmasi Logout -->
-    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold mb-4">Anda yakin ingin logout?</h2>
-            <p class="mb-6">Semua sesi aktif akan diakhiri.</p>
-            <div class="flex space-x-4">
-                <a href="LogoutAdmin.php" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">
-                    Logout
-                </a>
-                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">
-                    Batal
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        const searchInput = document.getElementById('searchInput');
-        const filterSelect = document.getElementById('filterSelect');
-        const reportTableBody = document.getElementById('reportTableBody');
-        const logoutButton = document.getElementById('logoutButton');
-        const logoutModal = document.getElementById('logoutModal');
-
-        // Filter function
-        function filterReports() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const filterStatus = filterSelect.value.toLowerCase();
-            const rows = reportTableBody.getElementsByTagName('tr');
-
-            Array.from(rows).forEach(row => {
-                const cells = row.getElementsByTagName('td');
-                const issue = cells[1].textContent.toLowerCase();
-                const status = cells[4].textContent.toLowerCase();
-
-                const matchesSearch = issue.includes(searchTerm);
-                const matchesFilter = filterStatus === '' || status.includes(filterStatus);
-
-                row.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
-            });
+        // JavaScript untuk menangani aksi di laporan dan laporan komentar
+        function deleteReport(reportId, button) {
+            if (confirm('Apakah Anda yakin ingin menghapus laporan ini?')) {
+                fetch('LaporanMasuk.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({'delete_id': reportId})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Laporan berhasil dihapus!');
+                        button.closest('tr').remove(); // Hapus baris dari tabel
+                    } else {
+                        alert('Gagal menghapus laporan: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Terjadi kesalahan:', error);
+                    alert('Terjadi kesalahan, coba lagi nanti.');
+                });
+            }
         }
 
-        // Event listeners
-        searchInput.addEventListener('input', filterReports);
-        filterSelect.addEventListener('change', filterReports);
-
-        // Menampilkan modal ketika tombol logout diklik
-        logoutButton.addEventListener('click', (event) => {
-            event.preventDefault(); // Mencegah navigasi langsung
-            logoutModal.classList.remove('hidden'); // Tampilkan modal
-        });
-
-        // Menutup modal
-        function closeModal() {
-            logoutModal.classList.add('hidden'); // Sembunyikan modal
+        function deleteCommentReport(commentReportId, button) {
+            if (confirm('Apakah Anda yakin ingin menghapus laporan komentar ini?')) {
+                fetch('LaporanMasuk.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({'delete_comment_id': commentReportId})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Laporan komentar berhasil dihapus!');
+                        button.closest('tr').remove(); // Hapus baris dari tabel
+                    } else {
+                        alert('Gagal menghapus laporan komentar: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Terjadi kesalahan:', error);
+                    alert('Terjadi kesalahan, coba lagi nanti.');
+                });
+            }
         }
 
-        // Update status function
         function updateStatus(reportId, button) {
             if (confirm('Apakah Anda yakin ingin menyelesaikan laporan ini?')) {
                 fetch('LaporanMasuk.php', {
@@ -219,17 +271,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: new URLSearchParams({
-                        'id': reportId,
-                        'status': 'Selesai',
-                    })
+                    body: new URLSearchParams({'id': reportId, 'status': 'Selesai'})
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         alert('Laporan berhasil diselesaikan!');
-
-                        // Update the row status without refreshing
                         const row = button.closest('tr');
                         const statusCell = row.getElementsByTagName('td')[4];
 
@@ -240,37 +287,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
                         button.textContent = 'Terselesaikan';
                         button.classList.remove('bg-yellow-500');
                         button.classList.add('bg-green-500');
-                        button.disabled = true; // Disable the button after completion
+                        button.disabled = true; // Nonaktifkan tombol setelah selesai
                     } else {
                         alert('Gagal menyelesaikan laporan: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Terjadi kesalahan:', error);
-                    alert('Terjadi kesalahan, coba lagi nanti.');
-                });
-            }
-        }
-
-        // Delete report function
-        function deleteReport(reportId, button) {
-            if (confirm('Apakah Anda yakin ingin menghapus laporan ini?')) {
-                fetch('LaporanMasuk.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        'delete_id': reportId,
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Laporan berhasil dihapus!');
-                        button.closest('tr').remove(); // Remove row from table
-                    } else {
-                        alert('Gagal menghapus laporan: ' + data.message);
                     }
                 })
                 .catch(error => {
@@ -283,3 +302,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
 
 </body>
 </html>
+
+<?php
+// Tutup koneksi setelah semua operasi selesai
+mysqli_close($conn);
+?>

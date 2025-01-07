@@ -106,12 +106,32 @@ if ($searchUserId) {
                 <h1 class="text-2xl font-semibold text-white">Pusat Admin</h1>
             </div>
             <nav class="space-y-4">
-                <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">Beranda</a>
-                <a href="KelolaPengguna.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">Kelola Pengguna</a>
-                <a href="KelolaKonten.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">Kelola Konten</a>
-                <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg bg-[#5865F2] text-white">Kelola Komunitas</a>
-                <a href="LaporanMasuk.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">Laporan Masuk</a>
-                <button id="logoutButton" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">Keluar</button>
+                <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                    <i class="fas fa-home"></i>
+                    <span>Beranda</span>
+                </a>
+                <a href="KelolaPengguna.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Kelola Pengguna</span>
+                </a>
+                <a href="KelolaKonten.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Kelola Konten</span>
+                </a>
+                <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg bg-[#5865F2] text-white">
+                    <i class="fas fa-users"></i>
+                    <span>Kelola Komunitas</span>
+                </a>
+                <a href="LaporanMasuk.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Laporan Masuk</span>
+                </a>
+                <form method="POST" action="" class="flex items-center space-x-2">
+                    <button type="submit" name="logout" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Keluar</span>
+                    </button>
+                </form>
             </nav>
         </aside>
 
