@@ -215,7 +215,7 @@ function time_ago($datetime, $full = false) {
         <?php include('../slicing/rightSidebar.html'); ?>
     </div>
 
-    <!-- Modal Report (Menggunakan Flowbite) -->
+    <!-- Modal Report Post (Menggunakan Flowbite) -->
     <div id="reportModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full flex items-center justify-center bg-black bg-opacity-70">
         <div class="relative p-4 w-full max-w-md h-full md:h-auto">
             <!-- Konten modal -->
@@ -237,7 +237,9 @@ function time_ago($datetime, $full = false) {
                             <select id="reason" name="reason" required class="w-full border border-gray-300 rounded-md shadow-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="" disabled selected>Pilih alasan</option>
                                 <option value="Spam">Spam</option>
-                                <option value="Offensive Content">Konten Menyinggung</option>
+                                <option value="Konten Menyinggung">Konten Menyinggung</option>
+                                <option value="Konten Tidak Sesuai">Konten Tidak Sesuai</option>
+                                <option value="Pelecehan">Pelecehan</option>
                                 <option value="Others">Lainnya</option>
                             </select>
                         </div>
@@ -251,6 +253,52 @@ function time_ago($datetime, $full = false) {
                         <input type="hidden" id="postId" name="post_id" value="">
                         <div class="flex justify-end space-x-2">
                             <button type="button" onclick="closeReportModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md shadow-sm hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600">Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Report Comment (Baru) -->
+    <div id="reportCommentModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full flex items-center justify-center bg-black bg-opacity-70">
+        <div class="relative p-4 w-full max-w-md h-full md:h-auto">
+            <!-- Konten modal -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <button type="button" onclick="closeReportCommentModal()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-hide="reportCommentModal">
+                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="sr-only">Tutup modal</span>
+                </button>
+                <div class="p-6 text-center">
+                    <h3 class="text-lg font-normal text-gray-500 dark:text-gray-400 mb-4">Report Comment</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4" id="reportCommentContent">
+                        "..."
+                    </p>
+                    <form id="reportCommentForm" action="report_comment.php" method="POST">
+                        <div class="mb-4">
+                            <label for="commentReason" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">ALASAN</label>
+                            <select id="commentReason" name="reason" required class="w-full border border-gray-300 rounded-md shadow-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="" disabled selected>Pilih alasan</option>
+                                <option value="Spam">Spam</option>
+                                <option value="Konten Menyinggung">Konten Menyinggung</option>
+                                <option value="Konten Tidak Sesuai">Konten Tidak Sesuai</option>
+                                <option value="Pelecehan">Pelecehan</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="commentDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">DESKRIPSI</label>
+                            <textarea id="commentDescription" name="description" rows="4" placeholder="Silahkan beritahu kami tentang masalah anda"
+                                required class="w-full border border-gray-300 rounded-md shadow-sm p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+                        </div>
+
+                        <input type="hidden" id="commentId" name="comment_id" value="">
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="closeReportCommentModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md shadow-sm hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300">Cancel</button>
                             <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600">Report</button>
                         </div>
                     </form>
@@ -351,7 +399,7 @@ function time_ago($datetime, $full = false) {
         }
     }
 
-    // Fungsi untuk membuka modal laporan
+    // Fungsi untuk membuka modal laporan post
     function openReportModal(postId, content) {
         console.log('Post ID:', postId); // Debug postId
         console.log('Content:', content); // Debug content
@@ -365,14 +413,14 @@ function time_ago($datetime, $full = false) {
         document.getElementById('reportContent').innerText = `"${content}"`;
     }
 
-    // Fungsi untuk menutup modal laporan
+    // Fungsi untuk menutup modal laporan post
     function closeReportModal() {
         const modal = document.getElementById('reportModal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
 
-    // Menangani pengiriman form laporan
+    // Menangani pengiriman form laporan post
     document.getElementById('reportForm').addEventListener('submit', function (event) {
         event.preventDefault();
         const reason = document.getElementById('reason').value;
@@ -395,6 +443,57 @@ function time_ago($datetime, $full = false) {
         .then(data => {
             showNotification(data.message || 'Laporan berhasil dikirim.', data.status === 'success' ? 'green' : 'red');
             closeReportModal();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Terjadi kesalahan saat mengirim laporan.', 'red');
+        });
+    });
+
+    // Fungsi untuk membuka modal laporan komentar
+    function openReportCommentModal(commentId, commentContent) {
+        console.log('Comment ID:', commentId); // Debug commentId
+        console.log('Content:', commentContent); // Debug content
+
+        // Menggunakan Flowbite untuk membuka modal
+        const modal = document.getElementById('reportCommentModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex'); // Gunakan flex untuk penengahan
+
+        document.getElementById('commentId').value = commentId; // Tetapkan nilai comment_id
+        document.getElementById('reportCommentContent').innerText = `"${commentContent}"`;
+    }
+
+    // Fungsi untuk menutup modal laporan komentar
+    function closeReportCommentModal() {
+        const modal = document.getElementById('reportCommentModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    // Menangani pengiriman form laporan komentar
+    document.getElementById('reportCommentForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const reason = document.getElementById('commentReason').value;
+        const description = document.getElementById('commentDescription').value;
+        const commentId = document.getElementById('commentId').value;
+
+        // Kirim data ke server dalam format x-www-form-urlencoded
+        fetch('report_comment.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                reason: reason,
+                description: description,
+                comment_id: commentId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            showNotification(data.message || 'Laporan berhasil dikirim.', data.status === 'success' ? 'green' : 'red');
+            closeReportCommentModal();
         })
         .catch(error => {
             console.error('Error:', error);
@@ -472,7 +571,7 @@ function time_ago($datetime, $full = false) {
                                             <button onclick="openEditCommentModal(${comment.id}, \`${escapeHtml(comment.comment)}\`)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</button>
                                             <button onclick="initiateDeleteComment(${comment.id})" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</button>
                                         ` : `
-                                            <button onclick="reportComment(${comment.id})" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Laporkan</button>
+                                            <button onclick="openReportCommentModal(${comment.id}, \`${escapeHtml(comment.comment)}\`)" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Laporkan</button>
                                         `}
                                         <button onclick="closeCommentOptions(${comment.id})" class="block w-full text-left px-4 py-2 text-sm text-gray-500 hover:bg-gray-100">Batalkan</button>
                                     </div>
@@ -561,7 +660,7 @@ function time_ago($datetime, $full = false) {
                                     <button onclick="openEditCommentModal(${commentData.id}, \`${escapeHtml(commentData.comment)}\`)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</button>
                                     <button onclick="initiateDeleteComment(${commentData.id})" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</button>
                                 ` : `
-                                    <button onclick="reportComment(${commentData.id})" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Laporkan</button>
+                                    <button onclick="openReportCommentModal(${commentData.id}, \`${escapeHtml(commentData.comment)}\`)" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Laporkan</button>
                                 `}
                                 <button onclick="closeCommentOptions(${commentData.id})" class="block w-full text-left px-4 py-2 text-sm text-gray-500 hover:bg-gray-100">Batalkan</button>
                             </div>
@@ -761,22 +860,8 @@ function time_ago($datetime, $full = false) {
     }
 
     // Fungsi untuk menangani pelaporan komentar
-    function reportComment(commentId) {
-        // Implementasikan modal pelaporan komentar atau langsung kirim laporan
-        const description = prompt('Masukkan deskripsi laporan Anda:');
-        if (description !== null && description.trim() !== '') {
-            fetch('report_comment.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ comment_id: commentId, description: description }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                showNotification(data.message || 'Komentar telah dilaporkan.', data.status === 'success' ? 'green' : 'red');
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    }
+    // Tidak lagi menggunakan prompt, melainkan menggunakan modal
+    // Fungsi openReportCommentModal ditambahkan di atas
 
     // Fungsi untuk toggle menu opsi komentar
     function toggleCommentOptions(commentId) {
