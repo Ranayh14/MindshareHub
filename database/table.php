@@ -104,16 +104,19 @@ $sql_commentlikes = "CREATE TABLE IF NOT EXISTS comment_likes (
     UNIQUE (comment_id, user_id) -- Mencegah duplikasi like
 )";
 
-$sql_reportComments = "CREATE TABLE IF NOT EXISTS comment_reports (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    comment_id INT NOT NULL,
-    user_id INT NOT NULL,
-    reason VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-)";
+$sql_reportComments = " CREATE TABLE IF NOT EXISTS comment_reports (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        comment_id INT NOT NULL,    
+        user_id INT NOT NULL,
+        reason VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        status VARCHAR(50) DEFAULT 'Menunggu',  -- Menambahkan kolom status dengan nilai default 'Menunggu'
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+";
+
 
 // Eksekusi query dengan try-catch
 try {

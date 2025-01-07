@@ -1,41 +1,55 @@
 <?php
-include("../conn.php"); // Pastikan file ini terhubung ke database Anda
+include("../conn.php");
 
 // Memperbarui status laporan
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id']) && isset($_POST['status'])) {
     $reportId = $_POST['id'];
     $status = $_POST['status'];
 
-    // Memperbarui status di tabel laporan
     $sql = "UPDATE reports SET status = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('si', $status, $reportId);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true]);  // Kirim respon sukses
+        echo json_encode(['success' => true]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Gagal memperbarui status laporan.']);
     }
-
     $stmt->close();
-    exit;  // Hentikan skrip setelah mengirimkan respon
+    exit;
+}
+
+// Memperbarui status laporan komentar
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['comment_report_id']) && isset($_POST['status'])) {
+    $reportId = $_POST['comment_report_id'];
+    $status = $_POST['status'];
+
+    $sql = "UPDATE comment_reports SET status = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('si', $status, $reportId);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Gagal memperbarui status laporan komentar.']);
+    }
+    $stmt->close();
+    exit;
 }
 
 // Menghapus laporan
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
     $reportId = $_POST['delete_id'];
 
-    // Menghapus laporan dari database
     $sql = "DELETE FROM reports WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $reportId);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true]);  // Kirim respon sukses
+        echo json_encode(['success' => true]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Gagal menghapus laporan.']);
     }
-
     $stmt->close();
     exit;
 }
@@ -44,17 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_comment_id'])) {
     $commentReportId = $_POST['delete_comment_id'];
 
-    // Menghapus laporan komentar dari database
     $sql = "DELETE FROM comment_reports WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $commentReportId);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true]);  // Kirim respon sukses
+        echo json_encode(['success' => true]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Gagal menghapus laporan komentar.']);
     }
-
     $stmt->close();
     exit;
 }
@@ -64,8 +76,7 @@ $sql = "
     SELECT r.*, p.content AS post_content 
     FROM reports r 
     JOIN posts p ON r.post_id = p.id 
-    ORDER BY r.created_at DESC
-";
+    ORDER BY r.created_at DESC";
 $result = mysqli_query($conn, $sql);
 $no = 1;
 
@@ -75,11 +86,9 @@ $sql_comment_reports = "
     FROM comment_reports cr 
     JOIN comments c ON cr.comment_id = c.id 
     JOIN users u ON cr.user_id = u.id 
-    ORDER BY cr.created_at DESC
-";
+    ORDER BY cr.created_at DESC";
 $result_comment_reports = mysqli_query($conn, $sql_comment_reports);
-$no_comment_report = 1; // Inisialisasi variabel untuk nomor komentar
-
+$no_comment_report = 1;
 ?>
 
 <!DOCTYPE html>
@@ -95,7 +104,6 @@ $no_comment_report = 1; // Inisialisasi variabel untuk nomor komentar
     </style>
 </head>
 <body class="bg-[#36393F] text-gray-100">
-
     <div class="flex min-h-screen">
         <aside class="w-64 bg-[#202225] p-6">
             <div class="mb-6">
@@ -150,7 +158,6 @@ $no_comment_report = 1; // Inisialisasi variabel untuk nomor komentar
                             </thead>
                             <tbody id="reportTableBody">
                                 <?php
-                                // Mengambil laporan dari database
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     $status = isset($row['status']) ? $row['status'] : 'Menunggu';
                                     echo '<tr class="hover:bg-[#35393f]">';
@@ -160,8 +167,7 @@ $no_comment_report = 1; // Inisialisasi variabel untuk nomor komentar
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row['created_at']) . '</td>';
                                     echo '<td class="px-4 py-2 ' . ($status === 'Selesai' ? 'text-green-400' : 'text-yellow-400') . '">' . htmlspecialchars($status) . '</td>';
                                     echo '<td class="px-4 py-2">';
-                                    echo '<button onclick="updateStatus(' . $row['id'] . ', this)" class="bg-yellow-500 text-white px-2 py-1 rounded">Selesaikan</button>';
-                                    // Mengubah tombol mata untuk meninjau postingan
+                                    echo '<button onclick="updateStatus(' . $row['id'] . ', this)" class="bg-yellow-500 text-white px-2 py-1 rounded' . ($status === 'Selesai' ? ' bg-green-500 disabled' : '') . '">'. ($status === 'Selesai' ? 'Terselesaikan' : 'Selesaikan') .'</button>';
                                     echo ' <button onclick="window.location=\'Detailpostingan.php?id=' . $row['post_id'] . '\'" class="text-blue-500 hover:text-blue-300 ml-4"><i class="fas fa-eye"></i></button>';
                                     echo ' <button onclick="deleteReport(' . $row['id'] . ', this)" class="bg-red-500 text-white px-2 py-1 rounded ml-4"><i class="fas fa-trash"></i></button>';
                                     echo '</td>';
@@ -184,20 +190,23 @@ $no_comment_report = 1; // Inisialisasi variabel untuk nomor komentar
                                     <th class="px-4 py-2 text-gray-400">Alasan</th>
                                     <th class="px-4 py-2 text-gray-400">Deskripsi</th>
                                     <th class="px-4 py-2 text-gray-400">Tanggal</th>
+                                    <th class="px-4 py-2 text-gray-400">Status</th>
                                     <th class="px-4 py-2 text-gray-400">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="commentReportTableBody">
                                 <?php
                                 while ($row_comment_report = mysqli_fetch_assoc($result_comment_reports)) {
+                                    $status = isset($row_comment_report['status']) ? $row_comment_report['status'] : 'Menunggu';
                                     echo '<tr class="hover:bg-[#35393f]">';
                                     echo '<td class="px-4 py-2">' . $no_comment_report++ . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['comment_content']) . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['reason']) . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['description']) . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['created_at']) . '</td>';
+                                    echo '<td class="px-4 py-2 ' . ($status === 'Selesai' ? 'text-green-400' : 'text-yellow-400') . '">' . htmlspecialchars($status) . '</td>';
                                     echo '<td class="px-4 py-2">';
-                                    // Menambahkan tombol mata untuk meninjau komentar
+                                    echo '<button onclick="updateCommentStatus(' . $row_comment_report['id'] . ', this)" class="bg-yellow-500 text-white px-2 py-1 rounded' . ($status === 'Selesai' ? ' bg-green-500 disabled' : '') . '">'. ($status === 'Selesai' ? 'Terselesaikan' : 'Selesaikan') .'</button>';
                                     echo ' <button onclick="window.location=\'DetailKomentar.php?id=' . $row_comment_report['comment_id'] . '\'" class="text-blue-500 hover:text-blue-300 ml-4"><i class="fas fa-eye"></i></button>';
                                     echo '<button onclick="deleteCommentReport(' . $row_comment_report['id'] . ', this)" class="bg-red-500 text-white px-2 py-1 rounded ml-4"><i class="fas fa-trash"></i></button>';
                                     echo '</td>';
@@ -213,7 +222,52 @@ $no_comment_report = 1; // Inisialisasi variabel untuk nomor komentar
     </div>
 
     <script>
-        // JavaScript untuk menangani aksi di laporan dan laporan komentar
+        function updateStatus(reportId, button) {
+            fetch('LaporanMasuk.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({'id': reportId, 'status': 'Selesai'})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Status laporan berhasil diperbarui!');
+                    button.textContent = 'Terselesaikan';
+                    button.classList.remove('bg-yellow-500');
+                    button.classList.add('bg-green-500');
+                    button.disabled = true;
+                    button.closest('tr').querySelector('td:nth-child(5)').textContent = 'Selesai';
+                } else {
+                    alert('Gagal memperbarui status laporan.');
+                }
+            });
+        }
+
+        function updateCommentStatus(commentReportId, button) {
+            fetch('LaporanMasuk.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({'comment_report_id': commentReportId, 'status': 'Selesai'})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Status laporan komentar berhasil diperbarui!');
+                    button.textContent = 'Terselesaikan';
+                    button.classList.remove('bg-yellow-500');
+                    button.classList.add('bg-green-500');
+                    button.disabled = true;
+                    button.closest('tr').querySelector('td:nth-child(6)').textContent = 'Selesai';
+                } else {
+                    alert('Gagal memperbarui status laporan komentar.');
+                }
+            });
+        }
+
         function deleteReport(reportId, button) {
             if (confirm('Apakah Anda yakin ingin menghapus laporan ini?')) {
                 fetch('LaporanMasuk.php', {
@@ -227,14 +281,10 @@ $no_comment_report = 1; // Inisialisasi variabel untuk nomor komentar
                 .then(data => {
                     if (data.success) {
                         alert('Laporan berhasil dihapus!');
-                        button.closest('tr').remove(); // Hapus baris dari tabel
+                        button.closest('tr').remove();
                     } else {
-                        alert('Gagal menghapus laporan: ' + data.message);
+                        alert('Gagal menghapus laporan.');
                     }
-                })
-                .catch(error => {
-                    console.error('Terjadi kesalahan:', error);
-                    alert('Terjadi kesalahan, coba lagi nanti.');
                 });
             }
         }
@@ -252,58 +302,11 @@ $no_comment_report = 1; // Inisialisasi variabel untuk nomor komentar
                 .then(data => {
                     if (data.success) {
                         alert('Laporan komentar berhasil dihapus!');
-                        button.closest('tr').remove(); // Hapus baris dari tabel
+                        button.closest('tr').remove();
                     } else {
-                        alert('Gagal menghapus laporan komentar: ' + data.message);
+                        alert('Gagal menghapus laporan komentar.');
                     }
-                })
-                .catch(error => {
-                    console.error('Terjadi kesalahan:', error);
-                    alert('Terjadi kesalahan, coba lagi nanti.');
                 });
             }
         }
-
-        function updateStatus(reportId, button) {
-            if (confirm('Apakah Anda yakin ingin menyelesaikan laporan ini?')) {
-                fetch('LaporanMasuk.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({'id': reportId, 'status': 'Selesai'})
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Laporan berhasil diselesaikan!');
-                        const row = button.closest('tr');
-                        const statusCell = row.getElementsByTagName('td')[4];
-
-                        statusCell.textContent = 'Selesai';
-                        statusCell.classList.remove('text-yellow-400');
-                        statusCell.classList.add('text-green-400');
-
-                        button.textContent = 'Terselesaikan';
-                        button.classList.remove('bg-yellow-500');
-                        button.classList.add('bg-green-500');
-                        button.disabled = true; // Nonaktifkan tombol setelah selesai
-                    } else {
-                        alert('Gagal menyelesaikan laporan: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Terjadi kesalahan:', error);
-                    alert('Terjadi kesalahan, coba lagi nanti.');
-                });
-            }
-        }
-    </script>
-
-</body>
-</html>
-
-<?php
-// Tutup koneksi setelah semua operasi selesai
-mysqli_close($conn);
-?>
+    </script>   
