@@ -1,14 +1,12 @@
 <?php
 // Menghubungkan ke database
+session_start();
 include("../conn.php");
 
-// Proses Logout
-if (isset($_POST['logout'])) {
-    session_start();
-    $_SESSION = array();
-    session_destroy();
-    header("Location: login.php");
-    exit();
+// Alihkan jika tidak login
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../login/login.html");
+    exit;
 }
 
 // Inisialisasi variabel
@@ -43,7 +41,7 @@ if (isset($_POST['delete_post'])) {
         $sqlDelete = "DELETE FROM posts WHERE id = $postId AND user_id = $searchUserId";
         mysqli_query($conn, $sqlDelete);
         header("Location: KelolaKomunitas.php?search=" . urlencode($search));
-        exit();
+        exit(); 
     }
 }
 
@@ -71,69 +69,12 @@ if ($searchUserId) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        function showSuggestions(value) {
-            if (value.length === 0) {
-                document.getElementById("suggestions").innerHTML = "";
-                return;
-            }
-            // Kirimkan pencarian ke server untuk mendapatkan hasil pengguna yang sesuai
-            document.getElementById("suggestions").innerHTML = "";
-            fetch("<?php echo $_SERVER['PHP_SELF']; ?>?search=" + value)
-                .then(response => response.text())
-                .then(data => {
-                    let suggestions = "";
-                    let users = <?php echo json_encode($users); ?>;
-                    users.forEach(user => {
-                        suggestions += `<div class="cursor-pointer hover:bg-gray-200" onclick="selectUser(${user.id}, '${user.username}')">${user.username}</div>`;
-                    });
-                    document.getElementById("suggestions").innerHTML = suggestions;
-                });
-        }
 
-        function selectUser(id, username) {
-            document.getElementById("search").value = username;
-            document.getElementById("searchUserId").value = id;
-            document.getElementById("suggestions").innerHTML = "";
-        }
-    </script>
 </head>
 <body class="bg-[#2f3136] text-gray-100">
     <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <aside class="w-64 bg-[#202225] p-6">
-            <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-white">Pusat Admin</h1>
-            </div>
-            <nav class="space-y-4">
-                <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-home"></i>
-                    <span>Beranda</span>
-                </a>
-                <a href="KelolaPengguna.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-user-friends"></i>
-                    <span>Kelola Pengguna</span>
-                </a>
-                <a href="KelolaKonten.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Kelola Konten</span>
-                </a>
-                <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg bg-[#5865F2] text-white">
-                    <i class="fas fa-users"></i>
-                    <span>Kelola Komunitas</span>
-                </a>
-                <a href="LaporanMasuk.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>Laporan Masuk</span>
-                </a>
-                <form method="POST" action="" class="flex items-center space-x-2">
-                    <button type="submit" name="logout" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Keluar</span>
-                    </button>
-                </form>
-            </nav>
-        </aside>
+        <?php include('sidebaradmin.php'); ?>
 
         <!-- Main Content -->
         <main class="flex-1 p-8">
@@ -194,5 +135,64 @@ if ($searchUserId) {
             </div>
         </main>
     </div>
+
+    <!-- Modal Konfirmasi Logout -->
+    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Anda yakin ingin logout?</h2>
+            <p class="mb-6">Semua sesi aktif akan diakhiri.</p>
+            <div class="flex space-x-4">
+                <a href="LogoutAdmin.php" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">
+                    Logout
+                </a>
+                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSuggestions(value) {
+            if (value.length === 0) {
+                document.getElementById("suggestions").innerHTML = "";
+                return;
+            }
+            document.getElementById("suggestions").innerHTML = "";
+            fetch("<?php echo $_SERVER['PHP_SELF']; ?>?search=" + value)
+                .then(response => response.text())
+                .then(data => {
+                    let suggestions = "";
+                    let users = <?php echo json_encode($users); ?>;
+                    users.forEach(user => {
+                        suggestions += `<div class="cursor-pointer hover:bg-gray-200" onclick="selectUser(${user.id}, '${user.username}')">${user.username}</div>`;
+                    });
+                    document.getElementById("suggestions").innerHTML = suggestions;
+                });
+        }
+
+        function selectUser(id, username) {
+            document.getElementById("search").value = username;
+            document.getElementById("searchUserId").value = id;
+            document.getElementById("suggestions").innerHTML = "";
+        }
+
+        // Modal Logout
+        const logoutButton = document.getElementById('logoutButton');
+        const logoutModal = document.getElementById('logoutModal');
+
+        // Menampilkan modal ketika tombol logout di sidebar diklik
+        if (logoutButton) {
+            logoutButton.addEventListener('click', (event) => {
+                event.preventDefault(); // Mencegah navigasi langsung
+                logoutModal.classList.remove('hidden'); // Tampilkan modal
+            });
+        }
+
+        // Menutup modal
+        function closeModal() {
+            logoutModal.classList.add('hidden'); // Sembunyikan modal
+        }
+    </script>
 </body>
 </html>

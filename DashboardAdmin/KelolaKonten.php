@@ -97,35 +97,10 @@ $result = mysqli_query($conn, "SELECT * FROM content ORDER BY created_at DESC");
 </head>
 <body class="bg-[#2f3136] text-gray-100">
     <div class="min-h-screen flex">
-        <aside class="w-64 bg-[#202225] p-6">
-            <h1 class="text-2xl font-semibold text-white mb-6">Pusat Admin</h1>
-            <nav class="space-y-4">
-                <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-home w-5 h-5"></i>
-                    <span>Beranda</span>
-                </a>
-                <a href="KelolaPengguna.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-user-friends w-5 h-5"></i>
-                    <span>Kelola Pengguna</span>
-                </a>
-                <a href="KelolaKonten.php" class="flex items-center space-x-2 p-2 rounded-lg bg-[#5865F2] text-white">
-                    <i class="fas fa-file-alt w-5 h-5"></i>
-                    <span>Kelola Konten</span>
-                </a>
-                <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-users w-5 h-5"></i>
-                    <span>Kelola Komunitas</span>
-                </a>
-                <a href="laporanMasuk.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-clipboard-list w-5 h-5"></i>
-                    <span>Laporan Masuk</span>
-                </a>
-                <button id="logoutButton" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-sign-out-alt w-5 h-5"></i>
-                    <span>Keluar</span>
-                </button>
-            </nav>
-        </aside>
+
+    
+            <?php include('sidebaradmin.php'); ?>
+          
 
         <main class="flex-1 p-8">
             <div class="mb-8">

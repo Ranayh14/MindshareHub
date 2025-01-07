@@ -8,14 +8,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id']) && isset($_POST[
 
     $sql = "UPDATE reports SET status = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('si', $status, $reportId);
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
+    if ($stmt) {
+        $stmt->bind_param('si', $status, $reportId);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Gagal memperbarui status laporan.']);
+            error_log("Error: " . $stmt->error);
+        }
+        $stmt->close();
     } else {
-        echo json_encode(['success' => false, 'message' => 'Gagal memperbarui status laporan.']);
+        echo json_encode(['success' => false, 'message' => 'Gagal mempersiapkan pernyataan.']);
     }
-    $stmt->close();
     exit;
 }
 
@@ -26,14 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['comment_report_id']) &
 
     $sql = "UPDATE comment_reports SET status = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('si', $status, $reportId);
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
+    if ($stmt) {
+        $stmt->bind_param('si', $status, $reportId);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Gagal memperbarui status laporan komentar.']);
+            error_log("Error: " . $stmt->error);
+        }
+        $stmt->close();
     } else {
-        echo json_encode(['success' => false, 'message' => 'Gagal memperbarui status laporan komentar.']);
+        echo json_encode(['success' => false, 'message' => 'Gagal mempersiapkan pernyataan.']);
     }
-    $stmt->close();
     exit;
 }
 
@@ -43,14 +51,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
 
     $sql = "DELETE FROM reports WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('i', $reportId);
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
+    if ($stmt) {
+        $stmt->bind_param('i', $reportId);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Gagal menghapus laporan.']);
+            error_log("Error: " . $stmt->error);
+        }
+        $stmt->close();
     } else {
-        echo json_encode(['success' => false, 'message' => 'Gagal menghapus laporan.']);
+        echo json_encode(['success' => false, 'message' => 'Gagal mempersiapkan pernyataan.']);
     }
-    $stmt->close();
     exit;
 }
 
@@ -60,14 +72,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_comment_id'])) 
 
     $sql = "DELETE FROM comment_reports WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('i', $commentReportId);
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
+    if ($stmt) {
+        $stmt->bind_param('i', $commentReportId);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Gagal menghapus laporan komentar.']);
+            error_log("Error: " . $stmt->error);
+        }
+        $stmt->close();
     } else {
-        echo json_encode(['success' => false, 'message' => 'Gagal menghapus laporan komentar.']);
+        echo json_encode(['success' => false, 'message' => 'Gagal mempersiapkan pernyataan.']);
     }
-    $stmt->close();
     exit;
 }
 
@@ -105,37 +121,9 @@ $no_comment_report = 1;
 </head>
 <body class="bg-[#36393F] text-gray-100">
     <div class="flex min-h-screen">
-        <aside class="w-64 bg-[#202225] p-6">
-            <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-white">Pusat Admin</h1>
-            </div>
-            <nav class="space-y-4">
-                <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-home w-5 h-5"></i>
-                    <span>Beranda</span>
-                </a>
-                <a href="KelolaPengguna.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-user-friends w-5 h-5"></i>
-                    <span>Kelola Pengguna</span>
-                </a>
-                <a href="KelolaKonten.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-file-alt w-5 h-5"></i>
-                    <span>Kelola Konten</span>
-                </a>
-                <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-users w-5 h-5"></i>
-                    <span>Kelola Komunitas</span>
-                </a>
-                <a href="LaporanMasuk.php" class="flex items-center space-x-2 p-2 rounded-lg bg-[#5865F2] text-white">
-                    <i class="fas fa-clipboard-list w-5 h-5"></i>
-                    <span>Laporan Masuk</span>
-                </a>
-                <a href="#" id="logoutButton" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
-                    <i class="fas fa-sign-out-alt w-5 h-5"></i>
-                    <span>Keluar</span>
-                </a>
-            </nav>
-        </aside>
+    
+            <?php include('sidebaradmin.php'); ?>
+               
 
         <main class="flex-1 p-8 bg-[#36393F]">
             <div class="bg-[#2F3136] p-6 rounded-lg shadow-lg">
@@ -150,6 +138,7 @@ $no_comment_report = 1;
                                 <tr>
                                     <th class="px-4 py-2 text-gray-400">No</th>
                                     <th class="px-4 py-2 text-gray-400">Konten Postingan</th>
+                                    <th class="px-4 py-2 text-gray-400">Alasan</th>
                                     <th class="px-4 py-2 text-gray-400">Deskripsi</th>
                                     <th class="px-4 py-2 text-gray-400">Tanggal</th>
                                     <th class="px-4 py-2 text-gray-400">Status</th>
@@ -163,11 +152,12 @@ $no_comment_report = 1;
                                     echo '<tr class="hover:bg-[#35393f]">';
                                     echo '<td class="px-4 py-2">' . $no++ . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row['post_content']) . '</td>'; 
+                                    echo '<td class="px-4 py-2">' . htmlspecialchars($row['reason']) . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row['description']) . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row['created_at']) . '</td>';
-                                    echo '<td class="px-4 py-2 ' . ($status === 'Selesai' ? 'text-green-400' : 'text-yellow-400') . '">' . htmlspecialchars($status) . '</td>';
+                                    echo '<td class="px-4 py-2 ' . ($status === 'selesai' ? 'text-green-400' : 'text-yellow-400') . '">' . htmlspecialchars($status) . '</td>';
                                     echo '<td class="px-4 py-2">';
-                                    echo '<button onclick="updateStatus(' . $row['id'] . ', this)" class="bg-yellow-500 text-white px-2 py-1 rounded' . ($status === 'Selesai' ? ' bg-green-500 disabled' : '') . '">'. ($status === 'Selesai' ? 'Terselesaikan' : 'Selesaikan') .'</button>';
+                                    echo '<button onclick="updateStatus(' . $row['id'] . ', this)" class="bg-yellow-500 text-white px-2 py-1 rounded' . ($status === 'selesai' ? ' bg-green-500 disabled' : '') . '">'. ($status === 'selesai' ? 'Terselesaikan' : 'Selesaikan') .'</button>';
                                     echo ' <button onclick="window.location=\'Detailpostingan.php?id=' . $row['post_id'] . '\'" class="text-blue-500 hover:text-blue-300 ml-4"><i class="fas fa-eye"></i></button>';
                                     echo ' <button onclick="deleteReport(' . $row['id'] . ', this)" class="bg-red-500 text-white px-2 py-1 rounded ml-4"><i class="fas fa-trash"></i></button>';
                                     echo '</td>';
@@ -204,9 +194,9 @@ $no_comment_report = 1;
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['reason']) . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['description']) . '</td>';
                                     echo '<td class="px-4 py-2">' . htmlspecialchars($row_comment_report['created_at']) . '</td>';
-                                    echo '<td class="px-4 py-2 ' . ($status === 'Selesai' ? 'text-green-400' : 'text-yellow-400') . '">' . htmlspecialchars($status) . '</td>';
+                                    echo '<td class="px-4 py-2 ' . ($status === 'selesai' ? 'text-green-400' : 'text-yellow-400') . '">' . htmlspecialchars($status) . '</td>';
                                     echo '<td class="px-4 py-2">';
-                                    echo '<button onclick="updateCommentStatus(' . $row_comment_report['id'] . ', this)" class="bg-yellow-500 text-white px-2 py-1 rounded' . ($status === 'Selesai' ? ' bg-green-500 disabled' : '') . '">'. ($status === 'Selesai' ? 'Terselesaikan' : 'Selesaikan') .'</button>';
+                                    echo '<button onclick="updateCommentStatus(' . $row_comment_report['id'] . ', this)" class="bg-yellow-500 text-white px-2 py-1 rounded' . ($status === 'selesai' ? ' bg-green-500 disabled' : '') . '">'. ($status === 'selesai' ? 'Terselesaikan' : 'Selesaikan') .'</button>';
                                     echo ' <button onclick="window.location=\'DetailKomentar.php?id=' . $row_comment_report['comment_id'] . '\'" class="text-blue-500 hover:text-blue-300 ml-4"><i class="fas fa-eye"></i></button>';
                                     echo '<button onclick="deleteCommentReport(' . $row_comment_report['id'] . ', this)" class="bg-red-500 text-white px-2 py-1 rounded ml-4"><i class="fas fa-trash"></i></button>';
                                     echo '</td>';
@@ -221,26 +211,63 @@ $no_comment_report = 1;
         </main>
     </div>
 
+    <!-- Modal Konfirmasi Logout -->
+    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Anda yakin ingin logout?</h2>
+            <p class="mb-6">Semua sesi aktif akan diakhiri.</p>
+            <div class="flex space-x-4">
+                <a href="LogoutAdmin.php" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">
+                    Logout
+                </a>
+                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Modal Logout
+        const logoutButton = document.getElementById('logoutButton');
+        const logoutModal = document.getElementById('logoutModal');
+
+        // Menampilkan modal ketika tombol logout di sidebar diklik
+        if (logoutButton) {
+            logoutButton.addEventListener('click', (event) => {
+                event.preventDefault(); // Mencegah navigasi langsung
+                logoutModal.classList.remove('hidden'); // Tampilkan modal
+            });
+        }
+
+        // Menutup modal
+        function closeModal() {
+            logoutModal.classList.add('hidden'); // Sembunyikan modal
+        }
+
         function updateStatus(reportId, button) {
             fetch('LaporanMasuk.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: new URLSearchParams({'id': reportId, 'status': 'Selesai'})
+                body: new URLSearchParams({'id': reportId, 'status': 'selesai'})
             })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 if (data.success) {
                     alert('Status laporan berhasil diperbarui!');
                     button.textContent = 'Terselesaikan';
                     button.classList.remove('bg-yellow-500');
-                    button.classList.add('bg-green-500');
+                    button.classList.add('bg-green-500', 'disabled');
                     button.disabled = true;
-                    button.closest('tr').querySelector('td:nth-child(5)').textContent = 'Selesai';
+                    const statusCell = button.closest('tr').querySelector('td:nth-child(6)');
+                    statusCell.textContent = 'Selesai';
+                    statusCell.classList.remove('text-yellow-400');
+                    statusCell.classList.add('text-green-400');
                 } else {
-                    alert('Gagal memperbarui status laporan.');
+                    alert('Gagal memperbarui status laporan: ' + data.message);
                 }
             });
         }
@@ -251,19 +278,23 @@ $no_comment_report = 1;
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: new URLSearchParams({'comment_report_id': commentReportId, 'status': 'Selesai'})
+                body: new URLSearchParams({'comment_report_id': commentReportId, 'status': 'selesai'})
             })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 if (data.success) {
                     alert('Status laporan komentar berhasil diperbarui!');
                     button.textContent = 'Terselesaikan';
                     button.classList.remove('bg-yellow-500');
-                    button.classList.add('bg-green-500');
+                    button.classList.add('bg-green-500', 'disabled');
                     button.disabled = true;
-                    button.closest('tr').querySelector('td:nth-child(6)').textContent = 'Selesai';
+                    const statusCell = button.closest('tr').querySelector('td:nth-child(6)');
+                    statusCell.textContent = 'Selesai';
+                    statusCell.classList.remove('text-yellow-400');
+                    statusCell.classList.add('text-green-400');
                 } else {
-                    alert('Gagal memperbarui status laporan komentar.');
+                    alert('Gagal memperbarui status laporan komentar: ' + data.message);
                 }
             });
         }
@@ -283,7 +314,7 @@ $no_comment_report = 1;
                         alert('Laporan berhasil dihapus!');
                         button.closest('tr').remove();
                     } else {
-                        alert('Gagal menghapus laporan.');
+                        alert('Gagal menghapus laporan: ' + data.message);
                     }
                 });
             }
@@ -304,9 +335,11 @@ $no_comment_report = 1;
                         alert('Laporan komentar berhasil dihapus!');
                         button.closest('tr').remove();
                     } else {
-                        alert('Gagal menghapus laporan komentar.');
+                        alert('Gagal menghapus laporan komentar: ' + data.message);
                     }
                 });
             }
         }
-    </script>   
+    </script>
+</body>
+</html>
