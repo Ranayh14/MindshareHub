@@ -19,11 +19,7 @@ $sql_user = "CREATE TABLE IF NOT EXISTS users (
 // Kode untuk membuat tabel content
 $sql_content = "CREATE TABLE IF NOT EXISTS content (
     id INT AUTO_INCREMENT PRIMARY KEY,
-<<<<<<< HEAD
-    user_id INT NOT NULL,  
-=======
     user_id INT NOT NULL,
->>>>>>> 3483b8795b92d162fbaf7ee74f51eb4a4eedbb91
     title VARCHAR(100) NOT NULL,
     notes TEXT NOT NULL,
     image VARCHAR(255) DEFAULT NULL,
@@ -72,16 +68,18 @@ $sql_diarys = "CREATE TABLE IF NOT EXISTS diarys (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- Menambahkan constraint foreign key
 )";
 
-$sql_report ="CREATE TABLE IF NOT EXISTS reports (
+$sql_report = "CREATE TABLE IF NOT EXISTS reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL,
     reported_by INT NOT NULL,
     reason VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('aktif', 'selesai', 'ditolak') DEFAULT 'aktif',  -- Status untuk laporan
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (reported_by) REFERENCES users(id)
 )";
+
 
 $sql_comments = "CREATE TABLE IF NOT EXISTS comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -110,6 +108,7 @@ $sql_reportComments = "CREATE TABLE IF NOT EXISTS comment_reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     comment_id INT NOT NULL,
     user_id INT NOT NULL,
+    reason VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,

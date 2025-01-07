@@ -28,14 +28,12 @@ $notifications = $stmt->get_result();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 </head>
 <body>
-
 <div class="fixed top-0 left-0 h-screen w-64 z-50">
     <?php include('../slicing/sidebar.php'); ?>
 </div>
 
 <div class="ml-64 flex-1 p-6">
     <h2 class="text-2xl font-semibold mb-6">Dashboard</h2>
-
     <h2 class="text-2xl font-semibold mt-6">Notifikasi</h2>
     <div class="space-y-4">
         <?php while ($row = $notifications->fetch_assoc()): ?>
@@ -62,6 +60,7 @@ $notifications = $stmt->get_result();
 <script>
     // Skrip JavaScript jika diperlukan
 </script>
+
 </body>
 </html>
 

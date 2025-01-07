@@ -38,19 +38,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Validasi input
         if (!empty($title) && !empty($notes)) {
-            // Simpan konten ke database dengan user_id = 2
-            $admin_user_id = 2; // Asumsi admin memiliki user_id 2
+            // Simpan konten ke database dengan user_id admin
+            $admin_user_id = $user_id; // Menggunakan ID admin dari sesi
             $sql = "INSERT INTO content (user_id, title, notes) VALUES (?, ?, ?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("iss", $admin_user_id, $title, $notes);
 
             if ($stmt->execute()) {
-                // Simpan notifikasi ke database
-                $sql_notifications = "INSERT INTO notifications (user_id, title, notes) VALUES (?, ?, ?)";
-                $stmt_notifications = $conn->prepare($sql_notifications);
-                $stmt_notifications->bind_param("iss", $admin_user_id, $title, $notes);
-                $stmt_notifications->execute();
-                $stmt_notifications->close();
+                // Simpan notifikasi ke database untuk semua pengguna biasa
+                $sql_users = "SELECT id FROM users WHERE roles = 'user'"; // Ambil semua pengguna biasa
+                $result_users = $conn->query($sql_users);
+
+                while ($row_user = $result_users->fetch_assoc()) {
+                    $user_to_notify_id = $row_user['id'];
+                    $sql_notifications = "INSERT INTO notifications (user_id, title, notes) VALUES (?, ?, ?)";
+                    $stmt_notifications = $conn->prepare($sql_notifications);
+                    $stmt_notifications->bind_param("iss", $user_to_notify_id, $title, $notes);
+                    $stmt_notifications->execute();
+                    $stmt_notifications->close();
+                }
 
                 // Redirect setelah menambah konten
                 header("Location: KelolaKonten.php");
@@ -110,14 +116,14 @@ $result = mysqli_query($conn, "SELECT * FROM content ORDER BY created_at DESC");
                     <i class="fas fa-users w-5 h-5"></i>
                     <span>Kelola Komunitas</span>
                 </a>
-                <a href="laporanMasuk.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="laporanMasuk.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
                 </a>
-                <a href="LogoutAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <button id="logoutButton" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-5 h-5"></i>
                     <span>Keluar</span>
-                </a>
+                </button>
             </nav>
         </aside>
 
@@ -184,11 +190,43 @@ $result = mysqli_query($conn, "SELECT * FROM content ORDER BY created_at DESC");
         </main>
     </div>
 
+    <!-- Modal Konfirmasi Logout -->
+    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Anda yakin ingin logout?</h2>
+            <p class="mb-6">Semua sesi aktif akan diakhiri.</p>
+            <div class="flex space-x-4">
+                <form method="POST" action="LogoutAdmin.php">
+                    <button type="submit" name="logout" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">
+                        Logout
+                    </button>
+                </form>
+                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function toggleForm() {
             const form = document.getElementById('contentForm');
             form.classList.toggle('hidden');
             document.getElementById('addContentForm').reset(); // Reset form saat menambah konten
+        }
+
+        const logoutButton = document.getElementById('logoutButton');
+        const logoutModal = document.getElementById('logoutModal');
+
+        // Menampilkan modal ketika tombol logout diklik
+        logoutButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Mencegah navigasi langsung
+            logoutModal.classList.remove('hidden'); // Tampilkan modal
+        });
+
+        // Menutup modal
+        function closeModal() {
+            logoutModal.classList.add('hidden'); // Sembunyikan modal
         }
     </script>
 </body>

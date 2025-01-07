@@ -12,7 +12,6 @@ function banUser($userId, $reason) {
 // Fungsi untuk mengaktifkan kembali pengguna
 function activateUser($userId) {
     global $conn;
-    // Hanya menghapus status banned dan tanggal banned
     $stmt = $conn->prepare("UPDATE users SET is_banned = FALSE, ban_date = NULL WHERE id = ?");
     $stmt->bind_param("i", $userId);
     return $stmt->execute();
@@ -79,7 +78,7 @@ $users = getAllUsers();
     <div class="min-h-screen flex">
         <aside class="w-64 bg-[#202225] p-6">
             <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-white">PusatAdmin</h1>
+                <h1 class="text-2xl font-semibold text-white">Pusat Admin</h1>
             </div>
             <nav class="space-y-4">
                 <a href="DashboardAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
@@ -98,15 +97,14 @@ $users = getAllUsers();
                     <i class="fas fa-users w-5 h-5"></i>
                     <span>Kelola Komunitas</span>
                 </a>
-                <a href="LaporanMasuk.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="LaporanMasuk.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
                 </a>
-                <a href="LogoutAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="#" id="logoutButton" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-5 h-5"></i>
                     <span>Keluar</span>
                 </a>
-     
             </nav>
         </aside>
 
@@ -124,7 +122,7 @@ $users = getAllUsers();
                             <th class="px-4 py-2 text-gray-200">Email</th>
                             <th class="px-4 py-2 text-gray-200">Status</th>
                             <th class="px-4 py-2 text-gray-200">Aksi</th>
-                            <th class="px-4 py-2 text-gray-200">Alasan Banned</th> <!-- Kolom untuk alasan banned -->
+                            <th class="px-4 py-2 text-gray-200">Alasan Banned</th>
                         </tr>
                     </thead>
                     <tbody id="userTable">
@@ -147,7 +145,7 @@ $users = getAllUsers();
                                             <option value="Penyalahgunaan">Penyalahgunaan</option>
                                             <option value="Lainnya">Lainnya</option>
                                         </select>
-                                        <button class="bg-red-500 text-white px-2 py-1 rounded" onclick="banUser('<?php echo htmlspecialchars($user['username']); ?>', <?php echo $user['id']; ?>)">Banned</button>
+                                        <button class="bg-red-500 text-white px-2 py-1 rounded" onclick="confirmBanUser('<?php echo htmlspecialchars($user['username']); ?>', <?php echo $user['id']; ?>)">Banned</button>
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-4 py-2 text-gray-300" id="reason<?php echo $user['id']; ?>">
@@ -161,8 +159,35 @@ $users = getAllUsers();
         </main>
     </div>
 
+    <!-- Modal Konfirmasi Tindakan -->
+    <div id="confirmModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Konfirmasi Tindakan</h2>
+            <p id="modalMessage" class="mb-6">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
+            <div class="flex space-x-4">
+                <button id="confirmButton" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">Ya</button>
+                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Logout -->
+    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Anda yakin ingin logout?</h2>
+            <p class="mb-6">Semua sesi aktif akan diakhiri.</p>
+            <div class="flex space-x-4">
+                <a href="LogoutAdmin.php" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">Logout</a>
+                <button onclick="closeLogoutModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">Batal</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function banUser(username, userId) {
+        let currentAction = null;
+        let currentUserId = null;
+
+        function confirmBanUser(username, userId) {
             const reasonSelect = document.getElementById(`banReason${userId}`);
             const reason = reasonSelect.value;
 
@@ -171,69 +196,82 @@ $users = getAllUsers();
                 return;
             }
 
-            if (confirm(`Apakah Anda yakin ingin mem-banned pengguna ${username} dengan alasan: "${reason}"?`)) {
-                fetch('KelolaPengguna.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ action: 'ban', userId: userId, reason: reason })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const userRow = document.getElementById(`user${userId}`);
-                        const statusCell = userRow.querySelector('td:nth-child(4)');
-                        statusCell.textContent = 'Nonaktif';
-                        statusCell.classList.remove('text-green-400');
-                        statusCell.classList.add('text-red-400');
+            currentAction = 'ban';
+            currentUserId = userId;
+            document.getElementById('modalMessage').textContent = `Apakah Anda yakin ingin mem-banned pengguna ${username} dengan alasan: "${reason}"?`;
+            document.getElementById('confirmModal').classList.remove('hidden'); // Tampilkan modal
+        }
 
-                        const actionCell = userRow.querySelector('td:nth-child(5)');
-                        actionCell.innerHTML = '<button class="bg-green-500 text-white px-2 py-1 rounded" onclick="activateUser(\'' + username + '\', ' + userId + ')">Aktifkan</button>';
-
-                        const reasonCell = userRow.querySelector('td:nth-child(6)');
-                        reasonCell.textContent = reason; // Update alasan banned
-
-                        alert(`Pengguna ${username} telah dibanned dengan alasan: "${reason}".`);
-                    } else {
-                        alert('Gagal mem-banned pengguna.');
-                    }
-                });
+        document.getElementById('confirmButton').addEventListener('click', function() {
+            if (currentAction === 'ban') {
+                const reason = document.getElementById(`banReason${currentUserId}`).value;
+                banUser(currentUserId, reason);
+            } else if (currentAction === 'activate') {
+                activateUser(currentUserId);
             }
+            closeModal();
+        });
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.add('hidden'); // Sembunyikan modal
+            currentAction = null;
+            currentUserId = null;
         }
 
         function activateUser(username, userId) {
-            if (confirm(`Apakah Anda yakin ingin mengaktifkan kembali pengguna ${username}?`)) {
-                fetch('KelolaPengguna.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ action: 'activate', userId: userId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const userRow = document.getElementById(`user${userId}`);
-                        const statusCell = userRow.querySelector('td:nth-child(4)');
-                        statusCell.textContent = 'Aktif';
-                        statusCell.classList.remove('text-red-400');
-                        statusCell.classList.add('text-green-400');
+            currentAction = 'activate';
+            currentUserId = userId;
+            document.getElementById('modalMessage').textContent = `Apakah Anda yakin ingin mengaktifkan kembali pengguna ${username}?`;
+            document.getElementById('confirmModal').classList.remove('hidden'); // Tampilkan modal
+        }
 
-                        const actionCell = userRow.querySelector('td:nth-child(5)');
-                        actionCell.innerHTML = '<button class="bg-red-500 text-white px-2 py-1 rounded" onclick="banUser(\'' + username + '\', ' + userId + ')">Banned</button>';
+        function banUser(userId, reason) {
+            fetch('KelolaPengguna.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: 'ban', userId: userId, reason: reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const userRow = document.getElementById(`user${userId}`);
+                    const statusCell = userRow.querySelector('td:nth-child(4)');
+                    statusCell.textContent = 'Nonaktif';
+                    statusCell.classList.remove('text-green-400');
+                    statusCell.classList.add('text-red-400');
 
-                        // Update alasan banned saat diaktifkan kembali
-                        const reasonCell = userRow.querySelector('td:nth-child(6)');
-                        reasonCell.textContent = data.ban_reason ? data.ban_reason : 'Tidak ada alasan';
+                    const actionCell = userRow.querySelector('td:nth-child(5)');
+                    actionCell.innerHTML = '<button class="bg-green-500 text-white px-2 py-1 rounded" onclick="activateUser(\'' + username + '\', ' + userId + ')">Aktifkan</button>';
 
-                        alert(`Pengguna ${username} telah diaktifkan kembali.`);
-                    } else {
-                        alert('Gagal mengaktifkan pengguna.');
-                    }
-                });
-            }
+                    const reasonCell = userRow.querySelector('td:nth-child(6)');
+                    reasonCell.textContent = reason; // Update alasan banned
+
+                    alert(`Pengguna ${username} telah dibanned dengan alasan: "${reason}".`);
+                } else {
+                    alert('Gagal mem-banned pengguna.');
+                }
+            });
+        }
+
+        const logoutButton = document.getElementById('logoutButton');
+        const logoutModal = document.getElementById('logoutModal');
+
+        // Menampilkan modal ketika tombol logout diklik
+        logoutButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Mencegah navigasi langsung
+            logoutModal.classList.remove('hidden'); // Tampilkan modal
+        });
+
+        function closeLogoutModal() {
+            logoutModal.classList.add('hidden'); // Sembunyikan modal
         }
     </script>
 </body>
 </html>
+
+<?php
+// Menutup koneksi
+mysqli_close($conn);
+?>

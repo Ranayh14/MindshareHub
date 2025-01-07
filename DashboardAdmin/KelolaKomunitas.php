@@ -2,6 +2,15 @@
 // Menghubungkan ke database
 include("../conn.php");
 
+// Proses Logout
+if (isset($_POST['logout'])) {
+    session_start();
+    $_SESSION = array();
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
+
 // Ambil data pengguna dari database
 $sql = "SELECT username FROM users";
 $result = mysqli_query($conn, $sql);
@@ -57,14 +66,14 @@ $result = mysqli_query($conn, $sql);
                     <i class="fas fa-users w-5 h-5"></i>
                     <span>Kelola Komunitas</span>
                 </a>
-                <a href="LaporanMasuk.html" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <a href="LaporanMasuk.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
                     <span>Laporan Masuk</span>
                 </a>
-                <a href="LogoutAdmin.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
+                <button id="logoutButton" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-5 h-5"></i>
                     <span>Keluar</span>
-                </a>
+                </button>
             </nav>
         </aside>
 
@@ -136,7 +145,39 @@ $result = mysqli_query($conn, $sql);
         </main>
     </div>
 
+    <!-- Modal Konfirmasi Logout -->
+    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Anda yakin ingin logout?</h2>
+            <p class="mb-6">Semua sesi aktif akan diakhiri.</p>
+            <div class="flex space-x-4">
+                <form method="POST" action="LogoutAdmin.php">
+                    <button type="submit" name="logout" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">
+                        Logout
+                    </button>
+                </form>
+                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        const logoutButton = document.getElementById('logoutButton');
+        const logoutModal = document.getElementById('logoutModal');
+
+        // Menampilkan modal ketika tombol logout diklik
+        logoutButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Mencegah navigasi langsung
+            logoutModal.classList.remove('hidden'); // Tampilkan modal
+        });
+
+        // Menutup modal
+        function closeModal() {
+            logoutModal.classList.add('hidden'); // Sembunyikan modal
+        }
+
         function viewPost(postId) {
             alert(`Menampilkan detail postingan dengan ID: ${postId}`);
             // Alihkan ke halaman detail postingan pengguna di sini
