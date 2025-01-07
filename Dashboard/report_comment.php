@@ -15,6 +15,7 @@ if (!isset($_POST['comment_id']) || !isset($_POST['description'])) {
 }
 
 $comment_id = intval($_POST['comment_id']);
+$reason = trim($_POST['reason']);
 $description = trim($_POST['description']);
 $user_id = $_SESSION['user_id'];
 
@@ -25,13 +26,13 @@ if (empty($description)) {
 }
 
 // Insert laporan ke database (buat tabel reports jika belum ada)
-$sql = "INSERT INTO comment_reports (comment_id, user_id, description) VALUES (?, ?, ?)";
+$sql = "INSERT INTO comment_reports (comment_id, user_id, reason,description) VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
     echo json_encode(['status' => 'error', 'message' => 'Gagal menyiapkan statement: ' . $conn->error]);
     exit;
 }
-$stmt->bind_param("iis", $comment_id, $user_id, $description);
+$stmt->bind_param("iiss", $comment_id, $user_id, $reason, $description);
 
 if ($stmt->execute()) {
     echo json_encode(['status' => 'success', 'message' => 'Komentar telah dilaporkan']);
