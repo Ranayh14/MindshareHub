@@ -43,15 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindshareHub - Diary</title>
+    <link rel="stylesheet" href="/Dashboard/Dashboard.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#1a1b26] text-white flex">
     <!-- sidebar -->
-    <div>
-        <?php include('../slicing/sidbar.html'); ?>
+    <div class="fixed top-0 left-0 h-screen w-64 z-50">
+        <?php include('../slicing/sidebar.php'); ?>
     </div>
 
-    <div class="main-content flex-1 p-5">
+    <div class="main-content flex-1 p-5 ml-64">
         <div class="header flex items-center justify-between mb-5">
             <div class="title-container flex-grow mr-2">
                 <input id="title" type="text" class="title-input w-full p-3 bg-[#2d2d3d] text-white text-lg rounded outline-none" placeholder="Judul" value="">

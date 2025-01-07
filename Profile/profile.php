@@ -29,7 +29,7 @@ $resultPosts = mysqli_query($conn, $queryPosts);
     <title>MindshareHub - Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
-    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="/Dashboard/Dashboard.css">
 </head>
 <body class="bg-gray-900 text-white flex">
 
