@@ -33,8 +33,7 @@ $notifications = $stmt->get_result();
 </div>
 
 <div class="ml-64 flex-1 p-6">
-    <h2 class="text-2xl font-semibold mb-6">Dashboard</h2>
-    <h2 class="text-2xl font-semibold mt-6">Notifikasi</h2>
+    <h2 class="text-2xl font-semibold mt-6 mb-6">Notifikasi</h2>
     <div class="space-y-4">
         <?php while ($row = $notifications->fetch_assoc()): ?>
             <div class="bg-gray-800 p-4 rounded-lg flex items-start space-x-3">

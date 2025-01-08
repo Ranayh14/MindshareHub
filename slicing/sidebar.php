@@ -1,3 +1,4 @@
+<!-- sidebar.php -->
 <?php
 include('../conn.php');
 
@@ -71,7 +72,7 @@ $stmt->close();
             </nav>
         </div>
         <div class="flex items-center p-4 bg-purple-700 rounded-full">
-            <div class="bg-white rounded-full mr-2" style="width: 30px; height: 30px;"></div>
+            <img src="<?php echo (!empty($userData['profile_picture']) ? '../Asset/' . htmlspecialchars($userData['profile_picture']) : '../Asset/pp1.png'); ?>" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-1 current-user-profile">
             <div>
                 <div class="flex items-center">
                     <span class="text-white">
@@ -85,8 +86,6 @@ $stmt->close();
             </div>
             <i class="fas fa-ellipsis-h text-gray-400 ml-auto"></i>
         </div>
-
-
     </div>
     <script>
         // Highlight the current active menu item

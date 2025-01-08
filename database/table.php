@@ -129,6 +129,10 @@ $sql_audioNotes = "CREATE TABLE IF NOT EXISTS audio_notes (
     FOREIGN KEY (user_id) REFERENCES users(id)
 )";
 
+// Perbarui semua profile_picture yang NULL menjadi 'pp1.png'
+$sql_default_pp = "UPDATE users SET profile_picture = 'pp1.png' WHERE profile_picture IS NULL";
+
+
 // Eksekusi query dengan try-catch
 try {
     if (mysqli_query($conn, $sql_user)) {
@@ -195,6 +199,12 @@ try {
         echo "Tabel audio_notes berhasil dibuat.<br>";
     } else {
         echo "Tabel audio_notes gagal dibuat: " . mysqli_error($conn) . "<br>";
+    }
+
+    if (mysqli_query($conn, $sql_default_pp)) {
+        echo "Profile pictures yang NULL berhasil diupdate ke pp1.png.<br>";
+    } else {
+        echo "Gagal memperbarui profile pictures: " . mysqli_error($conn) . "<br>";
     }
 } catch (mysqli_sql_exception $e) {
     echo "Terjadi kesalahan: " . $e->getMessage();

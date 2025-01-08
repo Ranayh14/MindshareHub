@@ -96,7 +96,7 @@ function time_ago($datetime, $full = false) {
         <div class="content">
             <div class="new-post-form p-6 rounded-lg mb-6 mt-6 bg-customPurple text-white">
                 <div class="flex items-center mb-4">
-                    <div class="avatar w-12 h-12 bg-gray-300 rounded-full"></div> <!-- Placeholder avatar -->
+                <img src="<?php echo (!empty($userData['profile_picture']) ? '../Asset/' . htmlspecialchars($userData['profile_picture']) : '../Asset/pp1.png'); ?>" alt="Profile Picture" class="w-10 h-10 rounded-full object-cover mr-1 current-user-profile">
                     <h2 class="text-lg font-semibold ml-4">Buat Postingan Baru</h2>
                 </div>
                 <form action="post.php" method="POST" enctype="multipart/form-data" class="space-y-4">
@@ -124,12 +124,13 @@ function time_ago($datetime, $full = false) {
                 <?php
                     $user_id = $_SESSION['user_id'];
                     $username_session = htmlspecialchars($_SESSION['username']); // Menyimpan username session untuk digunakan di JavaScript
-                    $sql = "SELECT posts.id, posts.content, posts.created_at, posts.likes, posts.user_id, users.username, posts.image_path,
-                        (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS liked,
-                        (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS total_comments
-                    FROM posts
-                    JOIN users ON posts.user_id = users.id
-                    ORDER BY posts.created_at DESC";
+                    $sql = "SELECT posts.id, posts.content, posts.created_at, posts.likes, posts.user_id, users.username, users.profile_picture, posts.image_path,
+                                (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS liked,
+                                (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS total_comments
+                            FROM posts
+                            JOIN users ON posts.user_id = users.id
+                            ORDER BY posts.created_at DESC";
+
                     $stmt = $conn->prepare($sql);
                     $stmt->bind_param("i", $user_id);
                     $stmt->execute();
@@ -142,8 +143,7 @@ function time_ago($datetime, $full = false) {
                             echo '<div class="post relative p-6 rounded-lg mb-6 bg-customPurple text-white" id="post-' . htmlspecialchars($row['id']) . '">';
                             echo '    <div class="post-header flex justify-between items-start">'; // Mengubah 'items-center' menjadi 'items-start' untuk penyesuaian
                             echo '        <div class="flex items-center">';
-                            echo '            <div class="avatar w-10 h-10 bg-gray-300 rounded-full"></div>'; // Placeholder avatar
-                            
+                            echo '            <img src="' . (!empty($row['profile_picture']) ? '../Asset/' . htmlspecialchars($row['profile_picture']) : '../Asset/pp1.png') . '" alt="Profile Picture" class="w-10 h-10 rounded-full object-cover" />';
                             // Menambahkan "(You)" jika postingan milik pengguna
                             echo '            <div class="post-author text-lg font-semibold ml-3">' . htmlspecialchars($row['username']) . ($isOwner ? ' (You)' : '') . '</div>';
                             
@@ -193,7 +193,7 @@ function time_ago($datetime, $full = false) {
                             echo '    </div>';
                             echo '    <form class="add-comment-form" onsubmit="submitComment(event, ' . htmlspecialchars($row['id']) . ')">';
                             echo '        <div class="flex items-center space-x-3">';
-                            echo '            <div class="avatar w-8 h-8 bg-gray-300 rounded-full"></div>'; // Placeholder avatar
+                            echo '            <img src="' . (!empty($row['profile_picture']) ? '../Asset/' . htmlspecialchars($row['profile_picture']) : '../Asset/pp1.png') . '" alt="Profile Picture" class="w-10 h-10 rounded-full object-cover" />';                            
                             echo '            <textarea name="comment" rows="1" class="flex-1 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-white bg-gray-700 resize-none" placeholder="Tambahkan komentar..." required></textarea>';
                             echo '            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none">Kirim</button>';
                             echo '        </div>';
@@ -559,7 +559,7 @@ function time_ago($datetime, $full = false) {
                         // Bagian yang memuat komentar dalam JavaScript
                         commentDiv.innerHTML = `
                             <div class="flex items-center mb-2">
-                                <div class="avatar w-8 h-8 bg-gray-300 rounded-full"></div>
+                                <img src="<?php echo (!empty($row['profile_picture']) ? '../Asset/' . htmlspecialchars($row['profile_picture']) : '../Asset/pp1.png'); ?>" alt="Profile Picture" class="w-10 h-10 rounded-full object-cover" />
                                 <div class="username font-semibold ml-2">${escapeHtml(comment.username)}${comment.username === currentUsername ? ' (You)' : ''}</div>
                                 <div class="comment-time pl-4 text-sm text-gray-300">${timeAgo(comment.created_at)}</div>
                                 <div class="relative ml-auto"> <!-- Mengubah ml-2 menjadi ml-auto untuk menempatkan opsi ke kanan -->
@@ -648,7 +648,7 @@ function time_ago($datetime, $full = false) {
 
                 commentDiv.innerHTML = `
                     <div class="flex items-center mb-2">
-                        <div class="avatar w-8 h-8 bg-gray-300 rounded-full"></div>
+                        <img src="<?php echo (!empty($row['profile_picture']) ? '../Asset/' . htmlspecialchars($row['profile_picture']) : '../Asset/pp1.png'); ?>" alt="Profile Picture" class="w-10 h-10 rounded-full object-cover" />
                         <div class="username font-semibold ml-2">${escapeHtml(commentData.username)}${commentData.username === currentUsername ? ' (You)' : ''}</div>
                         <div class="comment-time pl-4 text-sm text-gray-300">${timeAgo(commentData.created_at)}</div>
                         <div class="relative ml-auto"> <!-- Mengubah ml-2 menjadi ml-auto untuk menempatkan opsi ke kanan -->
