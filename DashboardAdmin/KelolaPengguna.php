@@ -12,7 +12,7 @@ function banUser($userId, $reason) {
 // Fungsi untuk mengaktifkan kembali pengguna
 function activateUser($userId) {
     global $conn;
-    $stmt = $conn->prepare("UPDATE users SET is_banned = FALSE, ban_date = NULL WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE users SET is_banned = FALSE, ban_reason = NULL, ban_date = NULL WHERE id = ?");
     $stmt->bind_param("i", $userId);
     return $stmt->execute();
 }
@@ -41,15 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($data['action'] === 'activate') {
         $userId = $data['userId'];
         $success = activateUser($userId);
-        
-        // Ambil alasan banned dari database
-        $stmt = $conn->prepare("SELECT ban_reason FROM users WHERE id = ?");
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $ban_reason = $result->fetch_assoc()['ban_reason'];
-        
-        echo json_encode(['success' => $success, 'ban_reason' => $ban_reason]);
+        echo json_encode(['success' => $success]);
     }
     exit;
 }
@@ -63,12 +55,11 @@ $users = getAllUsers();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Pengguna - Forum Anonim</title>
+    <title>Pengaturan Pengguna - Forum Anonim</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-        /* Gaya untuk dropdown */
         select {
             color: black; /* Warna teks hitam */
         }
@@ -76,10 +67,8 @@ $users = getAllUsers();
 </head>
 <body class="bg-[#2f3136] text-gray-100">
     <div class="min-h-screen flex">
-    
-            <?php include('sidebaradmin.php'); ?>
+        <?php include('sidebaradmin.php'); ?>
                  
-
         <main class="flex-1 p-8">
             <div class="mb-8">
                 <h2 class="text-2xl font-bold">Kelola Pengguna</h2>
@@ -143,18 +132,6 @@ $users = getAllUsers();
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Logout -->
-    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold mb-4">Anda yakin ingin logout?</h2>
-            <p class="mb-6">Semua sesi aktif akan diakhiri.</p>
-            <div class="flex space-x-4">
-                <a href="LogoutAdmin.php" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">Logout</a>
-                <button onclick="closeLogoutModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">Batal</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         let currentAction = null;
         let currentUserId = null;
@@ -179,7 +156,7 @@ $users = getAllUsers();
                 const reason = document.getElementById(`banReason${currentUserId}`).value;
                 banUser(currentUserId, reason);
             } else if (currentAction === 'activate') {
-                activateUser(currentUserId);
+                activateUserRequest(currentUserId);
             }
             closeModal();
         });
@@ -208,42 +185,33 @@ $users = getAllUsers();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const userRow = document.getElementById(`user${userId}`);
-                    const statusCell = userRow.querySelector('td:nth-child(4)');
-                    statusCell.textContent = 'Nonaktif';
-                    statusCell.classList.remove('text-green-400');
-                    statusCell.classList.add('text-red-400');
-
-                    const actionCell = userRow.querySelector('td:nth-child(5)');
-                    actionCell.innerHTML = '<button class="bg-green-500 text-white px-2 py-1 rounded" onclick="activateUser(\'' + username + '\', ' + userId + ')">Aktifkan</button>';
-
-                    const reasonCell = userRow.querySelector('td:nth-child(6)');
-                    reasonCell.textContent = reason; // Update alasan banned
-
-                    alert(`Pengguna ${username} telah dibanned dengan alasan: "${reason}".`);
+                    alert('Pengguna berhasil di-banned.');
+                    location.reload();
                 } else {
                     alert('Gagal mem-banned pengguna.');
                 }
             });
         }
 
-        const logoutButton = document.getElementById('logoutButton');
-        const logoutModal = document.getElementById('logoutModal');
-
-        // Menampilkan modal ketika tombol logout diklik
-        logoutButton.addEventListener('click', (event) => {
-            event.preventDefault(); // Mencegah navigasi langsung
-            logoutModal.classList.remove('hidden'); // Tampilkan modal
-        });
-
-        function closeLogoutModal() {
-            logoutModal.classList.add('hidden'); // Sembunyikan modal
+        function activateUserRequest(userId) {
+            fetch('KelolaPengguna.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: 'activate', userId: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Pengguna berhasil diaktifkan kembali.');
+                    location.reload();
+                } else {
+                    alert('Gagal mengaktifkan kembali pengguna.');
+                }
+            });
         }
     </script>
 </body>
 </html>
 
-<?php
-// Menutup koneksi
-mysqli_close($conn);
-?>

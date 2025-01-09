@@ -35,13 +35,19 @@ if (isset($_GET['search'])) {
 // Menghapus postingan
 if (isset($_POST['delete_post'])) {
     $postId = intval($_POST['post_id']);
-    
+
     // Validasi agar hanya postingan milik user yang dipilih yang bisa dihapus
     if ($searchUserId) {
+        // Hapus laporan terkait postingan
+        $sqlDeleteReports = "DELETE FROM reports WHERE post_id = $postId";
+        mysqli_query($conn, $sqlDeleteReports);
+
+        // Hapus postingan
         $sqlDelete = "DELETE FROM posts WHERE id = $postId AND user_id = $searchUserId";
         mysqli_query($conn, $sqlDelete);
+
         header("Location: KelolaKomunitas.php?search=" . urlencode($search));
-        exit(); 
+        exit();
     }
 }
 
@@ -65,11 +71,10 @@ if ($searchUserId) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Komunitas - Forum Anonim</title>
+    <title>Kontrol Komunitas - Forum Anonim</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-
 </head>
 <body class="bg-[#2f3136] text-gray-100">
     <div class="min-h-screen flex">
@@ -136,22 +141,6 @@ if ($searchUserId) {
         </main>
     </div>
 
-    <!-- Modal Konfirmasi Logout -->
-    <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-[#202225] p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold mb-4">Anda yakin ingin logout?</h2>
-            <p class="mb-6">Semua sesi aktif akan diakhiri.</p>
-            <div class="flex space-x-4">
-                <a href="LogoutAdmin.php" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-400 transition duration-200">
-                    Logout
-                </a>
-                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">
-                    Batal
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
         function showSuggestions(value) {
             if (value.length === 0) {
@@ -175,23 +164,6 @@ if ($searchUserId) {
             document.getElementById("search").value = username;
             document.getElementById("searchUserId").value = id;
             document.getElementById("suggestions").innerHTML = "";
-        }
-
-        // Modal Logout
-        const logoutButton = document.getElementById('logoutButton');
-        const logoutModal = document.getElementById('logoutModal');
-
-        // Menampilkan modal ketika tombol logout di sidebar diklik
-        if (logoutButton) {
-            logoutButton.addEventListener('click', (event) => {
-                event.preventDefault(); // Mencegah navigasi langsung
-                logoutModal.classList.remove('hidden'); // Tampilkan modal
-            });
-        }
-
-        // Menutup modal
-        function closeModal() {
-            logoutModal.classList.add('hidden'); // Sembunyikan modal
         }
     </script>
 </body>

@@ -9,15 +9,15 @@
                 </a>
                 <a href="KelolaPengguna.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-user-friends w-5 h-5"></i>
-                    <span>Kelola Pengguna</span>
+                    <span>Pengaturan Pengguna</span>
                 </a>
                 <a href="KelolaKonten.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-file-alt w-5 h-5"></i>
-                    <span>Kelola Konten</span>
+                    <span>Manajemen Konten</span>
                 </a>
                 <a href="KelolaKomunitas.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-users w-5 h-5"></i>
-                    <span>Kelola Komunitas</span>
+                    <span>KontrolKomunitas</span>
                 </a>
                 <a href="LaporanMasuk.php" class="flex items-center space-x-2 p-2 rounded-lg text-gray-300 hover:bg-[#5865F2] hover:text-white transition duration-200">
                     <i class="fas fa-clipboard-list w-5 h-5"></i>
