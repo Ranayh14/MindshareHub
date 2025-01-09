@@ -15,12 +15,6 @@ if (isset($_POST['submit'])) {
       $error = "Pin Salah. Silakan coba lagi.";
     }
 }
-
-// // Redirect jika mengisi email
-// if (!isset($_SESSION['email'])) {
-//   header("Location: ../gantiPassword/gpTahap1.html");
-//   exit;
-// }
 ?>
 
 <!DOCTYPE html>
@@ -33,16 +27,6 @@ if (isset($_POST['submit'])) {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
   <style>
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-
-    @layer utilities {
-      .bg-customPurple {
-        background-color: rgba(43, 27, 84, 1);
-      }
-    }
-
     /* Media query untuk menyembunyikan gambar di tampilan mobile */
     @media (max-width: 768px) {
       .hide-on-mobile {
@@ -51,9 +35,9 @@ if (isset($_POST['submit'])) {
     }
   </style>
 </head>
-<body class="bg-customPurple h-screen flex items-center justify-center m-0">
+<body class="bg-[#2B1B54] h-screen flex items-center justify-center m-0">
   <!-- Kontainer Utama -->
-  <div class="flex flex-col md:flex-row bg-customPurple shadow-lg overflow-hidden w-full h-screen">
+  <div class="flex flex-col md:flex-row bg-[#2B1B54] shadow-lg overflow-hidden w-full h-screen">
     <!-- Bagian Kiri: Ilustrasi -->
     <div class="relative flex-grow bg-cover bg-center h-full hide-on-mobile" style="background-image: url('/Asset/poster1.png');">
       <img src="/Asset/poster1.png" alt="Illustration" class="absolute inset-0 object-cover w-full h-full opacity-55" />
