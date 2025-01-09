@@ -55,7 +55,7 @@ $users = getAllUsers();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Pengguna - Forum Anonim</title>
+    <title>Pengaturan Pengguna - Forum Anonim</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
