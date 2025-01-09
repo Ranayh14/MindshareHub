@@ -794,10 +794,6 @@ function time_ago($datetime, $full = false) {
 
     // Fungsi utilitas untuk mendapatkan ID postingan dari ID komentar
     function getPostIdFromCommentId(commentId) {
-        // Fungsi ini mengasumsikan bahwa ID komentar unik dan dapat dipetakan ke postingan masing-masing.
-        // Anda mungkin perlu menyesuaikan ini berdasarkan struktur data Anda yang sebenarnya.
-        // Untuk kesederhanaan, mari kita menelusuri DOM ke atas untuk menemukan ID postingan.
-
         const commentElement = document.querySelector(`#comment-options-${commentId}`);
         if (commentElement) {
             const postElement = commentElement.closest('.post');
@@ -858,10 +854,6 @@ function time_ago($datetime, $full = false) {
             closeConfirmationModal();
         });
     }
-
-    // Fungsi untuk menangani pelaporan komentar
-    // Tidak lagi menggunakan prompt, melainkan menggunakan modal
-    // Fungsi openReportCommentModal ditambahkan di atas
 
     // Fungsi untuk toggle menu opsi komentar
     function toggleCommentOptions(commentId) {
