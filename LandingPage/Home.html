@@ -28,6 +28,13 @@ font-family: 'Poppins', sans-serif;
     <div>
         <img src="Logo MindsahreHub-08 1.png" alt="MindshareHub Logo" class="w-20 py-1">
     </div>
+    <nav class="flex-grow flex justify-start ml-[50px]">
+        <div class="flex gap-4 space-x-10">
+            <a href="Home.html" class="text-white font-medium hover:text-gray-300 transition border-b border-b-4 border-rounded border-gray-300">Home</a>
+            <a href="aboutUs.html" class="text-white font-medium hover:text-gray-300 hover:border-b hover:border-b-4 hover:border-rounded hover:border-gray-300">About Us</a>
+            <a href="help.html" class="text-white font-medium hover:text-gray-300 hover:border-b hover:border-b-4 hover:border-rounded hover:border-gray-300">FAQ</a>
+        </div>
+    </nav>
     <!-- Login & Register Buttons -->
     <div class="flex gap-4">
         <a href="/login/login.html" class="py-2 px-4 text-white border border-white rounded-full hover:bg-white hover:text-[#2B1B54] transition">Login</a>
@@ -90,19 +97,6 @@ font-family: 'Poppins', sans-serif;
     </button>
 </div>
 
-<!-- Terms and Conditions Card -->
-<section class="mt-16 bg-[#2B1B54] text-white py-8 px-10 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:scale-105 max-w-4xl mx-auto">
-    <h2 class="text-xl font-semibold mb-4">Terms and Conditions</h2>
-    <p class="text-xs leading-relaxed">
-        Dengan menggunakan layanan kami, Anda menyetujui syarat dan ketentuan yang berlaku. Untuk informasi lebih
-        lanjut, silakan baca
-        <!-- Modal toggle -->
-        <a href="#" data-modal-target="static-modal" data-modal-toggle="static-modal" class="text-blue-300 hover:underline font-medium text-sm">
-            Terms and Conditions
-        </a>
-    </p>
-</section>
-
 <!-- Main modal -->
 <div id="static-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-5xl max-h-full">
@@ -162,8 +156,14 @@ font-family: 'Poppins', sans-serif;
 </div>
 
 <!-- Footer -->
-<footer class="text-center py-6  mt-10">
-    <p class="text-xs text-gray-300">© 2024 MindshareHub. Hak cipta dilindungi.</p>
+<footer class="bg-[#2B1B54] text-white py-6 mt-10 fixed w-full bottom-0">
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="flex justify-center space-x-4 mb-4">
+            <a href="help.html#cp" class="hover:text-gray-300">Contact Us</a>
+            <a href="#" data-modal-target="static-modal" data-modal-toggle="static-modal"class="hover:text-gray-300">Terms and Conditions</a>
+        </div>
+        <p class="text-xs">© 2024 MindshareHub. Hak cipta dilindungi.</p>
+    </div>
 </footer>
 
 <script>
