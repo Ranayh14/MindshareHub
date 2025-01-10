@@ -94,7 +94,7 @@ function time_ago($datetime, $full = false) {
         </div>
 
         <div class="content">
-            <div class="new-post-form p-6 rounded-lg mb-6 mt-6 bg-customPurple text-white">
+            <div class="new-post-form p-6 rounded-lg mb-6 mt-6 bg-[#2B1B54] text-white">
                 <div class="flex items-center mb-4">
                 <img src="<?php echo (!empty($userData['profile_picture']) ? '../Asset/' . htmlspecialchars($userData['profile_picture']) : '../Asset/pp1.png'); ?>" alt="Profile Picture" class="w-10 h-10 rounded-full object-cover mr-1 current-user-profile">
                     <h2 class="text-lg font-semibold ml-4">Buat Postingan Baru</h2>
@@ -140,7 +140,7 @@ function time_ago($datetime, $full = false) {
                         while ($row = $result->fetch_assoc()) {
                             $isOwner = $row['user_id'] === $user_id; // Cek apakah postingan milik pengguna
                             $isLiked = $row['liked'] > 0; // Jika pengguna telah menyukai postingan
-                            echo '<div class="post relative p-6 rounded-lg mb-6 bg-customPurple text-white" id="post-' . htmlspecialchars($row['id']) . '">';
+                            echo '<div class="post relative p-6 rounded-lg mb-6 bg-[#2B1B54] text-white" id="post-' . htmlspecialchars($row['id']) . '">';
                             echo '    <div class="post-header flex justify-between items-start">'; // Mengubah 'items-center' menjadi 'items-start' untuk penyesuaian
                             echo '        <div class="flex items-center">';
                             echo '            <img src="' . (!empty($row['profile_picture']) ? '../Asset/' . htmlspecialchars($row['profile_picture']) : '../Asset/pp1.png') . '" alt="Profile Picture" class="w-10 h-10 rounded-full object-cover" />';

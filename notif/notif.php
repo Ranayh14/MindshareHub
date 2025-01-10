@@ -65,6 +65,5 @@ $notifications = $stmt->get_result();
 
 <?php
 // Menutup koneksi
-$stmt->close();
 $conn->close();
 ?>
