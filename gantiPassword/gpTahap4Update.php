@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     @tailwind utilities;
 
                     @layer utilities {
-                    .bg-customPurple {
+                    .bg-[#2B1B54] {
                         background-color: rgba(43, 27, 84, 1);
                     }
                     }
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 </style>
             </head>
-            <body class='bg-customPurple h-screen flex items-center justify-center'>
+            <body class='bg-[#2B1B54] h-screen flex items-center justify-center'>
                 <div class='modal flex items-center'>
                     <div class='bg-white p-6 rounded-lg shadow-lg text-center'>
                         <div class='w-32 h-32 mx-auto mb-3 flex items-center justify-center'>
