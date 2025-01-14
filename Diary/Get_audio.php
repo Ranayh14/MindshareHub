@@ -32,8 +32,7 @@ if (isset($_GET['note_id'])) {
             'created_at' => $row['created_at']
         ];
     }
-
-    // Mengembalikan data audio dalam format JSON
+   //Mengembalikan data audio dalam format JSON
     echo json_encode($audioFiles);
 } else {
     // Jika parameter note_id tidak ada, mengirimkan error

@@ -50,9 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param('ssi', $title, $content, $user_id);
         $stmt->execute();
         echo json_encode(["status" => "success", "id" => $stmt->insert_id, "title" => $title, "content" => $content]);
-    } elseif ($action === 'update' && !empty($editId)) {
+    }
+    
+    elseif ($action === 'update' && !empty($editId)) {
         if (empty($title)) {
-            echo json_encode(["status" => "error", "message" => "Judul diperlukan untuk memperbarui catatan."]);
+            echo json_encode(["status" => "error", "message" => "Judul tidak boleh kosong."]);
             exit;
         }
         $sql = "UPDATE diarys SET title = ?, content = ? WHERE id = ? AND user_id = ?";
@@ -60,7 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param('ssii', $title, $content, $editId, $user_id);
         $stmt->execute();
         echo json_encode(["status" => "success", "id" => $editId, "title" => $title, "content" => $content]);
-    } elseif ($action === 'delete' && !empty($editId)) {
+    } 
+    
+    elseif ($action === 'delete' && !empty($editId)) {
         $sql = "DELETE FROM diarys WHERE id = ? AND user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('ii', $editId, $user_id);
